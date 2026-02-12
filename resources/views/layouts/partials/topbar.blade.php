@@ -1,4 +1,4 @@
-<div class="topbar-shell border-b border-[color:rgba(255,255,255,0.2)]">
+<div class="topbar-shell border-b border-[color:rgba(17,24,39,0.1)]">
     <div class="mx-auto flex h-11 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <nav class="flex items-center gap-1.5 sm:gap-3">
             <a href="{{ route('about') }}" class="nav-link-sm">About</a>

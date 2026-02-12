@@ -1,9 +1,9 @@
-<header class="header-shell sticky top-0 z-50 border-b border-[color:rgba(17,24,39,0.12)]" :class="{ 'scrolled': scrolled }">
+<header class="header-shell sticky top-0 z-50 border-b border-[color:rgba(255,255,255,0.35)]" :class="{ 'scrolled': scrolled }">
     <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-20 items-center gap-4">
             <a href="{{ route('home') }}" class="group flex shrink-0 items-center gap-3">
-                <span class="font-heading text-3xl tracking-[0.02em]">ARO<span class="text-[var(--accent)]">SOFT</span></span>
-                <span class="hidden text-[0.65rem] uppercase tracking-[0.22em] muted-faint xl:block">Innovations Ltd</span>
+                <span class="brand-mark font-heading text-3xl tracking-[0.02em]">ARO<span>SOFT</span></span>
+                <span class="brand-subtitle hidden text-[0.65rem] uppercase tracking-[0.22em] xl:block">Innovations Ltd</span>
             </a>
 
             <nav class="hidden flex-1 items-center justify-center gap-1 lg:flex">
