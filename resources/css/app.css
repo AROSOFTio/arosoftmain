@@ -87,14 +87,20 @@ a {
 }
 
 .header-shell {
-    background: linear-gradient(90deg, rgba(0, 157, 49, 0.98), rgba(13, 181, 74, 0.97));
-    backdrop-filter: blur(8px);
-    transition: box-shadow 220ms ease, background 220ms ease;
+    background: #ffffff;
+    transition: box-shadow 220ms ease;
 }
 
 .header-shell.scrolled {
-    background: linear-gradient(90deg, rgba(0, 150, 47, 0.98), rgba(12, 170, 70, 0.97));
-    box-shadow: 0 10px 26px rgba(17, 24, 39, 0.2);
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.12);
+}
+
+.main-nav-band {
+    border: 1px solid rgba(0, 157, 49, 0.34);
+    border-top: none;
+    border-radius: 0 0 1.05rem 1.05rem;
+    background: linear-gradient(90deg, rgba(0, 157, 49, 0.98), rgba(13, 181, 74, 0.97));
+    box-shadow: 0 12px 26px rgba(17, 24, 39, 0.13);
 }
 
 .shell-card {
@@ -132,50 +138,62 @@ a {
     outline: none;
 }
 
-.header-shell .brand-mark {
+.main-nav-band .brand-mark {
     color: #ffffff;
 }
 
-.header-shell .brand-mark span {
+.main-nav-band .brand-mark span {
     color: rgba(255, 255, 255, 0.88);
 }
 
-.header-shell .brand-subtitle {
+.main-nav-band .brand-subtitle {
     color: rgba(255, 255, 255, 0.72);
 }
 
-.header-shell .nav-link {
+.main-nav-band .nav-link {
     color: rgba(255, 255, 255, 0.96);
 }
 
-.header-shell .nav-link:hover,
-.header-shell .nav-link:focus-visible {
+.main-nav-band .nav-link:hover,
+.main-nav-band .nav-link:focus-visible {
     color: #ffffff;
     border-color: rgba(255, 255, 255, 0.44);
     background: rgba(255, 255, 255, 0.16);
 }
 
-.header-shell .btn-outline {
+.main-nav-band .btn-outline {
     border-color: rgba(255, 255, 255, 0.62);
     background: rgba(255, 255, 255, 0.08);
     color: #ffffff;
 }
 
-.header-shell .btn-outline:hover,
-.header-shell .btn-outline:focus-visible {
+.main-nav-band .btn-outline:hover,
+.main-nav-band .btn-outline:focus-visible {
     border-color: rgba(255, 255, 255, 0.85);
     background: rgba(255, 255, 255, 0.2);
     box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.16);
 }
 
-.header-shell .search-input {
+.main-nav-band .search-input {
     border-color: rgba(255, 255, 255, 0.52);
     background: rgba(255, 255, 255, 0.97);
 }
 
-.header-shell .search-input:focus {
+.main-nav-band .search-input:focus {
     border-color: rgba(255, 255, 255, 0.88);
     box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+.main-nav-band .icon-button {
+    border-color: rgba(255, 255, 255, 0.58);
+    color: rgba(255, 255, 255, 0.96);
+}
+
+.main-nav-band .icon-button:hover,
+.main-nav-band .icon-button:focus-visible {
+    border-color: rgba(255, 255, 255, 0.9);
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.14);
 }
 
 .nav-link-sm {
@@ -445,8 +463,71 @@ a {
     font-size: 0.95rem;
 }
 
+.offcanvas-panel {
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+    background: linear-gradient(180deg, rgba(0, 157, 49, 0.98), rgba(0, 131, 40, 0.98));
+    color: #ffffff;
+    box-shadow: -8px 0 28px rgba(17, 24, 39, 0.24);
+}
+
+.offcanvas-panel .muted-copy {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.offcanvas-panel .muted-faint {
+    color: rgba(255, 255, 255, 0.64);
+}
+
+.offcanvas-panel .btn-outline {
+    border-color: rgba(255, 255, 255, 0.58);
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.offcanvas-panel .btn-outline:hover,
+.offcanvas-panel .btn-outline:focus-visible {
+    border-color: rgba(255, 255, 255, 0.86);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.16);
+}
+
+.offcanvas-panel .shell-card {
+    border-color: rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow: none;
+    color: #ffffff;
+}
+
+.offcanvas-panel .icon-button {
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #ffffff;
+}
+
+.offcanvas-panel .icon-button:hover,
+.offcanvas-panel .icon-button:focus-visible {
+    border-color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.offcanvas-panel .nav-link-sm {
+    color: rgba(255, 255, 255, 0.92);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.offcanvas-panel .nav-link-sm:hover,
+.offcanvas-panel .nav-link-sm:focus-visible {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.14);
+}
+
 .footer-texture {
     background: linear-gradient(180deg, #16212f, #0f1723);
+}
+
+.footer-panel {
+    border: 1px solid rgba(17, 24, 39, 0.16);
+    box-shadow: 0 16px 34px rgba(17, 24, 39, 0.14);
 }
 
 .footer-texture .muted-copy {

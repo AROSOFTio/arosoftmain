@@ -1,14 +1,15 @@
-<header class="header-shell sticky top-0 z-50 border-b border-[color:rgba(255,255,255,0.35)]" :class="{ 'scrolled': scrolled }">
+<header class="header-shell sticky top-0 z-50 border-b border-[color:rgba(17,24,39,0.1)]" :class="{ 'scrolled': scrolled }">
     <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="flex h-20 items-center gap-4">
-            <a href="{{ route('home') }}" class="group flex shrink-0 items-center gap-3">
-                <span class="brand-mark font-heading text-3xl tracking-[0.02em]">ARO<span>SOFT</span></span>
-                <span class="brand-subtitle hidden text-[0.65rem] uppercase tracking-[0.22em] xl:block">Innovations Ltd</span>
-            </a>
+        <div class="main-nav-band">
+            <div class="flex h-20 items-center gap-4 px-4 sm:px-5">
+                <a href="{{ route('home') }}" class="group flex shrink-0 flex-col items-start leading-none">
+                    <span class="brand-mark font-heading text-3xl tracking-[0.02em]">ARO<span>SOFT</span></span>
+                    <span class="brand-subtitle mt-1 text-[0.58rem] uppercase tracking-[0.22em]">Innovations Ltd</span>
+                </a>
 
-            <nav class="hidden flex-1 items-center justify-center gap-1 lg:flex">
-                <a href="{{ route('home') }}" class="nav-link">Home</a>
-                <a href="{{ route('blog') }}" class="nav-link">Blog</a>
+                <nav class="hidden flex-1 items-center justify-center gap-1 lg:flex">
+                    <a href="{{ route('home') }}" class="nav-link">Home</a>
+                    <a href="{{ route('blog') }}" class="nav-link">Blog</a>
 
                 <div class="relative" @mouseenter="openMega('services')" @mouseleave="closeMega('services')">
                     <button
@@ -109,16 +110,59 @@
                     </div>
                 </div>
 
-                <a href="{{ route('tools') }}" class="nav-link">IT Tools</a>
-            </nav>
+                    <a href="{{ route('tools') }}" class="nav-link">IT Tools</a>
+                </nav>
 
-            <div class="ml-auto hidden items-center gap-3 lg:flex">
-                <div class="relative w-80" @click.outside="closeSearch()">
+                <div class="ml-auto hidden items-center gap-3 lg:flex">
+                    <div class="relative w-80" @click.outside="closeSearch()">
+                        <svg viewBox="0 0 24 24" fill="none" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:rgba(17,24,39,0.45)]" aria-hidden="true">
+                            <circle cx="11" cy="11" r="6.2" stroke="currentColor" stroke-width="1.8"/>
+                            <path d="m16 16 4.2 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        </svg>
+                        <input
+                            type="search"
+                            class="search-input"
+                            placeholder="Search services, videos, pages..."
+                            x-model="searchQuery"
+                            @focus="focusSearch()"
+                            @input.debounce.160ms="updateSearch()"
+                            @keydown.escape.stop.prevent="closeSearch()"
+                        >
+                        @include('layouts.partials.search-dropdown')
+                    </div>
+
+                    <button type="button" class="btn-outline" @click="openOffcanvas()">
+                        <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">
+                            <path d="M4 7h16M4 12h16M10 17h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                        </svg>
+                        Menu
+                    </button>
+                </div>
+
+                <div class="ml-auto flex items-center gap-2 lg:hidden">
+                    <button type="button" class="icon-button" @click="toggleMobileSearch()" aria-label="Toggle search">
+                        <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">
+                            <circle cx="11" cy="11" r="6.2" stroke="currentColor" stroke-width="1.8"/>
+                            <path d="m16 16 4.2 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+
+                    <button type="button" class="icon-button" @click="openOffcanvas()" aria-label="Open menu">
+                        <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">
+                            <path d="M4 7h16M4 12h16M10 17h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="px-4 pb-4 sm:px-5 lg:hidden" x-cloak x-show="mobileSearchOpen" x-transition>
+                <div class="relative" @click.outside="closeSearch()">
                     <svg viewBox="0 0 24 24" fill="none" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:rgba(17,24,39,0.45)]" aria-hidden="true">
                         <circle cx="11" cy="11" r="6.2" stroke="currentColor" stroke-width="1.8"/>
                         <path d="m16 16 4.2 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                     </svg>
                     <input
+                        x-ref="mobileSearchInput"
                         type="search"
                         class="search-input"
                         placeholder="Search services, videos, pages..."
@@ -129,48 +173,6 @@
                     >
                     @include('layouts.partials.search-dropdown')
                 </div>
-
-                <button type="button" class="btn-outline" @click="openOffcanvas()">
-                    <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">
-                        <path d="M4 7h16M4 12h16M10 17h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-                    </svg>
-                    Menu
-                </button>
-            </div>
-
-            <div class="ml-auto flex items-center gap-2 lg:hidden">
-                <button type="button" class="icon-button" @click="toggleMobileSearch()" aria-label="Toggle search">
-                    <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">
-                        <circle cx="11" cy="11" r="6.2" stroke="currentColor" stroke-width="1.8"/>
-                        <path d="m16 16 4.2 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                    </svg>
-                </button>
-
-                <button type="button" class="icon-button" @click="openOffcanvas()" aria-label="Open menu">
-                    <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">
-                        <path d="M4 7h16M4 12h16M10 17h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-
-        <div class="pb-4 lg:hidden" x-cloak x-show="mobileSearchOpen" x-transition>
-            <div class="relative" @click.outside="closeSearch()">
-                <svg viewBox="0 0 24 24" fill="none" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:rgba(17,24,39,0.45)]" aria-hidden="true">
-                    <circle cx="11" cy="11" r="6.2" stroke="currentColor" stroke-width="1.8"/>
-                    <path d="m16 16 4.2 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                </svg>
-                <input
-                    x-ref="mobileSearchInput"
-                    type="search"
-                    class="search-input"
-                    placeholder="Search services, videos, pages..."
-                    x-model="searchQuery"
-                    @focus="focusSearch()"
-                    @input.debounce.160ms="updateSearch()"
-                    @keydown.escape.stop.prevent="closeSearch()"
-                >
-                @include('layouts.partials.search-dropdown')
             </div>
         </div>
     </div>

@@ -20,7 +20,7 @@
         x-transition:leave="transition transform duration-180 ease-in"
         x-transition:leave-start="opacity-100 translate-x-0"
         x-transition:leave-end="opacity-0 translate-x-full"
-        class="mega-panel absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-[color:rgba(17,24,39,0.14)] p-6"
+        class="offcanvas-panel absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l p-6"
     >
         <div class="flex items-center justify-between">
             <p class="font-heading text-lg uppercase tracking-[0.2em]">Menu</p>
@@ -68,14 +68,14 @@
             <p class="text-[0.66rem] uppercase tracking-[0.2em] muted-faint">Latest tutorials</p>
             <div class="mt-3 space-y-2">
                 <template x-for="video in videos.slice(0, 4)" :key="video.title">
-                    <a :href="video.url" class="group flex items-center gap-3 rounded-xl border border-[color:rgba(17,24,39,0.14)] p-2 transition duration-200 hover:border-[color:rgba(0,157,49,0.45)]" @click="closeOffcanvas()">
+                    <a :href="video.url" class="group flex items-center gap-3 rounded-xl border border-[color:rgba(255,255,255,0.32)] p-2 transition duration-200 hover:border-[color:rgba(255,255,255,0.62)]" @click="closeOffcanvas()">
                         <div
-                            class="h-12 w-20 flex-none rounded-lg border border-[color:rgba(17,24,39,0.12)] bg-[color:rgba(255,255,255,0.96)] bg-cover bg-center"
+                            class="h-12 w-20 flex-none rounded-lg border border-[color:rgba(255,255,255,0.34)] bg-[color:rgba(255,255,255,0.18)] bg-cover bg-center"
                             :style="`background-image:url('${video.thumb}')`"
                         ></div>
                         <div class="min-w-0">
-                            <p class="truncate text-sm font-semibold text-[color:rgba(17,24,39,0.92)]" x-text="video.title"></p>
-                            <p class="text-[0.62rem] uppercase tracking-[0.15em] muted-faint" x-text="video.date"></p>
+                            <p class="truncate text-sm font-semibold text-white" x-text="video.title"></p>
+                            <p class="text-[0.62rem] uppercase tracking-[0.15em] text-[color:rgba(255,255,255,0.72)]" x-text="video.date"></p>
                         </div>
                     </a>
                 </template>
