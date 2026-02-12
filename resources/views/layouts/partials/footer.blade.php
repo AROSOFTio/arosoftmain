@@ -1,8 +1,8 @@
-<footer class="footer-texture mt-24 border-t border-[color:rgba(15,23,42,0.14)]">
+<footer class="footer-texture mt-24 border-t border-[color:rgba(17,24,39,0.12)]">
     <div class="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
             <section>
-                <p class="font-heading text-2xl tracking-[0.2em] text-[var(--ink)]">AROSOFT</p>
+                <p class="font-heading text-3xl tracking-[0.03em] text-[var(--ink)]">ARO<span class="text-[var(--accent)]">SOFT</span></p>
                 <p class="mt-4 max-w-xs text-base leading-8 muted-copy">
                     Arosoft Innovations Ltd delivers dependable IT and creative services for businesses and institutions in Kampala and beyond.
                 </p>
@@ -18,23 +18,23 @@
 
             <section>
                 <p class="text-[0.7rem] uppercase tracking-[0.2em] muted-faint">Services</p>
-                <div class="mt-4 space-y-2">
-                    <a href="{{ route('services.printing') }}" class="nav-link-sm inline-flex">Printing</a><br>
-                    <a href="{{ route('services.website-design') }}" class="nav-link-sm inline-flex">Website Design</a><br>
-                    <a href="{{ route('services.web-development') }}" class="nav-link-sm inline-flex">Web Development</a><br>
-                    <a href="{{ route('services.training-courses') }}" class="nav-link-sm inline-flex">Training/Courses</a><br>
-                    <a href="{{ route('services') }}" class="nav-link-sm inline-flex">System Development</a>
+                <div class="mt-4 space-y-1.5">
+                    <a href="{{ route('services.printing') }}" class="inline-block text-sm muted-copy transition hover:text-[var(--accent)]">Printing</a><br>
+                    <a href="{{ route('services.website-design') }}" class="inline-block text-sm muted-copy transition hover:text-[var(--accent)]">Website Design</a><br>
+                    <a href="{{ route('services.web-development') }}" class="inline-block text-sm muted-copy transition hover:text-[var(--accent)]">Web Development</a><br>
+                    <a href="{{ route('services.training-courses') }}" class="inline-block text-sm muted-copy transition hover:text-[var(--accent)]">Training/Courses</a><br>
+                    <a href="{{ route('services') }}" class="inline-block text-sm muted-copy transition hover:text-[var(--accent)]">System Development</a>
                 </div>
             </section>
 
             <section>
                 <p class="text-[0.7rem] uppercase tracking-[0.2em] muted-faint">Resources</p>
-                <div class="mt-4 space-y-2">
-                    <a href="{{ route('blog') }}" class="nav-link-sm inline-flex">Blog</a><br>
-                    <a href="{{ route('tutorials') }}" class="nav-link-sm inline-flex">Tutorials/Videos</a><br>
-                    <a href="{{ route('tools') }}" class="nav-link-sm inline-flex">IT Tools</a><br>
-                    <a href="{{ route('about') }}" class="nav-link-sm inline-flex">About</a><br>
-                    <a href="{{ route('privacy') }}" class="nav-link-sm inline-flex">Privacy</a>
+                <div class="mt-4 space-y-1.5">
+                    <a href="{{ route('blog') }}" class="inline-block text-sm muted-copy transition hover:text-[var(--accent)]">Blog</a><br>
+                    <a href="{{ route('tutorials') }}" class="inline-block text-sm muted-copy transition hover:text-[var(--accent)]">Tutorials/Videos</a><br>
+                    <a href="{{ route('tools') }}" class="inline-block text-sm muted-copy transition hover:text-[var(--accent)]">IT Tools</a><br>
+                    <a href="{{ route('about') }}" class="inline-block text-sm muted-copy transition hover:text-[var(--accent)]">About</a><br>
+                    <a href="{{ route('privacy') }}" class="inline-block text-sm muted-copy transition hover:text-[var(--accent)]">Privacy</a>
                 </div>
             </section>
 
@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    <div class="border-t border-[color:rgba(15,23,42,0.12)]">
+    <div class="border-t border-[color:rgba(17,24,39,0.1)]">
         <div class="mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-5 text-[0.66rem] uppercase tracking-[0.14em] muted-faint sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
             <p>&copy; {{ date('Y') }} Arosoft Innovations Ltd. All rights reserved.</p>
             <p>Built by Arosoft Innovations Ltd</p>

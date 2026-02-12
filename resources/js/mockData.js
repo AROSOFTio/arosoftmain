@@ -2,9 +2,9 @@ const makeThumb = (label) => {
     const svg = `
         <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 180'>
             <rect width='320' height='180' fill='#FFFFFF'/>
-            <path d='M0 132L320 42V180H0z' fill='#1FB56F' fill-opacity='0.18'/>
-            <circle cx='258' cy='52' r='22' fill='#1FB56F' fill-opacity='0.36'/>
-            <text x='20' y='34' fill='#1FB56F' fill-opacity='0.88' font-size='18' font-family='Montserrat'>${label}</text>
+            <path d='M0 132L320 42V180H0z' fill='#009D31' fill-opacity='0.18'/>
+            <circle cx='258' cy='52' r='22' fill='#009D31' fill-opacity='0.36'/>
+            <text x='20' y='34' fill='#009D31' fill-opacity='0.88' font-size='18' font-family='Montserrat'>${label}</text>
         </svg>
     `;
 

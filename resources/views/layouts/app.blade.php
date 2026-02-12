@@ -51,7 +51,7 @@
         <meta name="twitter:title" content="{{ $pageTitle }}">
         <meta name="twitter:description" content="{{ $pageDescription }}">
         <meta name="twitter:image" content="{{ $ogImage }}">
-        <meta name="theme-color" content="#1FB56F">
+        <meta name="theme-color" content="#009D31">
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -70,7 +70,7 @@
             @include('layouts.partials.header')
             @include('layouts.partials.offcanvas')
 
-            <main class="mx-auto w-full max-w-7xl px-4 pb-24 pt-14 sm:px-6 lg:px-8">
+            <main class="mx-auto w-full max-w-7xl px-4 pb-24 pt-12 sm:px-6 lg:px-8">
                 @yield('content')
             </main>
 

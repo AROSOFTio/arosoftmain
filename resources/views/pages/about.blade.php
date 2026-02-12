@@ -119,15 +119,15 @@
     <section class="content-section info-card">
         <h2 class="section-title">Frequently Asked Questions</h2>
         <div class="mt-5 space-y-3">
-            <details class="rounded-xl border border-[color:rgba(31,181,111,0.22)] p-4">
+            <details class="rounded-xl border border-[color:rgba(0,157,49,0.24)] p-4">
                 <summary class="cursor-pointer font-heading text-lg">Do you work with small businesses and schools?</summary>
                 <p class="mt-2 text-sm leading-7 muted-copy">Yes. We support SMEs, schools, ministries, and growing organizations with practical solutions that match budget and operational needs.</p>
             </details>
-            <details class="rounded-xl border border-[color:rgba(31,181,111,0.22)] p-4">
+            <details class="rounded-xl border border-[color:rgba(0,157,49,0.24)] p-4">
                 <summary class="cursor-pointer font-heading text-lg">Can you handle both branding and software projects?</summary>
                 <p class="mt-2 text-sm leading-7 muted-copy">Yes. Our team provides graphics, printing, website design, web development, and system development under one coordinated process.</p>
             </details>
-            <details class="rounded-xl border border-[color:rgba(31,181,111,0.22)] p-4">
+            <details class="rounded-xl border border-[color:rgba(0,157,49,0.24)] p-4">
                 <summary class="cursor-pointer font-heading text-lg">How do we start a project with Arosoft?</summary>
                 <p class="mt-2 text-sm leading-7 muted-copy">Send your requirements through our <a href="{{ route('contact') }}" class="text-[var(--accent)] underline decoration-transparent transition hover:decoration-[var(--accent)]">contact page</a> or WhatsApp, and we will guide you through scope, timeline, and pricing.</p>
             </details>
