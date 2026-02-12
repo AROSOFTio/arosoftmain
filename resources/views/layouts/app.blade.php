@@ -51,7 +51,7 @@
         <meta name="twitter:title" content="{{ $pageTitle }}">
         <meta name="twitter:description" content="{{ $pageDescription }}">
         <meta name="twitter:image" content="{{ $ogImage }}">
-        <meta name="theme-color" content="#050B14">
+        <meta name="theme-color" content="#1FB56F">
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

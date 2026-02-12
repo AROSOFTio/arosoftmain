@@ -65,7 +65,7 @@
             @endif
 
             @if ($errors->any())
-                <div class="mt-5 rounded-xl border border-[color:rgba(19,242,198,0.28)] bg-[color:rgba(19,242,198,0.08)] p-4 text-sm">
+                <div class="mt-5 rounded-xl border border-[color:rgba(31,181,111,0.28)] bg-[color:rgba(31,181,111,0.08)] p-4 text-sm">
                     <p class="font-semibold">Please correct the highlighted fields and try again.</p>
                 </div>
             @endif
@@ -81,14 +81,14 @@
                 <div class="grid gap-5 md:grid-cols-2">
                     <div>
                         <label for="full_name" class="form-label">Full name *</label>
-                        <input id="full_name" name="full_name" type="text" value="{{ old('full_name') }}" class="form-field @error('full_name') border-[color:rgba(255,255,255,0.65)] @enderror" required>
+                        <input id="full_name" name="full_name" type="text" value="{{ old('full_name') }}" class="form-field @error('full_name') border-[color:rgba(31,181,111,0.85)] @enderror" required>
                         @error('full_name')
                             <p class="mt-2 text-sm text-[var(--accent)]">{{ $message }}</p>
                         @enderror
                     </div>
                     <div>
                         <label for="email" class="form-label">Email *</label>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}" class="form-field @error('email') border-[color:rgba(255,255,255,0.65)] @enderror" required>
+                        <input id="email" name="email" type="email" value="{{ old('email') }}" class="form-field @error('email') border-[color:rgba(31,181,111,0.85)] @enderror" required>
                         @error('email')
                             <p class="mt-2 text-sm text-[var(--accent)]">{{ $message }}</p>
                         @enderror
@@ -105,7 +105,7 @@
                     </div>
                     <div>
                         <label for="subject" class="form-label">Subject *</label>
-                        <input id="subject" name="subject" type="text" value="{{ old('subject') }}" class="form-field @error('subject') border-[color:rgba(255,255,255,0.65)] @enderror" required>
+                        <input id="subject" name="subject" type="text" value="{{ old('subject') }}" class="form-field @error('subject') border-[color:rgba(31,181,111,0.85)] @enderror" required>
                         @error('subject')
                             <p class="mt-2 text-sm text-[var(--accent)]">{{ $message }}</p>
                         @enderror
@@ -114,7 +114,7 @@
 
                 <div>
                     <label for="message" class="form-label">Message *</label>
-                    <textarea id="message" name="message" rows="6" class="form-field @error('message') border-[color:rgba(255,255,255,0.65)] @enderror" required>{{ old('message') }}</textarea>
+                    <textarea id="message" name="message" rows="6" class="form-field @error('message') border-[color:rgba(31,181,111,0.85)] @enderror" required>{{ old('message') }}</textarea>
                     @error('message')
                         <p class="mt-2 text-sm text-[var(--accent)]">{{ $message }}</p>
                     @enderror
@@ -149,7 +149,7 @@
                 </div>
             </dl>
 
-            <div class="mt-8 rounded-xl border border-[color:rgba(19,242,198,0.22)] p-4">
+            <div class="mt-8 rounded-xl border border-[color:rgba(31,181,111,0.22)] p-4">
                 <h3 class="font-heading text-lg text-[var(--ink)]">Response time</h3>
                 <p class="mt-2 text-sm leading-7 muted-copy">Most inquiries receive a response within one business day.</p>
             </div>
