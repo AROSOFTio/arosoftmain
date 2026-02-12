@@ -3,6 +3,7 @@
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ServicesController;
+use App\Http\Controllers\ToolsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PageController::class, 'home'])->name('home');
@@ -22,4 +23,8 @@ Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::post('/contact', [ContactController::class, 'send'])->middleware('throttle:10,1')->name('contact.send');
-Route::get('/tools', [PageController::class, 'tools'])->name('tools');
+Route::get('/tools', [ToolsController::class, 'index'])->name('tools');
+Route::get('/tools/{slug}', [ToolsController::class, 'show'])->name('tools.show');
+Route::post('/tools/{slug}/process', [ToolsController::class, 'process'])
+    ->middleware('throttle:12,1')
+    ->name('tools.process');

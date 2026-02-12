@@ -89,11 +89,6 @@ class PageController extends Controller
         return view('pages.contact');
     }
 
-    public function tools(): View
-    {
-        return view('pages.tools');
-    }
-
     private function placeholder(string $title, string $heading, string $copy): View
     {
         return view('pages.placeholder', [
