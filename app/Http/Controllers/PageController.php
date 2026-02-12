@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class PageController extends Controller
@@ -90,9 +89,9 @@ class PageController extends Controller
         return view('pages.contact');
     }
 
-    public function tools(): RedirectResponse
+    public function tools(): View
     {
-        return redirect()->away('https://arosoft.io/tools');
+        return view('pages.tools');
     }
 
     private function placeholder(string $title, string $heading, string $copy): View

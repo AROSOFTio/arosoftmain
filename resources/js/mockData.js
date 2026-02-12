@@ -113,6 +113,18 @@ export const searchIndex = [
     },
     {
         type: 'Pages',
+        title: 'Tools',
+        url: '/tools',
+        meta: 'All tools landing page',
+    },
+    {
+        type: 'Pages',
+        title: 'Tools: Quote Builder',
+        url: '/services#quote-builder',
+        meta: 'Generate project estimates',
+    },
+    {
+        type: 'Pages',
         title: 'About',
         url: '/about',
         meta: 'Company profile',
@@ -130,4 +142,3 @@ export const searchIndex = [
         meta: 'Get in touch',
     },
 ];
-
