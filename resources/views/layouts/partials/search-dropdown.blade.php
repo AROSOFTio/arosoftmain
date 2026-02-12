@@ -18,9 +18,9 @@
                     <a
                         :href="item.url"
                         @click="clearSearch()"
-                        class="group flex items-center justify-between rounded-lg border border-[color:rgba(10,102,255,0.12)] px-3 py-2 transition duration-200 hover:border-[color:rgba(10,102,255,0.42)] hover:bg-[color:rgba(10,102,255,0.08)]"
+                        class="group flex items-center justify-between rounded-lg border border-[color:rgba(16,24,40,0.12)] px-3 py-2 transition duration-200 hover:border-[color:rgba(0,157,49,0.38)] hover:bg-[color:rgba(0,157,49,0.08)]"
                     >
-                        <span class="text-sm text-[color:rgba(10,102,255,0.92)]" x-text="item.title"></span>
+                        <span class="text-sm text-[color:rgba(16,24,40,0.92)]" x-text="item.title"></span>
                         <span class="text-[0.64rem] uppercase tracking-[0.16em] muted-faint" x-text="item.meta"></span>
                     </a>
                 </template>

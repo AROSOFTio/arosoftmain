@@ -1,4 +1,4 @@
-<header class="header-shell sticky top-0 z-50 border-b border-[color:rgba(10,102,255,0.18)]" :class="{ 'scrolled': scrolled }">
+<header class="header-shell sticky top-0 z-50 border-b border-[color:rgba(16,24,40,0.12)]" :class="{ 'scrolled': scrolled }">
     <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-20 items-center gap-4">
             <a href="{{ route('home') }}" class="group flex shrink-0 items-center gap-3">
@@ -38,19 +38,19 @@
                     >
                         <p class="text-[0.65rem] uppercase tracking-[0.2em] muted-faint">Service clusters</p>
                         <div class="mt-3 grid grid-cols-2 gap-3">
-                            <a href="{{ route('services.printing') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(10,102,255,0.48)]">
+                            <a href="{{ route('services.printing') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(0,157,49,0.48)]">
                                 <p class="font-heading text-lg">Printing</p>
                                 <p class="mt-1 text-sm muted-copy">Business cards, branding packs, and premium print runs.</p>
                             </a>
-                            <a href="{{ route('services.website-design') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(10,102,255,0.48)]">
+                            <a href="{{ route('services.website-design') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(0,157,49,0.48)]">
                                 <p class="font-heading text-lg">Website Design</p>
                                 <p class="mt-1 text-sm muted-copy">Conversion-first layouts with high-end visuals.</p>
                             </a>
-                            <a href="{{ route('services.web-development') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(10,102,255,0.48)]">
+                            <a href="{{ route('services.web-development') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(0,157,49,0.48)]">
                                 <p class="font-heading text-lg">Web Development</p>
                                 <p class="mt-1 text-sm muted-copy">Custom Laravel builds and scalable web architecture.</p>
                             </a>
-                            <a href="{{ route('services.training-courses') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(10,102,255,0.48)]">
+                            <a href="{{ route('services.training-courses') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(0,157,49,0.48)]">
                                 <p class="font-heading text-lg">Training/Courses</p>
                                 <p class="mt-1 text-sm muted-copy">Hands-on courses for teams and aspiring developers.</p>
                             </a>
@@ -94,13 +94,13 @@
 
                         <div class="mt-4 grid grid-cols-2 gap-3">
                             <template x-for="video in videos.slice(0, 4)" :key="video.title">
-                                <a :href="video.url" class="group overflow-hidden rounded-xl border border-[color:rgba(10,102,255,0.18)] transition duration-200 hover:border-[color:rgba(10,102,255,0.52)]">
+                                <a :href="video.url" class="group overflow-hidden rounded-xl border border-[color:rgba(16,24,40,0.14)] transition duration-200 hover:border-[color:rgba(0,157,49,0.4)]">
                                     <div
-                                        class="h-24 w-full border-b border-[color:rgba(10,102,255,0.14)] bg-[color:rgba(255,255,255,0.9)] bg-cover bg-center"
+                                        class="h-24 w-full border-b border-[color:rgba(16,24,40,0.1)] bg-[color:rgba(255,255,255,0.9)] bg-cover bg-center"
                                         :style="`background-image:url('${video.thumb}')`"
                                     ></div>
                                     <div class="space-y-1 p-3">
-                                        <p class="text-sm font-semibold leading-snug text-[color:rgba(10,102,255,0.92)]" x-text="video.title"></p>
+                                        <p class="text-sm font-semibold leading-snug text-[color:rgba(16,24,40,0.92)]" x-text="video.title"></p>
                                         <p class="text-[0.65rem] uppercase tracking-[0.16em] muted-faint" x-text="video.date"></p>
                                     </div>
                                 </a>
@@ -114,7 +114,7 @@
 
             <div class="ml-auto hidden items-center gap-3 lg:flex">
                 <div class="relative w-80" @click.outside="closeSearch()">
-                    <svg viewBox="0 0 24 24" fill="none" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:rgba(10,102,255,0.72)]" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:rgba(16,24,40,0.44)]" aria-hidden="true">
                         <circle cx="11" cy="11" r="6.2" stroke="currentColor" stroke-width="1.8"/>
                         <path d="m16 16 4.2 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                     </svg>
@@ -156,7 +156,7 @@
 
         <div class="pb-4 lg:hidden" x-cloak x-show="mobileSearchOpen" x-transition>
             <div class="relative" @click.outside="closeSearch()">
-                <svg viewBox="0 0 24 24" fill="none" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:rgba(10,102,255,0.72)]" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:rgba(16,24,40,0.44)]" aria-hidden="true">
                     <circle cx="11" cy="11" r="6.2" stroke="currentColor" stroke-width="1.8"/>
                     <path d="m16 16 4.2 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                 </svg>
