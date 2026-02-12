@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,4 +15,5 @@ Route::get('/tutorials', [PageController::class, 'tutorials'])->name('tutorials'
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+Route::post('/contact', [ContactController::class, 'send'])->middleware('throttle:10,1')->name('contact.send');
 Route::get('/tools', [PageController::class, 'tools'])->name('tools');

@@ -77,29 +77,17 @@ class PageController extends Controller
 
     public function about(): View
     {
-        return $this->placeholder(
-            'About',
-            'About Arosoft Innovations',
-            'Company mission, values, and leadership information will be added to this page.'
-        );
+        return view('pages.about');
     }
 
     public function privacy(): View
     {
-        return $this->placeholder(
-            'Privacy',
-            'Privacy policy',
-            'Our privacy policy text and data-handling details will be finalized here.'
-        );
+        return view('pages.privacy');
     }
 
     public function contact(): View
     {
-        return $this->placeholder(
-            'Contact',
-            'Contact page placeholder',
-            'Contact channels, map, and business support details will be published here.'
-        );
+        return view('pages.contact');
     }
 
     public function tools(): RedirectResponse
