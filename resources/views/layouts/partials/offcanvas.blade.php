@@ -32,26 +32,11 @@
         </div>
 
         <nav class="mt-8 space-y-2">
-            <a href="{{ route('home') }}" class="btn-outline w-full justify-between" @click="closeOffcanvas()">
-                Home
-                <span class="muted-faint">/</span>
-            </a>
-            <a href="{{ route('blog') }}" class="btn-outline w-full justify-between" @click="closeOffcanvas()">
-                Blog
-                <span class="muted-faint">/blog</span>
-            </a>
-            <a href="{{ route('services') }}" class="btn-outline w-full justify-between" @click="closeOffcanvas()">
-                Services
-                <span class="muted-faint">/services</span>
-            </a>
-            <a href="{{ route('tutorials') }}" class="btn-outline w-full justify-between" @click="closeOffcanvas()">
-                Tutorials
-                <span class="muted-faint">/tutorials</span>
-            </a>
-            <a href="{{ route('tools') }}" class="btn-outline w-full justify-between" @click="closeOffcanvas()">
-                Tools
-                <span class="muted-faint">/tools</span>
-            </a>
+            <a href="{{ route('home') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Home</a>
+            <a href="{{ route('blog') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Blog</a>
+            <a href="{{ route('services') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Services</a>
+            <a href="{{ route('tutorials') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Tutorials</a>
+            <a href="{{ route('tools') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Tools</a>
         </nav>
 
         <section class="mt-8">
