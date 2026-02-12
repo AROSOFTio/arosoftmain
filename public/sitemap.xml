@@ -19,34 +19,40 @@
         <loc>https://arosoft.io/tools</loc>
     </url>
     <url>
+        <loc>https://arosoft.io/tools/excel-vba-password-remover</loc>
+    </url>
+    <url>
+        <loc>https://arosoft.io/tools/excel-sheet-password-remover</loc>
+    </url>
+    <url>
+        <loc>https://arosoft.io/tools/pdf-password-remover</loc>
+    </url>
+    <url>
+        <loc>https://arosoft.io/tools/tiff-to-pdf-converter</loc>
+    </url>
+    <url>
         <loc>https://arosoft.io/tools/pdf-to-word-converter</loc>
     </url>
     <url>
         <loc>https://arosoft.io/tools/word-to-pdf-converter</loc>
     </url>
     <url>
-        <loc>https://arosoft.io/tools/excel-vba-password-remover</loc>
-    </url>
-    <url>
-        <loc>https://arosoft.io/tools/pdf-merge-tool</loc>
-    </url>
-    <url>
-        <loc>https://arosoft.io/tools/pdf-split-tool</loc>
-    </url>
-    <url>
         <loc>https://arosoft.io/tools/image-to-pdf-converter</loc>
     </url>
     <url>
-        <loc>https://arosoft.io/tools/image-text-extractor-ocr</loc>
+        <loc>https://arosoft.io/tools/qr-code-generator</loc>
+    </url>
+    <url>
+        <loc>https://arosoft.io/tools/hash-generator</loc>
+    </url>
+    <url>
+        <loc>https://arosoft.io/tools/uuid-generator</loc>
     </url>
     <url>
         <loc>https://arosoft.io/tools/json-formatter</loc>
     </url>
     <url>
         <loc>https://arosoft.io/tools/base64-encoder</loc>
-    </url>
-    <url>
-        <loc>https://arosoft.io/tools/base64-decoder</loc>
     </url>
     <url>
         <loc>https://arosoft.io/contact</loc>

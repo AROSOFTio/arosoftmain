@@ -27,11 +27,16 @@ class ToolsController extends Controller
         $tool = $catalog['tools'][$slug];
 
         if ($tool['input_type'] === 'text') {
+            $processor = $tool['processor'] ?? '';
+            $textPayloadRule = $processor === 'uuid_v4'
+                ? ['nullable', 'string', 'max:200000']
+                : ['required', 'string', 'max:200000'];
+
             $validated = $request->validate([
-                'text_payload' => ['required', 'string', 'max:200000'],
+                'text_payload' => $textPayloadRule,
             ]);
 
-            $result = $this->runTextProcessor($tool, $validated['text_payload']);
+            $result = $this->runTextProcessor($tool, (string) ($validated['text_payload'] ?? ''));
 
             if ($result['ok']) {
                 return redirect()
@@ -86,7 +91,7 @@ class ToolsController extends Controller
 
         $metaDescription = $isToolDetailPage
             ? $activeTool['description']
-            : 'Explore categorized Arosoft IT tools including Excel VBA password remover, PDF converters, OCR utilities, and developer helpers.';
+            : 'Explore categorized Arosoft IT tools including password removers, converters, and generators with dedicated SEO-friendly URLs.';
 
         $canonicalUrl = $isToolDetailPage
             ? route('tools.show', ['slug' => $activeTool['slug']])
@@ -257,6 +262,44 @@ class ToolsController extends Controller
                 'message' => 'Base64 decoded successfully.',
                 'label' => 'Decoded Output',
                 'output' => $decoded,
+            ];
+        }
+
+        if ($processor === 'hash_sha256') {
+            return [
+                'ok' => true,
+                'message' => 'SHA-256 hash generated successfully.',
+                'label' => 'SHA-256 Hash',
+                'output' => hash('sha256', $payload),
+            ];
+        }
+
+        if ($processor === 'uuid_v4') {
+            return [
+                'ok' => true,
+                'message' => 'UUID generated successfully.',
+                'label' => 'UUID v4',
+                'output' => (string) Str::uuid(),
+            ];
+        }
+
+        if ($processor === 'qr_link') {
+            if ($trimmedPayload === '') {
+                return [
+                    'ok' => false,
+                    'message' => 'Provide text or URL to generate a QR link.',
+                    'label' => 'QR Error',
+                    'output' => null,
+                ];
+            }
+
+            $qrUrl = 'https://quickchart.io/qr?text=' . rawurlencode($trimmedPayload);
+
+            return [
+                'ok' => true,
+                'message' => 'QR link generated successfully.',
+                'label' => 'QR Code URL',
+                'output' => $qrUrl,
             ];
         }
 
