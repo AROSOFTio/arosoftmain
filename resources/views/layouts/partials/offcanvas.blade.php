@@ -45,11 +45,11 @@
                 <span class="muted-faint">/services</span>
             </a>
             <a href="{{ route('tutorials') }}" class="btn-outline w-full justify-between" @click="closeOffcanvas()">
-                Tutorials/Videos
+                Tutorials
                 <span class="muted-faint">/tutorials</span>
             </a>
             <a href="{{ route('tools') }}" class="btn-outline w-full justify-between" @click="closeOffcanvas()">
-                IT Tools
+                Tools
                 <span class="muted-faint">/tools</span>
             </a>
         </nav>

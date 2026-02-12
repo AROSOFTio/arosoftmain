@@ -13,12 +13,12 @@ window.siteShell = () => ({
     showSearch: false,
     hasSearchMatches: false,
     previousActiveElement: null,
-    searchSections: ['Services', 'Tutorials/Videos', 'Pages'],
+    searchSections: ['Services', 'Tutorials', 'Pages'],
     videos,
     searchIndex,
     searchResults: {
         Services: [],
-        'Tutorials/Videos': [],
+        Tutorials: [],
         Pages: [],
     },
 
@@ -132,7 +132,7 @@ window.siteShell = () => ({
     freshSearchGroups() {
         return {
             Services: [],
-            'Tutorials/Videos': [],
+            Tutorials: [],
             Pages: [],
         };
     },

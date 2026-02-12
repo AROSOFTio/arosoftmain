@@ -69,9 +69,9 @@ class PageController extends Controller
     public function tutorials(): View
     {
         return $this->placeholder(
-            'Tutorials/Videos',
-            'Tutorials and videos',
-            'Video tutorials, walkthroughs, and implementation guides will be published here.'
+            'Tutorials',
+            'Tutorials',
+            'Practical tutorials, walkthroughs, and implementation guides will be published here.'
         );
     }
 

@@ -76,19 +76,19 @@ export const searchIndex = [
         meta: 'Hands-on technical learning',
     },
     {
-        type: 'Tutorials/Videos',
-        title: 'Latest Tutorials/Videos',
+        type: 'Tutorials',
+        title: 'Latest Tutorials',
         url: '/tutorials',
         meta: 'Fresh practical walkthroughs',
     },
     {
-        type: 'Tutorials/Videos',
+        type: 'Tutorials',
         title: 'How to Deploy on aaPanel',
         url: '/tutorials',
         meta: 'Deployment guide',
     },
     {
-        type: 'Tutorials/Videos',
+        type: 'Tutorials',
         title: 'Performance Optimization Basics',
         url: '/tutorials',
         meta: 'Speed and reliability',

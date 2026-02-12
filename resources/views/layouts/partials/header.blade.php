@@ -70,7 +70,7 @@
                         @focus="openMega('tutorials')"
                         :aria-expanded="megaOpen === 'tutorials'"
                     >
-                        Tutorials/Videos
+                        Tutorials
                         <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4" aria-hidden="true">
                             <path d="m5 7.5 5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
@@ -110,7 +110,7 @@
                     </div>
                 </div>
 
-                    <a href="{{ route('tools') }}" class="nav-link">IT Tools</a>
+                    <a href="{{ route('tools') }}" class="nav-link">Tools</a>
                 </nav>
 
                 <div class="ml-auto hidden items-center gap-3 lg:flex">
