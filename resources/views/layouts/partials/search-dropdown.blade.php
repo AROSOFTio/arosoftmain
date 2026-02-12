@@ -18,9 +18,9 @@
                     <a
                         :href="item.url"
                         @click="clearSearch()"
-                        class="group flex items-center justify-between rounded-lg border border-[color:rgba(19,242,198,0.12)] px-3 py-2 transition duration-200 hover:border-[color:rgba(19,242,198,0.42)] hover:bg-[color:rgba(19,242,198,0.08)]"
+                        class="group flex items-center justify-between rounded-lg border border-[color:rgba(10,102,255,0.12)] px-3 py-2 transition duration-200 hover:border-[color:rgba(10,102,255,0.42)] hover:bg-[color:rgba(10,102,255,0.08)]"
                     >
-                        <span class="text-sm text-[color:rgba(19,242,198,0.92)]" x-text="item.title"></span>
+                        <span class="text-sm text-[color:rgba(10,102,255,0.92)]" x-text="item.title"></span>
                         <span class="text-[0.64rem] uppercase tracking-[0.16em] muted-faint" x-text="item.meta"></span>
                     </a>
                 </template>
@@ -32,3 +32,4 @@
         No results yet. Try another keyword.
     </p>
 </div>
+

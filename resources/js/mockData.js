@@ -1,10 +1,10 @@
 const makeThumb = (label) => {
     const svg = `
         <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 180'>
-            <rect width='320' height='180' fill='#050B14'/>
-            <path d='M0 132L320 42V180H0z' fill='#13F2C6' fill-opacity='0.18'/>
-            <circle cx='258' cy='52' r='22' fill='#13F2C6' fill-opacity='0.36'/>
-            <text x='20' y='34' fill='#13F2C6' fill-opacity='0.88' font-size='18' font-family='Montserrat'>${label}</text>
+            <rect width='320' height='180' fill='#FFFFFF'/>
+            <path d='M0 132L320 42V180H0z' fill='#0A66FF' fill-opacity='0.18'/>
+            <circle cx='258' cy='52' r='22' fill='#0A66FF' fill-opacity='0.36'/>
+            <text x='20' y='34' fill='#0A66FF' fill-opacity='0.88' font-size='18' font-family='Montserrat'>${label}</text>
         </svg>
     `;
 
@@ -130,3 +130,4 @@ export const searchIndex = [
         meta: 'Get in touch',
     },
 ];
+

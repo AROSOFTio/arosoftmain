@@ -1,4 +1,4 @@
-<footer class="footer-texture mt-24 border-t border-[color:rgba(19,242,198,0.2)]">
+<footer class="footer-texture mt-24 border-t border-[color:rgba(10,102,255,0.2)]">
     <div class="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
             <section>
@@ -54,10 +54,11 @@
         </div>
     </div>
 
-    <div class="border-t border-[color:rgba(19,242,198,0.16)]">
+    <div class="border-t border-[color:rgba(10,102,255,0.16)]">
         <div class="mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-5 text-[0.66rem] uppercase tracking-[0.14em] muted-faint sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
             <p>&copy; {{ date('Y') }} Arosoft Innovations. All rights reserved.</p>
             <p>Built by Arosoft Innovations Ltd</p>
         </div>
     </div>
 </footer>
+
