@@ -24,10 +24,8 @@ if (file_exists($maintenance = __DIR__.'/storage/framework/maintenance.php')) {
 if (! file_exists(__DIR__.'/vendor/autoload.php')) {
     http_response_code(503);
     header('Content-Type: text/plain; charset=utf-8');
-    echo "Deployment incomplete.\n";
-    echo "Missing file: /vendor/autoload.php\n\n";
-    echo "Run deploy script on server:\n";
-    echo "bash /www/wwwroot/arosoft.io/deploy/aapanel-deploy.sh\n";
+    echo "Server error: missing dependency file /vendor/autoload.php\n";
+    echo "Run: composer install --no-dev --optimize-autoloader\n";
     exit;
 }
 

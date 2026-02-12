@@ -8,23 +8,17 @@ Laravel 11 frontend shell for Arosoft Innovations (header/nav, mega menus, off-c
 - Tailwind CSS + Alpine.js
 - Vite
 
-## Zero-touch deploy flow (aaPanel)
+## aaPanel note
 
-Use aaPanel Git Manager script tab with this single command:
+If the site shows:
+
+`missing dependency file /vendor/autoload.php`
+
+install dependencies on the server:
 
 ```bash
-bash /www/wwwroot/arosoft.io/deploy/aapanel-deploy.sh
+composer install --no-dev --optimize-autoloader
 ```
-
-If you see `Missing file: /vendor/autoload.php` in browser, it means the deploy script has not run yet for that release.
-
-After this one-time setup, each git deployment runs automatically:
-
-1. `composer install --no-dev`
-2. Laravel optimize/cache commands
-3. `npm ci` (or `npm install`) + `npm run build`
-4. Permission fixes for `storage` and `bootstrap/cache`
-5. Build mirroring from `public/build` to `build` for root fallback mode
 
 ## Root fallback mode
 
