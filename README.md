@@ -16,6 +16,8 @@ Use aaPanel Git Manager script tab with this single command:
 bash /www/wwwroot/arosoft.io/deploy/aapanel-deploy.sh
 ```
 
+If you see `Missing file: /vendor/autoload.php` in browser, it means the deploy script has not run yet for that release.
+
 After this one-time setup, each git deployment runs automatically:
 
 1. `composer install --no-dev`
