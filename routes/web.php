@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminSettingsController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\BlogDashboardController;
 use App\Http\Controllers\Admin\BlogMediaController;
 use App\Http\Controllers\Admin\BlogPostController as AdminBlogPostController;
@@ -55,6 +57,14 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
         Route::post('/logout', [AdminAuthController::class, 'destroy'])->name('logout');
 
         Route::get('/', fn () => redirect()->route('admin.blog.dashboard'))->name('index');
+
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+        Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+        Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
+        Route::put('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
 
         Route::prefix('blog')->name('blog.')->group(function (): void {
             Route::get('/', BlogDashboardController::class)->name('dashboard');

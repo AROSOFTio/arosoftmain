@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogTag;
+use App\Support\AdminSettings;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 
@@ -14,7 +15,7 @@ class BlogFeedController extends Controller
     {
         $xml = Cache::remember(
             'blog:sitemap:xml',
-            now()->addMinutes(config('blog.feed_cache_ttl_minutes', 30)),
+            now()->addMinutes((int) AdminSettings::get('feed_cache_ttl_minutes', config('blog.feed_cache_ttl_minutes', 30))),
             function (): string {
                 $posts = BlogPost::query()
                     ->publiclyVisible()
@@ -46,7 +47,7 @@ class BlogFeedController extends Controller
     {
         $xml = Cache::remember(
             'blog:rss:xml',
-            now()->addMinutes(config('blog.feed_cache_ttl_minutes', 30)),
+            now()->addMinutes((int) AdminSettings::get('feed_cache_ttl_minutes', config('blog.feed_cache_ttl_minutes', 30))),
             function (): string {
                 $posts = BlogPost::query()
                     ->publiclyVisible()
@@ -64,4 +65,3 @@ class BlogFeedController extends Controller
         return response($xml, 200, ['Content-Type' => 'application/rss+xml; charset=UTF-8']);
     }
 }
-

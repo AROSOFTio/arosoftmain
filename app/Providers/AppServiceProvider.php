@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\BlogPost;
 use App\Models\User;
 use App\Policies\BlogPostPolicy;
+use App\Support\AdminSettings;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -32,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
 
             $emails = array_map(
                 static fn (string $email): string => strtolower(trim($email)),
-                config('blog.admin_emails', [])
+                AdminSettings::get('admin_emails', config('blog.admin_emails', []))
             );
 
             return in_array(strtolower((string) $user->email), $emails, true);

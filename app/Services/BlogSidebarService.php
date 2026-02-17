@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogTag;
+use App\Support\AdminSettings;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -33,7 +34,7 @@ class BlogSidebarService
     {
         return Cache::remember(
             $this->key('categories'),
-            now()->addMinutes(config('blog.sidebar_cache_ttl_minutes', 20)),
+            now()->addMinutes((int) AdminSettings::get('sidebar_cache_ttl_minutes', config('blog.sidebar_cache_ttl_minutes', 20))),
             fn (): Collection => BlogCategory::query()
                 ->whereHas('posts', fn ($query) => $query->publiclyVisible())
                 ->withCount(['posts as published_posts_count' => fn ($query) => $query->publiclyVisible()])
@@ -50,7 +51,7 @@ class BlogSidebarService
     {
         return Cache::remember(
             $this->key('tags'),
-            now()->addMinutes(config('blog.sidebar_cache_ttl_minutes', 20)),
+            now()->addMinutes((int) AdminSettings::get('sidebar_cache_ttl_minutes', config('blog.sidebar_cache_ttl_minutes', 20))),
             fn (): Collection => BlogTag::query()
                 ->whereHas('posts', fn ($query) => $query->publiclyVisible())
                 ->withCount(['posts as published_posts_count' => fn ($query) => $query->publiclyVisible()])
@@ -68,7 +69,7 @@ class BlogSidebarService
     {
         return Cache::remember(
             $this->key('popular'),
-            now()->addMinutes(config('blog.sidebar_cache_ttl_minutes', 20)),
+            now()->addMinutes((int) AdminSettings::get('sidebar_cache_ttl_minutes', config('blog.sidebar_cache_ttl_minutes', 20))),
             fn (): Collection => BlogPost::query()
                 ->publiclyVisible()
                 ->with(['category'])
@@ -86,7 +87,7 @@ class BlogSidebarService
     {
         return Cache::remember(
             $this->key('latest'),
-            now()->addMinutes(config('blog.sidebar_cache_ttl_minutes', 20)),
+            now()->addMinutes((int) AdminSettings::get('sidebar_cache_ttl_minutes', config('blog.sidebar_cache_ttl_minutes', 20))),
             fn (): Collection => BlogPost::query()
                 ->publiclyVisible()
                 ->with(['category'])

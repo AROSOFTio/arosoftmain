@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\BlogPost;
 use App\Models\User;
+use App\Support\AdminSettings;
 
 class BlogPostPolicy
 {
@@ -55,10 +56,9 @@ class BlogPostPolicy
 
         $emails = array_map(
             static fn (string $email): string => strtolower(trim($email)),
-            config('blog.admin_emails', [])
+            AdminSettings::get('admin_emails', config('blog.admin_emails', []))
         );
 
         return in_array(strtolower((string) $user->email), $emails, true);
     }
 }
-

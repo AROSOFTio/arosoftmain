@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\BlogPost;
+use App\Support\AdminSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -21,7 +22,7 @@ class BlogViewTracker
         );
 
         $cacheKey = 'blog:post_viewed:'.$post->id.':'.$fingerprint;
-        $ttlHours = (int) config('blog.view_count_window_hours', 12);
+        $ttlHours = (int) AdminSettings::get('view_count_window_hours', config('blog.view_count_window_hours', 12));
 
         if (!Cache::add($cacheKey, 1, now()->addHours($ttlHours))) {
             return;
@@ -31,4 +32,3 @@ class BlogViewTracker
         $post->view_count++;
     }
 }
-
