@@ -1,5 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\BlogDashboardController;
+use App\Http\Controllers\Admin\BlogMediaController;
+use App\Http\Controllers\Admin\BlogPostController as AdminBlogPostController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\BlogFeedController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ServicesController;
@@ -7,7 +13,15 @@ use App\Http\Controllers\ToolsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PageController::class, 'home'])->name('home');
-Route::get('/blog', [PageController::class, 'blog'])->name('blog');
+Route::get('/blog', [BlogController::class, 'index'])->name('blog');
+Route::get('/blog/search', [BlogController::class, 'search'])->name('blog.search');
+Route::get('/blog/category/{slug}', [BlogController::class, 'category'])->name('blog.category');
+Route::get('/blog/tag/{slug}', [BlogController::class, 'tag'])->name('blog.tag');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+
+Route::get('/sitemap.xml', [BlogFeedController::class, 'sitemap'])->name('sitemap');
+Route::get('/rss.xml', [BlogFeedController::class, 'rss'])->name('rss');
+
 Route::get('/services', [ServicesController::class, 'index'])->name('services');
 Route::post('/services/quote', [ServicesController::class, 'generateQuote'])->middleware('throttle:20,1')->name('services.quote');
 Route::post('/services/quote/pay', [ServicesController::class, 'payQuote'])->middleware('throttle:12,1')->name('services.quote.pay');
@@ -28,3 +42,27 @@ Route::get('/tools/{slug}', [ToolsController::class, 'show'])->name('tools.show'
 Route::post('/tools/{slug}/process', [ToolsController::class, 'process'])
     ->middleware('throttle:12,1')
     ->name('tools.process');
+
+Route::prefix('admin')->name('admin.')->group(function (): void {
+    Route::middleware('guest')->group(function (): void {
+        Route::get('/login', [AdminAuthController::class, 'create'])->name('login');
+        Route::post('/login', [AdminAuthController::class, 'store'])
+            ->middleware('throttle:8,1')
+            ->name('login.store');
+    });
+
+    Route::middleware(['auth', 'can:manage-blog'])->group(function (): void {
+        Route::post('/logout', [AdminAuthController::class, 'destroy'])->name('logout');
+
+        Route::get('/', fn () => redirect()->route('admin.blog.dashboard'))->name('index');
+
+        Route::prefix('blog')->name('blog.')->group(function (): void {
+            Route::get('/', BlogDashboardController::class)->name('dashboard');
+            Route::post('/media/upload', [BlogMediaController::class, 'store'])->name('media.upload');
+            Route::get('/posts/{blogPost}/preview', [AdminBlogPostController::class, 'preview'])->name('posts.preview');
+            Route::resource('/posts', AdminBlogPostController::class)
+                ->parameters(['posts' => 'blogPost'])
+                ->except(['show']);
+        });
+    });
+});
