@@ -231,7 +231,7 @@
 
 @once
     @push('head')
-        <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+        <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.6/tinymce.min.js" referrerpolicy="origin"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const titleInput = document.getElementById('title');
