@@ -2,9 +2,10 @@
     <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="main-nav-band">
             <div class="flex h-20 items-center gap-4 px-4 sm:px-5">
-                <a href="{{ route('home') }}" class="group flex shrink-0 flex-col items-start leading-none">
-                    <span class="brand-mark font-heading text-3xl tracking-[0.02em]">ARO<span>SOFT</span></span>
-                    <span class="brand-subtitle mt-1 text-[0.58rem] uppercase tracking-[0.22em]">Innovations Ltd</span>
+                <a href="{{ route('home') }}" class="group flex shrink-0 items-center leading-none">
+                    <span class="brand-logo-wrap">
+                        <img src="{{ asset('brand/logo-full.svg') }}" alt="Arosoft Innovations Ltd" class="brand-logo-full">
+                    </span>
                 </a>
 
                 <nav class="hidden flex-1 items-center justify-center gap-1 lg:flex">
@@ -122,7 +123,7 @@
                         <input
                             type="search"
                             class="search-input"
-                            placeholder="Search services, videos, pages..."
+                            placeholder="Search services, videos, blog, pages..."
                             x-model="searchQuery"
                             @focus="focusSearch()"
                             @input.debounce.160ms="updateSearch()"
@@ -165,7 +166,7 @@
                         x-ref="mobileSearchInput"
                         type="search"
                         class="search-input"
-                        placeholder="Search services, videos, pages..."
+                        placeholder="Search services, videos, blog, pages..."
                         x-model="searchQuery"
                         @focus="focusSearch()"
                         @input.debounce.160ms="updateSearch()"

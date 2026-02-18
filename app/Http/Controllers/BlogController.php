@@ -11,6 +11,7 @@ use App\Services\BlogViewTracker;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class BlogController extends Controller
@@ -76,6 +77,41 @@ class BlogController extends Controller
             queryBuilder: BlogPost::query()->publiclyVisible(),
             queryText: $queryText
         );
+    }
+
+    public function suggestions(Request $request): JsonResponse
+    {
+        $queryText = trim((string) $request->query('q', ''));
+
+        if ($queryText === '') {
+            return response()->json(['blog' => []]);
+        }
+
+        $term = '%'.str_replace(' ', '%', $queryText).'%';
+
+        $results = BlogPost::query()
+            ->publiclyVisible()
+            ->where(function (Builder $query) use ($term): void {
+                $query->where('title', 'like', $term)
+                    ->orWhere('excerpt', 'like', $term)
+                    ->orWhere('body', 'like', $term);
+            })
+            ->orderByDesc('published_at')
+            ->limit(4)
+            ->get(['slug', 'title', 'published_at'])
+            ->map(static function (BlogPost $post): array {
+                return [
+                    'type' => 'Blog',
+                    'title' => $post->title,
+                    'url' => route('blog.show', $post->slug),
+                    'meta' => $post->published_at?->format('M j, Y') ?: 'Blog article',
+                ];
+            })
+            ->values();
+
+        return response()->json([
+            'blog' => $results,
+        ]);
     }
 
     public function show(Request $request, string $slug): View

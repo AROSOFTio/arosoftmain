@@ -25,7 +25,7 @@
             'name' => 'Arosoft Innovations Ltd',
             'logo' => [
                 '@type' => 'ImageObject',
-                'url' => url('/favicon.ico'),
+                'url' => url('/android-chrome-512x512.png'),
             ],
         ],
         'mainEntityOfPage' => [
@@ -174,4 +174,3 @@
         />
     </section>
 @endsection
-

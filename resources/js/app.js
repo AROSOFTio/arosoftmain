@@ -13,12 +13,15 @@ window.siteShell = () => ({
     showSearch: false,
     hasSearchMatches: false,
     previousActiveElement: null,
-    searchSections: ['Services', 'Tutorials', 'Pages'],
+    searchSections: ['Services', 'Tutorials', 'Blog', 'Pages'],
+    searchAbortController: null,
+    searchRequestSequence: 0,
     videos,
     searchIndex,
     searchResults: {
         Services: [],
         Tutorials: [],
+        Blog: [],
         Pages: [],
     },
 
@@ -133,8 +136,16 @@ window.siteShell = () => ({
         return {
             Services: [],
             Tutorials: [],
+            Blog: [],
             Pages: [],
         };
+    },
+
+    cancelSearchRequest() {
+        if (this.searchAbortController) {
+            this.searchAbortController.abort();
+            this.searchAbortController = null;
+        }
     },
 
     focusSearch() {
@@ -146,15 +157,46 @@ window.siteShell = () => ({
     },
 
     clearSearch() {
+        this.cancelSearchRequest();
         this.searchQuery = '';
         this.showSearch = false;
         this.searchResults = this.freshSearchGroups();
         this.hasSearchMatches = false;
     },
 
-    updateSearch() {
-        const query = this.searchQuery.trim().toLowerCase();
-        if (!query) {
+    async fetchBlogResults(query) {
+        this.cancelSearchRequest();
+        const controller = new AbortController();
+        this.searchAbortController = controller;
+
+        try {
+            const response = await fetch(`/search/suggestions?q=${encodeURIComponent(query)}`, {
+                headers: {
+                    Accept: 'application/json',
+                },
+                signal: controller.signal,
+            });
+
+            if (!response.ok) {
+                return [];
+            }
+
+            const payload = await response.json();
+            return Array.isArray(payload.blog) ? payload.blog : [];
+        } finally {
+            if (this.searchAbortController === controller) {
+                this.searchAbortController = null;
+            }
+        }
+    },
+
+    async updateSearch() {
+        const query = this.searchQuery.trim();
+        const normalizedQuery = query.toLowerCase();
+        const requestId = ++this.searchRequestSequence;
+
+        if (!normalizedQuery) {
+            this.cancelSearchRequest();
             this.searchResults = this.freshSearchGroups();
             this.hasSearchMatches = false;
             this.showSearch = false;
@@ -165,12 +207,26 @@ window.siteShell = () => ({
 
         this.searchIndex.forEach((item) => {
             const text = `${item.title} ${item.meta}`.toLowerCase();
-            if (!text.includes(query) || !grouped[item.type]) {
+            if (!text.includes(normalizedQuery) || !grouped[item.type]) {
                 return;
             }
 
             grouped[item.type].push(item);
         });
+
+        try {
+            grouped.Blog = (await this.fetchBlogResults(query)).slice(0, 4);
+        } catch (error) {
+            if (error?.name !== 'AbortError') {
+                grouped.Blog = [];
+            } else {
+                return;
+            }
+        }
+
+        if (requestId !== this.searchRequestSequence) {
+            return;
+        }
 
         this.searchSections.forEach((section) => {
             grouped[section] = grouped[section].slice(0, 4);

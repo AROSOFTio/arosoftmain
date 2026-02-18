@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Admin Login | Arosoft</title>
         <meta name="robots" content="noindex,nofollow">
+        @include('layouts.partials.favicons')
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
@@ -13,6 +14,9 @@
     <body class="admin-shell antialiased">
         <main class="mx-auto flex min-h-screen w-full max-w-7xl items-center px-4 py-10 sm:px-6 lg:px-8">
             <section class="admin-card mx-auto w-full max-w-md p-7">
+                <a href="{{ route('home') }}" class="inline-flex brand-logo-wrap admin-login-logo-wrap">
+                    <img src="{{ asset('brand/logo-full.svg') }}" alt="Arosoft Innovations Ltd" class="brand-logo-full admin-login-logo">
+                </a>
                 <p class="page-kicker">Arosoft Blog</p>
                 <h1 class="mt-2 font-heading text-3xl">Admin login</h1>
                 <p class="mt-2 text-sm muted-copy">Sign in with an authorized admin account.</p>
@@ -61,4 +65,3 @@
         </main>
     </body>
 </html>
-

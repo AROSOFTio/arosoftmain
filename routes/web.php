@@ -15,6 +15,9 @@ use App\Http\Controllers\ToolsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PageController::class, 'home'])->name('home');
+Route::get('/search/suggestions', [BlogController::class, 'suggestions'])
+    ->middleware('throttle:45,1')
+    ->name('search.suggestions');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog');
 Route::get('/blog/search', [BlogController::class, 'search'])->name('blog.search');
 Route::get('/blog/category/{slug}', [BlogController::class, 'category'])->name('blog.category');

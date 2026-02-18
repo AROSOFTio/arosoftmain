@@ -60,6 +60,7 @@
         <meta name="twitter:description" content="{{ $twitterDescription }}">
         <meta name="twitter:image" content="{{ $twitterImage }}">
         <meta name="theme-color" content="#009D31">
+        @include('layouts.partials.favicons')
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

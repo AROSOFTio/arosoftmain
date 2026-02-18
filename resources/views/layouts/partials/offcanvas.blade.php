@@ -23,7 +23,9 @@
         class="offcanvas-panel absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l p-6"
     >
         <div class="flex items-center justify-between">
-            <p class="font-heading text-lg uppercase tracking-[0.2em]">Menu</p>
+            <a href="{{ route('home') }}" class="inline-flex brand-logo-wrap" @click="closeOffcanvas()">
+                <img src="{{ asset('brand/logo-full.svg') }}" alt="Arosoft Innovations Ltd" class="brand-logo-full">
+            </a>
             <button type="button" class="icon-button" @click="closeOffcanvas()" aria-label="Close menu">
                 <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">
                     <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>

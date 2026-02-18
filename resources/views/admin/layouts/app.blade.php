@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>@yield('title', 'Blog Admin') | Arosoft</title>
         <meta name="robots" content="noindex,nofollow">
+        @include('layouts.partials.favicons')
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
@@ -64,7 +65,9 @@
             <aside class="admin-sidebar" :class="{ 'is-collapsed': sidebarCollapsed, 'is-mobile-open': mobileSidebarOpen }">
                 <div class="admin-sidebar-head">
                     <a href="{{ route('admin.blog.dashboard') }}" class="admin-brand-link">
-                        <span class="admin-brand-icon">A</span>
+                        <span class="admin-brand-icon" aria-hidden="true">
+                            <img src="{{ asset('brand/logo-mark.svg') }}" alt="" class="admin-brand-icon-img">
+                        </span>
                         <div class="admin-brand-copy" x-show="!sidebarCollapsed">
                             <p class="admin-brand-title">Arosoft Admin</p>
                             <p class="admin-brand-subtitle">Content Control</p>

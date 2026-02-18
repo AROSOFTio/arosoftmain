@@ -3,7 +3,9 @@
         <div class="footer-panel footer-texture rounded-3xl px-6 py-14 sm:px-10 sm:py-16">
             <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
                 <section>
-                    <p class="font-heading text-3xl tracking-[0.03em] text-white">ARO<span class="text-[color:rgba(255,255,255,0.84)]">SOFT</span></p>
+                    <a href="{{ route('home') }}" class="inline-flex brand-logo-wrap footer-brand-logo-wrap">
+                        <img src="{{ asset('brand/logo-full.svg') }}" alt="Arosoft Innovations Ltd" class="brand-logo-full footer-brand-logo-full">
+                    </a>
                     <p class="mt-4 max-w-xs text-base leading-8 muted-copy">
                         Arosoft Innovations Ltd delivers dependable IT and creative services for businesses and institutions in Kampala and beyond.
                     </p>
