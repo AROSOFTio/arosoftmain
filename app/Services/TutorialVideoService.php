@@ -9,8 +9,8 @@ use Illuminate\Support\Str;
 
 class TutorialVideoService
 {
-    private const CHANNEL_ID_CACHE_KEY = 'tutorials.youtube.channel_id';
-    private const VIDEOS_CACHE_KEY = 'tutorials.youtube.videos';
+    private const CHANNEL_ID_CACHE_KEY_PREFIX = 'tutorials.youtube.channel_id.';
+    private const VIDEOS_CACHE_KEY_PREFIX = 'tutorials.youtube.videos.';
 
     /**
      * @return array<int, array<string, string>>
@@ -20,14 +20,16 @@ class TutorialVideoService
         $maxItems = max(1, (int) config('tutorials.max_items', 24));
         $safeLimit = max(1, min($limit, $maxItems));
         $cacheMinutes = max(5, (int) config('tutorials.cache_minutes', 30));
+        $videosCacheKey = $this->videosCacheKey();
 
-        if (Cache::has(self::VIDEOS_CACHE_KEY)) {
-            $cached = Cache::get(self::VIDEOS_CACHE_KEY, []);
+        if (Cache::has($videosCacheKey)) {
+            $cached = Cache::get($videosCacheKey, []);
             return array_slice(is_array($cached) ? $cached : [], 0, $safeLimit);
         }
 
         $fresh = $this->fetchLatestFromYouTube($maxItems);
-        Cache::put(self::VIDEOS_CACHE_KEY, $fresh, now()->addMinutes($cacheMinutes));
+        $ttl = count($fresh) > 0 ? $cacheMinutes : 5;
+        Cache::put($videosCacheKey, $fresh, now()->addMinutes($ttl));
 
         return array_slice($fresh, 0, $safeLimit);
     }
@@ -69,13 +71,15 @@ class TutorialVideoService
         }
 
         $cacheMinutes = max(60, (int) config('tutorials.cache_minutes', 30) * 8);
-        if (Cache::has(self::CHANNEL_ID_CACHE_KEY)) {
-            return (string) Cache::get(self::CHANNEL_ID_CACHE_KEY, '');
+        $channelCacheKey = $this->channelIdCacheKey($channelUrl);
+
+        if (Cache::has($channelCacheKey)) {
+            return (string) Cache::get($channelCacheKey, '');
         }
 
         $discoveredId = $this->discoverChannelId($channelUrl);
         Cache::put(
-            self::CHANNEL_ID_CACHE_KEY,
+            $channelCacheKey,
             $discoveredId,
             now()->addMinutes($discoveredId !== '' ? $cacheMinutes : 15)
         );
@@ -100,6 +104,18 @@ class TutorialVideoService
         }
 
         if (preg_match('/https:\/\/www\.youtube\.com\/channel\/(UC[a-zA-Z0-9_-]{20,})/', $html, $matches) === 1) {
+            return $matches[1];
+        }
+
+        if (preg_match('/<meta\s+itemprop="identifier"\s+content="(UC[a-zA-Z0-9_-]{20,})"/i', $html, $matches) === 1) {
+            return $matches[1];
+        }
+
+        if (preg_match('/<link\s+rel="alternate"\s+type="application\/rss\+xml".*?channel_id=(UC[a-zA-Z0-9_-]{20,})/i', $html, $matches) === 1) {
+            return $matches[1];
+        }
+
+        if (preg_match('/"browseId":"(UC[a-zA-Z0-9_-]{20,})"/', $html, $matches) === 1) {
             return $matches[1];
         }
 
@@ -173,5 +189,19 @@ class TutorialVideoService
         }
 
         return $videos;
+    }
+
+    private function channelIdCacheKey(string $channelUrl): string
+    {
+        return self::CHANNEL_ID_CACHE_KEY_PREFIX.sha1(Str::lower(trim($channelUrl)));
+    }
+
+    private function videosCacheKey(): string
+    {
+        $configuredChannelId = trim((string) config('tutorials.youtube_channel_id', ''));
+        $channelUrl = trim((string) config('tutorials.youtube_channel_url', ''));
+        $identity = $configuredChannelId !== '' ? $configuredChannelId : $channelUrl;
+
+        return self::VIDEOS_CACHE_KEY_PREFIX.sha1(Str::lower($identity));
     }
 }

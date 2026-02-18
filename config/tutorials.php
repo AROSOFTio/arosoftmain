@@ -11,7 +11,7 @@ return [
     |
     */
     'youtube_channel_url' => env('YOUTUBE_CHANNEL_URL', 'https://www.youtube.com/@bentech_ds'),
-    'youtube_channel_id' => env('YOUTUBE_CHANNEL_ID', ''),
+    'youtube_channel_id' => env('YOUTUBE_CHANNEL_ID', 'UC3c6uQ078JTwZjmeD8bC09Q'),
 
     /*
     |--------------------------------------------------------------------------
@@ -21,4 +21,3 @@ return [
     'cache_minutes' => (int) env('YOUTUBE_VIDEOS_CACHE_MINUTES', 30),
     'max_items' => (int) env('YOUTUBE_VIDEOS_MAX_ITEMS', 24),
 ];
-
