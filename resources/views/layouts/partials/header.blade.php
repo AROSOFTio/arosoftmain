@@ -94,7 +94,7 @@
                             <a href="{{ route('tutorials') }}" class="btn-outline">All tutorials</a>
                         </div>
 
-                        <div class="mt-4 grid grid-cols-2 gap-3">
+                        <div class="mt-4 grid grid-cols-2 gap-3" x-show="videos.length > 0">
                             <template x-for="video in videos.slice(0, 4)" :key="video.title">
                                 <a :href="video.url" class="group overflow-hidden rounded-xl border border-[color:rgba(17,24,39,0.14)] transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
                                     <div
@@ -108,6 +108,9 @@
                                 </a>
                             </template>
                         </div>
+                        <p x-show="videos.length === 0" class="mt-4 rounded-lg border border-[color:rgba(17,24,39,0.12)] px-3 py-2 text-sm muted-copy">
+                            No recent tutorial videos available right now.
+                        </p>
                     </div>
                 </div>
 

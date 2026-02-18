@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\TutorialVideoService;
 use Illuminate\View\View;
 
 class PageController extends Controller
@@ -65,13 +66,11 @@ class PageController extends Controller
         );
     }
 
-    public function tutorials(): View
+    public function tutorials(TutorialVideoService $tutorialVideoService): View
     {
-        return $this->placeholder(
-            'Tutorials',
-            'Tutorials',
-            'Practical tutorials, walkthroughs, and implementation guides will be published here.'
-        );
+        return view('pages.tutorials', [
+            'tutorialVideos' => $tutorialVideoService->latest(24),
+        ]);
     }
 
     public function about(): View

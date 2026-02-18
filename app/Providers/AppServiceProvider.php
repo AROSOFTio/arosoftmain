@@ -5,8 +5,10 @@ namespace App\Providers;
 use App\Models\BlogPost;
 use App\Models\User;
 use App\Policies\BlogPostPolicy;
+use App\Services\TutorialVideoService;
 use App\Support\AdminSettings;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -37,6 +39,18 @@ class AppServiceProvider extends ServiceProvider
             );
 
             return in_array(strtolower((string) $user->email), $emails, true);
+        });
+
+        View::composer('layouts.app', function ($view): void {
+            $data = $view->getData();
+            if (array_key_exists('tutorialVideos', $data)) {
+                return;
+            }
+
+            $view->with(
+                'tutorialVideos',
+                app(TutorialVideoService::class)->latest(8)
+            );
         });
     }
 }

@@ -53,7 +53,7 @@
 
         <section class="mt-8">
             <p class="text-[0.66rem] uppercase tracking-[0.2em] muted-faint">Latest tutorials</p>
-            <div class="mt-3 space-y-2">
+            <div class="mt-3 space-y-2" x-show="videos.length > 0">
                 <template x-for="video in videos.slice(0, 4)" :key="video.title">
                     <a :href="video.url" class="group flex items-center gap-3 rounded-xl border border-[color:rgba(255,255,255,0.32)] p-2 transition duration-200 hover:border-[color:rgba(255,255,255,0.62)]" @click="closeOffcanvas()">
                         <div
@@ -67,6 +67,9 @@
                     </a>
                 </template>
             </div>
+            <p x-show="videos.length === 0" class="mt-3 text-sm text-[color:rgba(255,255,255,0.78)]">
+                No recent tutorial videos available right now.
+            </p>
         </section>
 
         <div class="mt-auto space-y-4 pt-8">

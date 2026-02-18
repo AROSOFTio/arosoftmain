@@ -1,6 +1,5 @@
 import './bootstrap';
 import Alpine from 'alpinejs';
-import { videos } from './mockData';
 
 window.Alpine = Alpine;
 
@@ -16,7 +15,7 @@ window.siteShell = () => ({
     searchSections: ['Blog', 'Services', 'Courses', 'Tutorials', 'Tools', 'Pages'],
     searchAbortController: null,
     searchRequestSequence: 0,
-    videos,
+    videos: Array.isArray(window.siteTutorialVideos) ? window.siteTutorialVideos : [],
     searchResults: {
         Blog: [],
         Services: [],

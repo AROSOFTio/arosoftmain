@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
+use App\Services\TutorialVideoService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,11 @@ class SearchController extends Controller
     private const MAX_RESULTS = 28;
     private const MAX_PER_SECTION = 6;
 
+    public function __construct(
+        private readonly TutorialVideoService $tutorialVideoService,
+    ) {
+    }
+
     public function suggestions(Request $request): JsonResponse
     {
         $queryText = trim((string) $request->query('q', ''));
@@ -26,6 +32,7 @@ class SearchController extends Controller
         $tokens = $this->tokens($queryText);
 
         $results = $this->searchBlog($queryText, $tokens)
+            ->concat($this->searchTutorials($queryText, $tokens))
             ->concat($this->searchStaticIndex($queryText, $tokens))
             ->sortByDesc('score')
             ->values();
@@ -79,6 +86,43 @@ class SearchController extends Controller
                     'score' => $this->scoreMatch($searchable, (string) $post->title, $queryText, $tokens) + 30,
                 ];
             })
+            ->values();
+    }
+
+    /**
+     * @param array<int, string> $tokens
+     * @return Collection<int, array<string, mixed>>
+     */
+    private function searchTutorials(string $queryText, array $tokens): Collection
+    {
+        return collect($this->tutorialVideoService->latest(24))
+            ->map(function (array $video) use ($queryText, $tokens): ?array {
+                $title = (string) ($video['title'] ?? '');
+                $url = (string) ($video['url'] ?? '');
+
+                if ($title === '' || $url === '') {
+                    return null;
+                }
+
+                $searchable = trim(implode(' ', [
+                    $title,
+                    (string) ($video['date'] ?? ''),
+                ]));
+
+                $score = $this->scoreMatch($searchable, $title, $queryText, $tokens);
+                if ($score === 0) {
+                    return null;
+                }
+
+                return [
+                    'type' => 'Tutorials',
+                    'title' => $title,
+                    'url' => $url,
+                    'meta' => (string) ($video['date'] ?? 'YouTube'),
+                    'score' => $score + 24,
+                ];
+            })
+            ->filter()
             ->values();
     }
 
@@ -291,4 +335,3 @@ class SearchController extends Controller
         return array_values(array_filter($parts, static fn (string $part): bool => strlen($part) >= 2));
     }
 }
-

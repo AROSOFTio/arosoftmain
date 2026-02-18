@@ -66,6 +66,9 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 
+        <script>
+            window.siteTutorialVideos = @json($tutorialVideos ?? []);
+        </script>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <script type="application/ld+json">
             {!! json_encode($localBusinessSchema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT) !!}
