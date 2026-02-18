@@ -164,6 +164,19 @@ window.siteShell = () => ({
         this.hasSearchMatches = false;
     },
 
+    addBlogSearchFallback(grouped, query) {
+        if (!query || grouped.Blog.length > 0) {
+            return;
+        }
+
+        grouped.Blog.push({
+            type: 'Blog',
+            title: `Search blog for "${query}"`,
+            url: `/blog/search?q=${encodeURIComponent(query)}`,
+            meta: 'Open full results',
+        });
+    },
+
     async fetchBlogResults(query) {
         this.cancelSearchRequest();
         const controller = new AbortController();
@@ -223,6 +236,8 @@ window.siteShell = () => ({
                 return;
             }
         }
+
+        this.addBlogSearchFallback(grouped, query);
 
         if (requestId !== this.searchRequestSequence) {
             return;

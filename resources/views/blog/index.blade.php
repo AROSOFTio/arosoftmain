@@ -50,7 +50,7 @@
                         <x-blog.post-card :post="$post" :compact="true" />
                     @endforeach
                 </div>
-            @else
+            @elseif(!$featuredPost)
                 <article class="info-card">
                     <h2 class="font-heading text-2xl">No posts found</h2>
                     <p class="mt-2 text-sm leading-7 muted-copy">Try another keyword, category, or tag.</p>
@@ -83,4 +83,3 @@
         </aside>
     </section>
 @endsection
-
