@@ -139,6 +139,7 @@
             <div>
                 <label for="featured_image" class="form-label">Featured image</label>
                 <input id="featured_image" type="file" name="featured_image" accept="image/*" class="form-field !p-2">
+                <p class="mt-1 text-xs muted-faint">Accepted: JPG, PNG, GIF, WEBP, SVG (max 10 MB).</p>
                 @error('featured_image')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
                 @if($post->featuredImageUrl())
                     <img src="{{ $post->featuredImageUrl() }}" alt="" class="mt-3 h-36 w-full rounded-lg object-cover">
@@ -160,6 +161,7 @@
             <div>
                 <label for="og_image" class="form-label">OG image override</label>
                 <input id="og_image" type="file" name="og_image" accept="image/*" class="form-field !p-2">
+                <p class="mt-1 text-xs muted-faint">Accepted: JPG, PNG, GIF, WEBP, SVG (max 10 MB).</p>
                 @error('og_image')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
                 @if($post->ogImageUrl())
                     <img src="{{ $post->ogImageUrl() }}" alt="" class="mt-3 h-36 w-full rounded-lg object-cover">

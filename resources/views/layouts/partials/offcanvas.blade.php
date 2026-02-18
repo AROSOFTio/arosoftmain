@@ -72,6 +72,21 @@
             </p>
         </section>
 
+        <section class="mt-8">
+            <p class="text-[0.66rem] uppercase tracking-[0.2em] muted-faint">Popular playlists</p>
+            <div class="mt-3 space-y-2" x-show="playlists.length > 0">
+                <template x-for="playlist in playlists.slice(0, 4)" :key="playlist.playlist_id || playlist.url">
+                    <a :href="playlist.url" class="shell-card block rounded-xl px-4 py-3 transition duration-200 hover:border-[color:rgba(255,255,255,0.7)]" @click="closeOffcanvas()">
+                        <p class="truncate text-sm font-semibold text-white" x-text="playlist.title"></p>
+                        <p class="text-[0.62rem] uppercase tracking-[0.15em] text-[color:rgba(255,255,255,0.72)]" x-text="playlist.meta || 'Playlist'"></p>
+                    </a>
+                </template>
+            </div>
+            <p x-show="playlists.length === 0" class="mt-3 text-sm text-[color:rgba(255,255,255,0.78)]">
+                No playlists available right now.
+            </p>
+        </section>
+
         <div class="mt-auto space-y-4 pt-8">
             <div class="flex flex-wrap gap-2">
                 <a href="{{ route('about') }}" class="nav-link-sm" @click="closeOffcanvas()">About</a>

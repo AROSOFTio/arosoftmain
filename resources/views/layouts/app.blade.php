@@ -68,6 +68,7 @@
 
         <script>
             window.siteTutorialVideos = @json($tutorialVideos ?? []);
+            window.siteTutorialPlaylists = @json($tutorialPlaylists ?? []);
         </script>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <script type="application/ld+json">

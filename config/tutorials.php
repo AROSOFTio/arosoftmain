@@ -20,4 +20,5 @@ return [
     */
     'cache_minutes' => (int) env('YOUTUBE_VIDEOS_CACHE_MINUTES', 30),
     'max_items' => (int) env('YOUTUBE_VIDEOS_MAX_ITEMS', 24),
+    'max_playlists' => (int) env('YOUTUBE_PLAYLISTS_MAX_ITEMS', 12),
 ];

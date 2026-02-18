@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class BlogPost extends Model
 {
@@ -98,13 +98,23 @@ class BlogPost extends Model
             return null;
         }
 
-        return Storage::disk('public')->url($this->featured_image_path);
+        $path = ltrim((string) $this->featured_image_path, '/');
+        $routePath = Str::startsWith($path, 'blog/') ? (string) Str::after($path, 'blog/') : $path;
+
+        return route('blog.media', [
+            'path' => $routePath,
+        ]);
     }
 
     public function ogImageUrl(): ?string
     {
         if ($this->og_image_path) {
-            return Storage::disk('public')->url($this->og_image_path);
+            $path = ltrim((string) $this->og_image_path, '/');
+            $routePath = Str::startsWith($path, 'blog/') ? (string) Str::after($path, 'blog/') : $path;
+
+            return route('blog.media', [
+                'path' => $routePath,
+            ]);
         }
 
         return $this->featuredImageUrl();

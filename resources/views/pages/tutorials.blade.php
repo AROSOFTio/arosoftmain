@@ -1,5 +1,6 @@
 @php
     $channelUrl = (string) config('tutorials.youtube_channel_url', 'https://www.youtube.com/@bentech_ds');
+    $channelPlaylistsUrl = rtrim($channelUrl, '/').'/playlists';
 @endphp
 
 @extends('layouts.app')
@@ -52,6 +53,35 @@
                     Open YouTube Channel
                 </a>
             </article>
+        </section>
+    @endif
+
+    @if(!empty($tutorialPlaylists))
+        <section class="content-section">
+            <div class="mb-4 flex items-center justify-between gap-4">
+                <h2 class="font-heading text-2xl text-[color:rgba(17,24,39,0.92)]">Popular playlists</h2>
+                <a href="{{ $channelPlaylistsUrl }}" target="_blank" rel="noopener noreferrer" class="btn-outline !w-auto !px-4">
+                    View all playlists
+                </a>
+            </div>
+            <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                @foreach($tutorialPlaylists as $playlist)
+                    <a
+                        href="{{ $playlist['url'] }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="group overflow-hidden rounded-2xl border border-[color:rgba(17,24,39,0.12)] bg-white transition duration-200 hover:border-[color:rgba(0,157,49,0.42)] hover:shadow-[0_12px_30px_rgba(17,24,39,0.1)]"
+                    >
+                        <div class="aspect-video w-full bg-[color:rgba(17,24,39,0.06)] bg-cover bg-center" style="background-image:url('{{ $playlist['thumb'] ?? '' }}')"></div>
+                        <div class="space-y-2 p-4">
+                            <p class="text-sm font-semibold leading-6 text-[color:rgba(17,24,39,0.92)]">
+                                {{ $playlist['title'] }}
+                            </p>
+                            <p class="text-[0.68rem] uppercase tracking-[0.14em] muted-faint">{{ $playlist['meta'] ?? 'Playlist' }}</p>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
         </section>
     @endif
 @endsection

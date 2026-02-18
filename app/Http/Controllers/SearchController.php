@@ -95,7 +95,7 @@ class SearchController extends Controller
      */
     private function searchTutorials(string $queryText, array $tokens): Collection
     {
-        return collect($this->tutorialVideoService->latest(24))
+        $videoResults = collect($this->tutorialVideoService->latest(24))
             ->map(function (array $video) use ($queryText, $tokens): ?array {
                 $title = (string) ($video['title'] ?? '');
                 $url = (string) ($video['url'] ?? '');
@@ -124,6 +124,39 @@ class SearchController extends Controller
             })
             ->filter()
             ->values();
+
+        $playlistResults = collect($this->tutorialVideoService->latestPlaylists(12))
+            ->map(function (array $playlist) use ($queryText, $tokens): ?array {
+                $title = (string) ($playlist['title'] ?? '');
+                $url = (string) ($playlist['url'] ?? '');
+
+                if ($title === '' || $url === '') {
+                    return null;
+                }
+
+                $searchable = trim(implode(' ', [
+                    $title,
+                    (string) ($playlist['meta'] ?? ''),
+                    'playlist',
+                ]));
+
+                $score = $this->scoreMatch($searchable, $title, $queryText, $tokens);
+                if ($score === 0) {
+                    return null;
+                }
+
+                return [
+                    'type' => 'Tutorials',
+                    'title' => $title,
+                    'url' => $url,
+                    'meta' => (string) ($playlist['meta'] ?? 'Playlist'),
+                    'score' => $score + 20,
+                ];
+            })
+            ->filter()
+            ->values();
+
+        return $videoResults->concat($playlistResults)->values();
     }
 
     /**

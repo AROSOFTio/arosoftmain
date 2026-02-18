@@ -70,6 +70,7 @@ class PageController extends Controller
     {
         return view('pages.tutorials', [
             'tutorialVideos' => $tutorialVideoService->latest(24),
+            'tutorialPlaylists' => $tutorialVideoService->latestPlaylists(12),
         ]);
     }
 

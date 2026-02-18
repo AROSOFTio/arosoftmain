@@ -23,7 +23,7 @@ class UpsertBlogPostRequest extends FormRequest
             'slug' => ['nullable', 'string', 'max:255'],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'body' => ['required', 'string'],
-            'featured_image' => ['nullable', 'image', 'max:5120'],
+            'featured_image' => ['nullable', 'file', 'max:10240', 'extensions:jpg,jpeg,png,gif,webp,svg'],
             'featured_image_alt' => ['nullable', 'string', 'max:255'],
             'remove_featured_image' => ['nullable', 'boolean'],
             'status' => ['required', Rule::in(['draft', 'published', 'scheduled'])],
@@ -40,7 +40,7 @@ class UpsertBlogPostRequest extends FormRequest
             'robots' => ['nullable', 'string', 'max:100'],
             'og_title' => ['nullable', 'string', 'max:255'],
             'og_description' => ['nullable', 'string', 'max:320'],
-            'og_image' => ['nullable', 'image', 'max:5120'],
+            'og_image' => ['nullable', 'file', 'max:10240', 'extensions:jpg,jpeg,png,gif,webp,svg'],
             'remove_og_image' => ['nullable', 'boolean'],
         ];
     }

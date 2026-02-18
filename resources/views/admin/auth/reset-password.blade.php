@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Admin Login | Arosoft</title>
+        <title>Reset Password | Arosoft Admin</title>
         <meta name="robots" content="noindex,nofollow">
         @include('layouts.partials.favicons')
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,14 +18,8 @@
                     <img src="{{ asset('brand/logo-full.svg') }}" alt="Arosoft Innovations Ltd" class="brand-logo-full admin-login-logo">
                 </a>
                 <p class="page-kicker">Arosoft Blog</p>
-                <h1 class="mt-2 font-heading text-3xl">Admin login</h1>
-                <p class="mt-2 text-sm muted-copy">Sign in with an authorized admin account.</p>
-
-                @if(session('status'))
-                    <div class="mt-5 rounded-xl border border-[color:rgba(22,163,74,0.3)] bg-[color:rgba(22,163,74,0.08)] px-4 py-3 text-sm text-[color:rgba(21,128,61,0.95)]">
-                        {{ session('status') }}
-                    </div>
-                @endif
+                <h1 class="mt-2 font-heading text-3xl">Reset password</h1>
+                <p class="mt-2 text-sm muted-copy">Set a new password for your admin account.</p>
 
                 @if($errors->any())
                     <div class="mt-5 rounded-xl border border-[color:rgba(185,28,28,0.3)] bg-[color:rgba(185,28,28,0.07)] px-4 py-3 text-sm text-[color:rgba(127,29,29,0.95)]">
@@ -33,8 +27,9 @@
                     </div>
                 @endif
 
-                <form method="post" action="{{ route('admin.login.store') }}" class="mt-6 space-y-4">
+                <form method="post" action="{{ route('admin.password.update') }}" class="mt-6 space-y-4">
                     @csrf
+                    <input type="hidden" name="token" value="{{ $token }}">
 
                     <div>
                         <label for="email" class="form-label">Email</label>
@@ -42,7 +37,7 @@
                             id="email"
                             type="email"
                             name="email"
-                            value="{{ old('email') }}"
+                            value="{{ old('email', $email) }}"
                             required
                             autofocus
                             class="form-field"
@@ -50,7 +45,7 @@
                     </div>
 
                     <div>
-                        <label for="password" class="form-label">Password</label>
+                        <label for="password" class="form-label">New password</label>
                         <input
                             id="password"
                             type="password"
@@ -60,17 +55,23 @@
                         >
                     </div>
 
-                    <label class="inline-flex items-center gap-2 text-sm">
-                        <input type="checkbox" name="remember" value="1" class="h-4 w-4 rounded border-[color:rgba(17,24,39,0.3)]">
-                        <span>Remember me</span>
-                    </label>
-
                     <div>
-                        <a href="{{ route('admin.password.request') }}" class="nav-link-sm">Forgot password?</a>
+                        <label for="password_confirmation" class="form-label">Confirm new password</label>
+                        <input
+                            id="password_confirmation"
+                            type="password"
+                            name="password_confirmation"
+                            required
+                            class="form-field"
+                        >
                     </div>
 
-                    <button type="submit" class="btn-solid !w-full !text-[0.68rem]">Login</button>
+                    <button type="submit" class="btn-solid !w-full !text-[0.68rem]">Reset password</button>
                 </form>
+
+                <div class="mt-5">
+                    <a href="{{ route('admin.login') }}" class="nav-link-sm">Back to login</a>
+                </div>
             </section>
         </main>
     </body>

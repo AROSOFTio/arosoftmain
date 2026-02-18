@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminForgotPasswordController;
+use App\Http\Controllers\Admin\AdminResetPasswordController;
 use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\BlogDashboardController;
@@ -8,6 +10,7 @@ use App\Http\Controllers\Admin\BlogMediaController;
 use App\Http\Controllers\Admin\BlogPostController as AdminBlogPostController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BlogFeedController;
+use App\Http\Controllers\BlogMediaController as PublicBlogMediaController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SearchController;
@@ -24,6 +27,12 @@ Route::get('/blog/search', [BlogController::class, 'search'])->name('blog.search
 Route::get('/blog/category/{slug}', [BlogController::class, 'category'])->name('blog.category');
 Route::get('/blog/tag/{slug}', [BlogController::class, 'tag'])->name('blog.tag');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+Route::get('/media/blog/{path}', [PublicBlogMediaController::class, 'show'])
+    ->where('path', '.*')
+    ->name('blog.media');
+Route::get('/storage/blog/{path}', [PublicBlogMediaController::class, 'show'])
+    ->where('path', '.*')
+    ->name('blog.media.legacy');
 
 Route::get('/sitemap.xml', [BlogFeedController::class, 'sitemap'])->name('sitemap');
 Route::get('/rss.xml', [BlogFeedController::class, 'rss'])->name('rss');
@@ -55,6 +64,15 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
         Route::post('/login', [AdminAuthController::class, 'store'])
             ->middleware('throttle:8,1')
             ->name('login.store');
+
+        Route::get('/forgot-password', [AdminForgotPasswordController::class, 'create'])->name('password.request');
+        Route::post('/forgot-password', [AdminForgotPasswordController::class, 'store'])
+            ->middleware('throttle:8,1')
+            ->name('password.email');
+        Route::get('/reset-password/{token}', [AdminResetPasswordController::class, 'create'])->name('password.reset');
+        Route::post('/reset-password', [AdminResetPasswordController::class, 'store'])
+            ->middleware('throttle:8,1')
+            ->name('password.update');
     });
 
     Route::middleware(['auth', 'can:manage-blog'])->group(function (): void {

@@ -7,6 +7,35 @@
     $ogTitle = $post->og_title ?: $metaTitle;
     $ogDescription = $post->og_description ?: $metaDescription;
     $ogImage = $post->ogImageUrl() ?: url('/og-image.jpg');
+    $shareUrl = route('blog.show', $post->slug);
+    $shareTitle = $post->title;
+    $shareText = $post->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($post->body), 140);
+    $encodedShareUrl = urlencode($shareUrl);
+    $encodedShareTitle = urlencode($shareTitle);
+    $encodedShareText = urlencode($shareText);
+
+    $shareLinks = [
+        [
+            'label' => 'X',
+            'url' => 'https://x.com/intent/tweet?text='.$encodedShareTitle.'&url='.$encodedShareUrl,
+        ],
+        [
+            'label' => 'Facebook',
+            'url' => 'https://www.facebook.com/sharer/sharer.php?u='.$encodedShareUrl,
+        ],
+        [
+            'label' => 'LinkedIn',
+            'url' => 'https://www.linkedin.com/sharing/share-offsite/?url='.$encodedShareUrl,
+        ],
+        [
+            'label' => 'WhatsApp',
+            'url' => 'https://wa.me/?text='.$encodedShareTitle.'%20'.$encodedShareUrl,
+        ],
+        [
+            'label' => 'Email',
+            'url' => 'mailto:?subject='.$encodedShareTitle.'&body='.$encodedShareText.'%0A%0A'.$encodedShareUrl,
+        ],
+    ];
 
     $blogPostingSchema = [
         '@context' => 'https://schema.org',
@@ -134,6 +163,31 @@
             @endif
 
             <div class="info-card">
+                <p class="page-kicker">Share</p>
+                <h2 class="mt-2 font-heading text-xl">Share this article</h2>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    @foreach($shareLinks as $share)
+                        <a
+                            href="{{ $share['url'] }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="btn-outline !w-auto !px-4 !py-2 !text-[0.66rem]"
+                        >
+                            {{ $share['label'] }}
+                        </a>
+                    @endforeach
+                    <button
+                        type="button"
+                        class="btn-outline !w-auto !px-4 !py-2 !text-[0.66rem]"
+                        data-copy-share-url="{{ $shareUrl }}"
+                    >
+                        Copy Link
+                    </button>
+                </div>
+                <p class="mt-2 text-xs muted-faint" data-copy-share-feedback hidden>Link copied.</p>
+            </div>
+
+            <div class="info-card">
                 <p class="page-kicker">Author</p>
                 <h2 class="mt-2 font-heading text-xl">{{ $post->author?->name ?? 'Arosoft Team' }}</h2>
                 <p class="mt-2 text-sm leading-7 muted-copy">
@@ -174,3 +228,39 @@
         />
     </section>
 @endsection
+
+@push('head')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('[data-copy-share-url]').forEach(function (button) {
+                button.addEventListener('click', async function () {
+                    const url = button.getAttribute('data-copy-share-url');
+                    if (!url || !navigator.clipboard) {
+                        return;
+                    }
+
+                    try {
+                        await navigator.clipboard.writeText(url);
+
+                        const card = button.closest('.info-card');
+                        if (!card) {
+                            return;
+                        }
+
+                        const feedback = card.querySelector('[data-copy-share-feedback]');
+                        if (!feedback) {
+                            return;
+                        }
+
+                        feedback.hidden = false;
+                        window.setTimeout(function () {
+                            feedback.hidden = true;
+                        }, 1600);
+                    } catch (error) {
+                        // Clipboard write can fail in unsupported contexts; ignore silently.
+                    }
+                });
+            });
+        });
+    </script>
+@endpush

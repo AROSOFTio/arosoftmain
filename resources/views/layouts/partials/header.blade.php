@@ -111,6 +111,27 @@
                         <p x-show="videos.length === 0" class="mt-4 rounded-lg border border-[color:rgba(17,24,39,0.12)] px-3 py-2 text-sm muted-copy">
                             No recent tutorial videos available right now.
                         </p>
+
+                        <div class="mt-5 border-t border-[color:rgba(17,24,39,0.08)] pt-4">
+                            <p class="text-[0.65rem] uppercase tracking-[0.2em] muted-faint">Popular playlists</p>
+                            <div class="mt-3 grid grid-cols-2 gap-3" x-show="playlists.length > 0">
+                                <template x-for="playlist in playlists.slice(0, 4)" :key="playlist.playlist_id || playlist.url">
+                                    <a :href="playlist.url" class="group overflow-hidden rounded-xl border border-[color:rgba(17,24,39,0.14)] transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
+                                        <div
+                                            class="h-20 w-full border-b border-[color:rgba(17,24,39,0.1)] bg-[color:rgba(240,247,243,0.86)] bg-cover bg-center"
+                                            :style="playlist.thumb ? `background-image:url('${playlist.thumb}')` : ''"
+                                        ></div>
+                                        <div class="space-y-1 p-3">
+                                            <p class="text-sm font-semibold leading-snug text-[color:rgba(17,24,39,0.92)]" x-text="playlist.title"></p>
+                                            <p class="text-[0.65rem] uppercase tracking-[0.16em] muted-faint" x-text="playlist.meta || 'Playlist'"></p>
+                                        </div>
+                                    </a>
+                                </template>
+                            </div>
+                            <p x-show="playlists.length === 0" class="mt-3 rounded-lg border border-[color:rgba(17,24,39,0.12)] px-3 py-2 text-sm muted-copy">
+                                No playlists available right now.
+                            </p>
+                        </div>
                     </div>
                 </div>
 

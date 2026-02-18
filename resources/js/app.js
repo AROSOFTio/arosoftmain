@@ -16,6 +16,7 @@ window.siteShell = () => ({
     searchAbortController: null,
     searchRequestSequence: 0,
     videos: Array.isArray(window.siteTutorialVideos) ? window.siteTutorialVideos : [],
+    playlists: Array.isArray(window.siteTutorialPlaylists) ? window.siteTutorialPlaylists : [],
     searchResults: {
         Blog: [],
         Services: [],
