@@ -27,8 +27,9 @@
                 <select id="category" name="category" class="form-field">
                     <option value="">All</option>
                     @foreach($categories as $category)
+                        @php $depth = (int) ($category->depth ?? 0); @endphp
                         <option value="{{ $category->id }}" @selected((string) $category->id === $filters['category'])>
-                            {{ $category->name }}
+                            {{ str_repeat('-- ', $depth) }}{{ $category->name }}
                         </option>
                     @endforeach
                 </select>
@@ -80,6 +81,11 @@
                         <tr class="border-t border-[color:rgba(17,24,39,0.08)]">
                             <td class="px-5 py-3">
                                 <div class="font-semibold">{{ $post->title }}</div>
+                                @if($post->is_featured)
+                                    <span class="mt-1 inline-flex rounded-full border border-[color:rgba(0,157,49,0.42)] px-2 py-0.5 text-[0.62rem] font-semibold uppercase tracking-[0.08em] text-[color:rgba(0,157,49,0.98)]">
+                                        Featured
+                                    </span>
+                                @endif
                                 <div class="text-xs muted-faint">{{ $post->slug }}</div>
                             </td>
                             <td class="px-5 py-3">{{ ucfirst($post->status) }}</td>
@@ -113,4 +119,3 @@
         </div>
     </section>
 @endsection
-

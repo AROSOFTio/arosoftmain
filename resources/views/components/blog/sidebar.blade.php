@@ -30,9 +30,10 @@
         </div>
         <ul class="mt-3 space-y-2 text-sm">
             @forelse($categories as $category)
+                @php $depth = (int) ($category->depth ?? 0); @endphp
                 <li class="flex items-center justify-between gap-3">
                     <a href="{{ route('blog.category', $category->slug) }}" class="hover:text-[color:var(--accent)]">
-                        {{ $category->name }}
+                        {{ str_repeat('-- ', $depth) }}{{ $category->name }}
                     </a>
                     <span class="muted-faint">{{ $category->published_posts_count }}</span>
                 </li>
@@ -94,4 +95,3 @@
         <a href="{{ route('contact') }}" class="btn-solid mt-4 !w-full !text-[0.68rem]">Request updates</a>
     </section>
 </div>
-

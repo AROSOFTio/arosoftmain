@@ -17,6 +17,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -52,7 +53,10 @@ class BlogPostController extends Controller
             )
             ->when(
                 $filters['category'] !== '',
-                fn ($query) => $query->where('category_id', (int) $filters['category'])
+                fn ($query) => $query->whereIn(
+                    'category_id',
+                    BlogCategory::descendantAndSelfIdsFor((int) $filters['category'])
+                )
             )
             ->when(
                 $filters['author'] !== '',
@@ -74,7 +78,7 @@ class BlogPostController extends Controller
 
         return view('admin.blog.posts.index', [
             'posts' => $posts,
-            'categories' => BlogCategory::query()->orderBy('name')->get(['id', 'name']),
+            'categories' => $this->hierarchicalCategories(),
             'authors' => User::query()->orderBy('name')->get(['id', 'name']),
             'filters' => $filters,
         ]);
@@ -163,7 +167,7 @@ class BlogPostController extends Controller
     {
         return [
             'post' => $blogPost,
-            'categories' => BlogCategory::query()->orderBy('name')->get(['id', 'name']),
+            'categories' => $this->hierarchicalCategories(),
             'tags' => BlogTag::query()->orderBy('name')->get(['id', 'name']),
             'authors' => User::query()->orderBy('name')->get(['id', 'name']),
         ];
@@ -186,6 +190,7 @@ class BlogPostController extends Controller
                 'excerpt' => $validated['excerpt'] ?? null,
                 'body' => $this->sanitizer->sanitizeForStorage($validated['body']),
                 'featured_image_alt' => $validated['featured_image_alt'] ?? null,
+                'is_featured' => $request->boolean('is_featured'),
                 'status' => $this->resolveStatus($validated),
                 'published_at' => $this->resolvePublishedAt($validated),
                 'meta_title' => $validated['meta_title'] ?? null,
@@ -221,6 +226,13 @@ class BlogPostController extends Controller
 
             $post->save();
 
+            if ($post->is_featured) {
+                BlogPost::query()
+                    ->whereKeyNot($post->id)
+                    ->where('is_featured', true)
+                    ->update(['is_featured' => false]);
+            }
+
             $post->tags()->sync($this->resolveTagIds($validated));
         });
 
@@ -233,20 +245,101 @@ class BlogPostController extends Controller
     private function resolveCategoryId(array $validated): ?int
     {
         if (!empty($validated['new_category'])) {
-            $name = trim((string) $validated['new_category']);
-            $slug = Str::slug($name);
+            $segments = $this->parseCategoryPath((string) $validated['new_category']);
 
-            if ($slug !== '') {
-                $category = BlogCategory::query()->firstOrCreate(
-                    ['slug' => $slug],
-                    ['name' => Str::title($name)]
-                );
+            if ($segments !== []) {
+                $parentId = null;
+                $slugSegments = [];
 
-                return (int) $category->id;
+                foreach ($segments as $segment) {
+                    $slugPart = Str::slug($segment);
+
+                    if ($slugPart === '') {
+                        continue;
+                    }
+
+                    $slugSegments[] = $slugPart;
+                    $category = BlogCategory::query()->firstOrCreate(
+                        ['slug' => implode('-', $slugSegments)],
+                        [
+                            'name' => Str::title($segment),
+                            'parent_id' => $parentId,
+                        ]
+                    );
+
+                    if ((int) ($category->parent_id ?? 0) !== (int) ($parentId ?? 0)) {
+                        $category->parent_id = $parentId;
+                        $category->save();
+                    }
+
+                    $parentId = (int) $category->id;
+                }
+
+                if ($parentId) {
+                    return $parentId;
+                }
             }
         }
 
         return !empty($validated['category_id']) ? (int) $validated['category_id'] : null;
+    }
+
+    /**
+     * @return Collection<int, BlogCategory>
+     */
+    private function hierarchicalCategories(): Collection
+    {
+        $categories = BlogCategory::query()
+            ->orderBy('name')
+            ->get(['id', 'parent_id', 'name']);
+
+        $childrenByParent = $categories->groupBy(fn (BlogCategory $category) => (int) ($category->parent_id ?? 0));
+        $flattened = collect();
+
+        $walk = function (int $parentId, int $depth) use (&$walk, $childrenByParent, $flattened): void {
+            $siblings = $childrenByParent
+                ->get($parentId, collect())
+                ->sortBy(fn (BlogCategory $category): string => strtolower($category->name));
+
+            foreach ($siblings as $category) {
+                $category->setAttribute('depth', $depth);
+                $flattened->push($category);
+                $walk((int) $category->id, $depth + 1);
+            }
+        };
+
+        $walk(0, 0);
+
+        return $flattened;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function parseCategoryPath(string $rawPath): array
+    {
+        $normalized = trim($rawPath);
+
+        if ($normalized === '') {
+            return [];
+        }
+
+        $segments = preg_split('/\s*(?:>|\/|\\\\|\|)\s*/', $normalized) ?: [];
+
+        if (
+            count($segments) === 1
+            && str_contains($normalized, '-')
+            && substr_count($normalized, '-') >= 2
+            && !str_contains($normalized, ' ')
+        ) {
+            $segments = explode('-', $normalized);
+        }
+
+        return collect($segments)
+            ->map(fn (string $segment): string => trim($segment))
+            ->filter()
+            ->values()
+            ->all();
     }
 
     /**
@@ -341,4 +434,3 @@ class BlogPostController extends Controller
         Cache::forget('blog:rss:xml');
     }
 }
-

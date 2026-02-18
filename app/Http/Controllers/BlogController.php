@@ -25,32 +25,51 @@ class BlogController extends Controller
     public function index(Request $request): View
     {
         $queryText = trim((string) $request->query('q', ''));
+        $sort = $this->resolveSort((string) $request->query('sort', 'latest'));
+        $categorySlug = trim((string) $request->query('category', ''));
+        $activeCategory = null;
+        $queryBuilder = BlogPost::query()->publiclyVisible();
+
+        if ($categorySlug !== '') {
+            $activeCategory = BlogCategory::query()->where('slug', $categorySlug)->first();
+
+            if ($activeCategory instanceof BlogCategory) {
+                $queryBuilder->whereIn('category_id', $activeCategory->descendantAndSelfIds());
+            } else {
+                $queryBuilder->whereRaw('1 = 0');
+            }
+        }
 
         return $this->renderListing(
             title: 'Arosoft Blog',
             heading: 'Insights, tutorials, and product updates',
-            queryBuilder: BlogPost::query()->publiclyVisible(),
-            queryText: $queryText
+            queryBuilder: $queryBuilder,
+            queryText: $queryText,
+            category: $activeCategory,
+            sort: $sort,
         );
     }
 
     public function category(string $slug): View
     {
         $category = BlogCategory::query()->where('slug', $slug)->firstOrFail();
+        $sort = $this->resolveSort((string) request()->query('sort', 'latest'));
 
         return $this->renderListing(
             title: 'Category: '.$category->name,
             heading: $category->name,
             queryBuilder: BlogPost::query()
                 ->publiclyVisible()
-                ->where('category_id', $category->id),
-            category: $category
+                ->whereIn('category_id', $category->descendantAndSelfIds()),
+            category: $category,
+            sort: $sort,
         );
     }
 
     public function tag(string $slug): View
     {
         $tag = BlogTag::query()->where('slug', $slug)->firstOrFail();
+        $sort = $this->resolveSort((string) request()->query('sort', 'latest'));
 
         return $this->renderListing(
             title: 'Tag: '.$tag->name,
@@ -58,13 +77,15 @@ class BlogController extends Controller
             queryBuilder: BlogPost::query()
                 ->publiclyVisible()
                 ->whereHas('tags', fn (Builder $query) => $query->where('blog_tags.id', $tag->id)),
-            tag: $tag
+            tag: $tag,
+            sort: $sort,
         );
     }
 
     public function search(Request $request): View|RedirectResponse
     {
         $queryText = trim((string) $request->query('q', ''));
+        $sort = $this->resolveSort((string) $request->query('sort', 'latest'));
 
         if ($queryText === '') {
             return redirect()->route('blog');
@@ -74,7 +95,8 @@ class BlogController extends Controller
             title: 'Search results',
             heading: 'Search results for "'.$queryText.'"',
             queryBuilder: BlogPost::query()->publiclyVisible(),
-            queryText: $queryText
+            queryText: $queryText,
+            sort: $sort,
         );
     }
 
@@ -115,9 +137,10 @@ class BlogController extends Controller
         Builder $queryBuilder,
         string $queryText = '',
         ?BlogCategory $category = null,
-        ?BlogTag $tag = null
+        ?BlogTag $tag = null,
+        string $sort = 'latest',
     ): View {
-        $queryBuilder
+        $baseQuery = $queryBuilder
             ->with(['author:id,name', 'category:id,name,slug', 'tags:id,name,slug'])
             ->when($queryText !== '', function (Builder $query) use ($queryText): void {
                 $term = '%'.str_replace(' ', '%', $queryText).'%';
@@ -129,14 +152,18 @@ class BlogController extends Controller
                 });
             });
 
-        $featuredPost = (clone $queryBuilder)
+        $featuredPost = (clone $baseQuery)
+            ->where('is_featured', true)
             ->orderByDesc('published_at')
             ->first();
 
-        $posts = (clone $queryBuilder)
-            ->when($featuredPost, fn ($query) => $query->where('id', '!=', $featuredPost->id))
-            ->orderByDesc('published_at')
-            ->paginate(9)
+        $postsQuery = (clone $baseQuery)
+            ->when($featuredPost, fn ($query) => $query->where('id', '!=', $featuredPost->id));
+
+        $this->applySort($postsQuery, $sort);
+
+        $posts = $postsQuery
+            ->paginate(12)
             ->withQueryString();
 
         return view('blog.index', [
@@ -148,6 +175,27 @@ class BlogController extends Controller
             'queryText' => $queryText,
             'activeCategory' => $category,
             'activeTag' => $tag,
+            'sort' => $sort,
         ]);
+    }
+
+    private function applySort(Builder $query, string $sort): void
+    {
+        if ($sort === 'popular') {
+            $query->orderByDesc('view_count')->orderByDesc('published_at');
+            return;
+        }
+
+        if ($sort === 'oldest') {
+            $query->orderBy('published_at');
+            return;
+        }
+
+        $query->orderByDesc('published_at');
+    }
+
+    private function resolveSort(string $sort): string
+    {
+        return in_array($sort, ['latest', 'popular', 'oldest'], true) ? $sort : 'latest';
     }
 }

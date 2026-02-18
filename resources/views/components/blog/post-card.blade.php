@@ -4,7 +4,10 @@
     'compact' => false,
 ])
 
-<article class="shell-card overflow-hidden rounded-2xl">
+<article {{ $attributes->class([
+    'shell-card blog-card overflow-hidden rounded-2xl',
+    'blog-card--compact' => $compact,
+]) }}>
     @if($post->featuredImageUrl())
         <a href="{{ route('blog.show', $post->slug) }}" class="block">
             <img
@@ -45,4 +48,3 @@
         </div>
     </div>
 </article>
-

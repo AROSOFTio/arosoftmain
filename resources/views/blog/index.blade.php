@@ -2,6 +2,7 @@
     $metaTitle = 'AROSOFT Blog | '.$title;
     $metaDescription = $activeCategory?->description
         ?: ($queryText !== '' ? 'Search results from Arosoft blog for '.$queryText.'.' : 'Read Arosoft blog insights, tutorials, and product updates.');
+    $selectedCategorySlug = (string) request()->query('category', $activeCategory?->slug ?? '');
 @endphp
 
 @extends('layouts.app')
@@ -37,6 +38,54 @@
 
     <section class="content-section grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div class="space-y-7">
+            <section class="info-card">
+                <form action="{{ route('blog') }}" method="get" class="grid gap-3 md:grid-cols-12">
+                    <div class="md:col-span-5">
+                        <label for="blog-filter-search" class="form-label">Search</label>
+                        <input
+                            id="blog-filter-search"
+                            type="search"
+                            name="q"
+                            value="{{ $queryText }}"
+                            placeholder="Search by title, excerpt, or content"
+                            class="form-field"
+                        >
+                    </div>
+
+                    <div class="md:col-span-3">
+                        <label for="blog-filter-category" class="form-label">Category</label>
+                        <select id="blog-filter-category" name="category" class="form-field">
+                            <option value="">All categories</option>
+                            @foreach($sidebar['categories'] as $categoryOption)
+                                @php $depth = (int) ($categoryOption->depth ?? 0); @endphp
+                                <option
+                                    value="{{ $categoryOption->slug }}"
+                                    @selected($selectedCategorySlug === (string) $categoryOption->slug)
+                                >
+                                    {{ str_repeat('-- ', $depth) }}{{ $categoryOption->name }} ({{ $categoryOption->published_posts_count }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="blog-filter-sort" class="form-label">Sort</label>
+                        <select id="blog-filter-sort" name="sort" class="form-field">
+                            <option value="latest" @selected($sort === 'latest')>Latest</option>
+                            <option value="popular" @selected($sort === 'popular')>Most viewed</option>
+                            <option value="oldest" @selected($sort === 'oldest')>Oldest</option>
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2 md:self-end">
+                        <div class="flex flex-wrap gap-2 md:justify-end">
+                            <button type="submit" class="btn-solid !w-auto !px-4 !py-2 !text-[0.68rem]">Apply</button>
+                            <a href="{{ route('blog') }}" class="btn-outline !w-auto !px-4 !py-2 !text-[0.68rem]">Reset</a>
+                        </div>
+                    </div>
+                </form>
+            </section>
+
             @if($featuredPost)
                 <div>
                     <p class="page-kicker mb-3">Featured</p>
@@ -45,9 +94,14 @@
             @endif
 
             @if($posts->count())
-                <div class="grid gap-5 md:grid-cols-2">
+                <div class="blog-card-grid grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                     @foreach($posts as $post)
-                        <x-blog.post-card :post="$post" :compact="true" />
+                        <x-blog.post-card
+                            :post="$post"
+                            :compact="true"
+                            class="blog-card-item"
+                            :style="'--blog-card-index: '.($loop->index + 1).';'"
+                        />
                     @endforeach
                 </div>
             @elseif(!$featuredPost)

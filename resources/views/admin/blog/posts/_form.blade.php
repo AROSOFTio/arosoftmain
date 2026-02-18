@@ -2,6 +2,7 @@
     $selectedTagIds = collect(old('tags', $post->exists ? $post->tags->pluck('id')->all() : []))
         ->map(fn ($id) => (int) $id)
         ->all();
+    $selectedCategoryId = (int) old('category_id', $post->category_id ?: 0);
 @endphp
 
 <form
@@ -40,6 +41,21 @@
                 </select>
                 @error('status')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
             </div>
+        </div>
+
+        <div class="mt-4">
+            <label class="inline-flex items-center gap-2 text-sm">
+                <input
+                    type="checkbox"
+                    name="is_featured"
+                    value="1"
+                    class="h-4 w-4"
+                    @checked((bool) old('is_featured', $post->is_featured))
+                >
+                <span>Mark as featured post</span>
+            </label>
+            <p class="mt-1 text-xs muted-faint">Only one post stays featured at a time. Selecting this post unfeatures the previous one.</p>
+            @error('is_featured')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
         </div>
 
         <div class="mt-4">
@@ -87,15 +103,35 @@
         <h2 class="font-heading text-xl">Taxonomy</h2>
         <div class="mt-4 grid gap-4 lg:grid-cols-2">
             <div>
-                <label for="category_id" class="form-label">Category</label>
-                <select id="category_id" name="category_id" class="form-field">
-                    <option value="">None</option>
+                <p class="form-label">Category</p>
+                <div class="max-h-64 space-y-2 overflow-y-auto rounded-xl border border-[color:rgba(17,24,39,0.18)] bg-[color:rgba(255,255,255,0.95)] p-3">
+                    <label class="flex cursor-pointer items-center gap-3 rounded-lg border border-transparent px-3 py-2 hover:border-[color:rgba(0,157,49,0.36)] hover:bg-[color:rgba(0,157,49,0.08)]">
+                        <input
+                            type="radio"
+                            name="category_id"
+                            value=""
+                            class="peer sr-only"
+                            @checked($selectedCategoryId < 1)
+                        >
+                        <span class="flex-1 text-sm font-medium">None</span>
+                        <span class="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[color:rgba(0,157,49,0.55)] text-[0.72rem] font-bold text-[color:rgba(0,157,49,0.98)] opacity-0 transition peer-checked:opacity-100">&#10003;</span>
+                    </label>
+
                     @foreach($categories as $category)
-                        <option value="{{ $category->id }}" @selected((int) old('category_id', $post->category_id) === (int) $category->id)>
-                            {{ $category->name }}
-                        </option>
+                        @php $depth = (int) ($category->depth ?? 0); @endphp
+                        <label class="flex cursor-pointer items-center gap-3 rounded-lg border border-transparent px-3 py-2 hover:border-[color:rgba(0,157,49,0.36)] hover:bg-[color:rgba(0,157,49,0.08)]">
+                            <input
+                                type="radio"
+                                name="category_id"
+                                value="{{ $category->id }}"
+                                class="peer sr-only"
+                                @checked($selectedCategoryId === (int) $category->id)
+                            >
+                            <span class="flex-1 text-sm leading-6">{{ str_repeat('-- ', $depth) }}{{ $category->name }}</span>
+                            <span class="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[color:rgba(0,157,49,0.55)] text-[0.72rem] font-bold text-[color:rgba(0,157,49,0.98)] opacity-0 transition peer-checked:opacity-100">&#10003;</span>
+                        </label>
                     @endforeach
-                </select>
+                </div>
                 @error('category_id')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
             </div>
 
@@ -107,21 +143,32 @@
                     name="new_category"
                     value="{{ old('new_category') }}"
                     class="form-field"
-                    placeholder="Creates/selects by slug"
+                    placeholder="Tech > Hosting > VPS"
                 >
+                <p class="mt-1 text-xs muted-faint">Use `>` or `/` to create nested categories in one go.</p>
                 @error('new_category')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
             </div>
         </div>
 
         <div class="mt-4">
-            <label for="tags" class="form-label">Tags</label>
-            <select id="tags" name="tags[]" multiple size="8" class="form-field">
-                @foreach($tags as $tag)
-                    <option value="{{ $tag->id }}" @selected(in_array((int) $tag->id, $selectedTagIds, true))>
-                        {{ $tag->name }}
-                    </option>
-                @endforeach
-            </select>
+            <p class="form-label">Tags</p>
+            <div class="max-h-72 space-y-2 overflow-y-auto rounded-xl border border-[color:rgba(17,24,39,0.18)] bg-[color:rgba(255,255,255,0.95)] p-3">
+                @forelse($tags as $tag)
+                    <label class="flex cursor-pointer items-center gap-3 rounded-lg border border-transparent px-3 py-2 hover:border-[color:rgba(0,157,49,0.36)] hover:bg-[color:rgba(0,157,49,0.08)]">
+                        <input
+                            type="checkbox"
+                            name="tags[]"
+                            value="{{ $tag->id }}"
+                            class="peer sr-only"
+                            @checked(in_array((int) $tag->id, $selectedTagIds, true))
+                        >
+                        <span class="flex-1 text-sm leading-6">{{ $tag->name }}</span>
+                        <span class="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[color:rgba(0,157,49,0.55)] text-[0.72rem] font-bold text-[color:rgba(0,157,49,0.98)] opacity-0 transition peer-checked:opacity-100">&#10003;</span>
+                    </label>
+                @empty
+                    <p class="text-sm muted-faint">No tags yet.</p>
+                @endforelse
+            </div>
             @error('tags')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
             @error('tags.*')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
         </div>

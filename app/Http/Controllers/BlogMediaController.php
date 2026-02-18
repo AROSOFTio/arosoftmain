@@ -47,6 +47,7 @@ class BlogMediaController extends Controller
             'png' => 'image/png',
             'gif' => 'image/gif',
             'webp' => 'image/webp',
+            'avif' => 'image/avif',
             'svg' => 'image/svg+xml',
             default => 'application/octet-stream',
         };
