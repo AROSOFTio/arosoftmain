@@ -10,13 +10,14 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BlogFeedController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\ToolsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PageController::class, 'home'])->name('home');
-Route::get('/search/suggestions', [BlogController::class, 'suggestions'])
-    ->middleware('throttle:45,1')
+Route::get('/search/suggestions', [SearchController::class, 'suggestions'])
+    ->middleware('throttle:240,1')
     ->name('search.suggestions');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog');
 Route::get('/blog/search', [BlogController::class, 'search'])->name('blog.search');

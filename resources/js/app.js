@@ -1,6 +1,6 @@
 import './bootstrap';
 import Alpine from 'alpinejs';
-import { searchIndex, videos } from './mockData';
+import { videos } from './mockData';
 
 window.Alpine = Alpine;
 
@@ -13,15 +13,16 @@ window.siteShell = () => ({
     showSearch: false,
     hasSearchMatches: false,
     previousActiveElement: null,
-    searchSections: ['Services', 'Tutorials', 'Blog', 'Pages'],
+    searchSections: ['Blog', 'Services', 'Courses', 'Tutorials', 'Tools', 'Pages'],
     searchAbortController: null,
     searchRequestSequence: 0,
     videos,
-    searchIndex,
     searchResults: {
-        Services: [],
-        Tutorials: [],
         Blog: [],
+        Services: [],
+        Courses: [],
+        Tutorials: [],
+        Tools: [],
         Pages: [],
     },
 
@@ -134,9 +135,11 @@ window.siteShell = () => ({
 
     freshSearchGroups() {
         return {
-            Services: [],
-            Tutorials: [],
             Blog: [],
+            Services: [],
+            Courses: [],
+            Tutorials: [],
+            Tools: [],
             Pages: [],
         };
     },
@@ -164,20 +167,7 @@ window.siteShell = () => ({
         this.hasSearchMatches = false;
     },
 
-    addBlogSearchFallback(grouped, query) {
-        if (!query || grouped.Blog.length > 0) {
-            return;
-        }
-
-        grouped.Blog.push({
-            type: 'Blog',
-            title: `Search blog for "${query}"`,
-            url: `/blog/search?q=${encodeURIComponent(query)}`,
-            meta: 'Open full results',
-        });
-    },
-
-    async fetchBlogResults(query) {
+    async fetchSuggestions(query) {
         this.cancelSearchRequest();
         const controller = new AbortController();
         this.searchAbortController = controller;
@@ -195,7 +185,7 @@ window.siteShell = () => ({
             }
 
             const payload = await response.json();
-            return Array.isArray(payload.blog) ? payload.blog : [];
+            return Array.isArray(payload.results) ? payload.results : [];
         } finally {
             if (this.searchAbortController === controller) {
                 this.searchAbortController = null;
@@ -218,26 +208,25 @@ window.siteShell = () => ({
 
         const grouped = this.freshSearchGroups();
 
-        this.searchIndex.forEach((item) => {
-            const text = `${item.title} ${item.meta}`.toLowerCase();
-            if (!text.includes(normalizedQuery) || !grouped[item.type]) {
-                return;
-            }
-
-            grouped[item.type].push(item);
-        });
-
         try {
-            grouped.Blog = (await this.fetchBlogResults(query)).slice(0, 4);
+            const results = await this.fetchSuggestions(query);
+
+            results.forEach((item) => {
+                if (!item || !grouped[item.type]) {
+                    return;
+                }
+
+                grouped[item.type].push(item);
+            });
         } catch (error) {
             if (error?.name !== 'AbortError') {
-                grouped.Blog = [];
+                this.searchResults = this.freshSearchGroups();
+                this.hasSearchMatches = false;
+                this.showSearch = true;
             } else {
                 return;
             }
         }
-
-        this.addBlogSearchFallback(grouped, query);
 
         if (requestId !== this.searchRequestSequence) {
             return;

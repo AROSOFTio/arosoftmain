@@ -123,7 +123,7 @@
                         <input
                             type="search"
                             class="search-input"
-                            placeholder="Search services, videos, blog, pages..."
+                            placeholder="Search blog, courses, tools, services..."
                             x-model="searchQuery"
                             @focus="focusSearch()"
                             @input.debounce.160ms="updateSearch()"
@@ -166,7 +166,7 @@
                         x-ref="mobileSearchInput"
                         type="search"
                         class="search-input"
-                        placeholder="Search services, videos, blog, pages..."
+                        placeholder="Search blog, courses, tools, services..."
                         x-model="searchQuery"
                         @focus="focusSearch()"
                         @input.debounce.160ms="updateSearch()"
