@@ -1,9 +1,9 @@
 @php echo '<?xml version="1.0" encoding="UTF-8"?>'; @endphp
 <rss version="2.0">
     <channel>
-        <title>Arosoft Blog</title>
-        <link>{{ route('blog') }}</link>
-        <description>Latest articles from Arosoft Innovations Ltd.</description>
+        <title>AROSOFT Innovations Ltd.</title>
+        <link>{{ route('home') }}</link>
+        <description>Official website updates from AROSOFT Innovations Ltd.</description>
         <language>en-us</language>
         <lastBuildDate>{{ now()->toRssString() }}</lastBuildDate>
 
