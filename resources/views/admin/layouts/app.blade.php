@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>@yield('title', 'Blog Admin') | Arosoft</title>
+        <title>@yield('title', 'Admin') | AROSOFT Innovations Ltd.</title>
         <meta name="robots" content="noindex,nofollow">
         @include('layouts.partials.favicons')
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -221,8 +221,8 @@
                 </main>
 
                 <footer class="admin-footer">
-                    <p>© {{ now()->year }} Arosoft Innovations Ltd</p>
-                    <p>Blog CMS dashboard with publishing, users, SEO, and system controls.</p>
+                    <p>&copy; {{ now()->year }} AROSOFT Innovations Ltd.</p>
+                    <p>Admin dashboard for website content, users, SEO, and system controls.</p>
                 </footer>
             </div>
         </div>

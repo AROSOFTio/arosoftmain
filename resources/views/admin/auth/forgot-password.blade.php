@@ -17,7 +17,7 @@
                 <a href="{{ route('home') }}" class="inline-flex brand-logo-wrap admin-login-logo-wrap">
                     <img src="{{ asset('brand/logo-full.svg') }}" alt="Arosoft Innovations Ltd" class="brand-logo-full admin-login-logo">
                 </a>
-                <p class="page-kicker">Arosoft Blog</p>
+                <p class="page-kicker">AROSOFT Innovations Ltd.</p>
                 <h1 class="mt-2 font-heading text-3xl">Forgot password</h1>
                 <p class="mt-2 text-sm muted-copy">Enter your admin email to receive a reset link.</p>
 
