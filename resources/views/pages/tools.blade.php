@@ -36,6 +36,16 @@
         </div>
     @endif
 
+    <div class="mt-6">
+        <x-adsense.unit
+            slot="8082861654"
+            format="auto"
+            :full-width-responsive="true"
+            style="display:block"
+            wrapperClass="info-card"
+        />
+    </div>
+
     <section class="overflow-hidden rounded-2xl border border-[color:rgba(17,24,39,0.18)] bg-white shadow-[0_12px_26px_rgba(17,24,39,0.06)]">
         <div class="h-4 bg-[var(--accent)]"></div>
 
@@ -116,6 +126,13 @@
                             </p>
                         </article>
                     </div>
+
+                    <x-adsense.unit
+                        slot="4422776996"
+                        format="autorelaxed"
+                        style="display:block"
+                        wrapperClass="info-card"
+                    />
 
                     <article id="tool-workspace" class="rounded-lg border border-[color:rgba(17,24,39,0.14)] p-4">
                         <h3 class="font-heading text-xl">Process {{ $activeTool['name'] }}</h3>

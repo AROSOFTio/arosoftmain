@@ -36,6 +36,16 @@
         </div>
     </section>
 
+    <section class="content-section">
+        <x-adsense.unit
+            slot="8082861654"
+            format="auto"
+            :full-width-responsive="true"
+            style="display:block"
+            wrapperClass="info-card"
+        />
+    </section>
+
     <section class="content-section grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div class="space-y-7">
             <section class="info-card">
@@ -110,6 +120,13 @@
                     <p class="mt-2 text-sm leading-7 muted-copy">Try another keyword, category, or tag.</p>
                 </article>
             @endif
+
+            <x-adsense.unit
+                slot="4422776996"
+                format="autorelaxed"
+                style="display:block"
+                wrapperClass="info-card"
+            />
 
             <div class="pt-2">
                 {{ $posts->links() }}

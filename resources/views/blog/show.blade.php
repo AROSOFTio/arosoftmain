@@ -149,6 +149,14 @@
                 </div>
             </div>
 
+            <x-adsense.unit
+                slot="8137319086"
+                format="fluid"
+                layout="in-article"
+                style="display:block; text-align:center;"
+                wrapperClass="info-card"
+            />
+
             @if($post->tags->isNotEmpty())
                 <div class="info-card">
                     <h2 class="font-heading text-lg">Tags</h2>
@@ -205,6 +213,14 @@
                     </div>
                 </div>
             @endif
+
+            <x-adsense.unit
+                slot="8593659207"
+                format="fluid"
+                layoutKey="-h6-1e-31+19+jo"
+                style="display:block"
+                wrapperClass="info-card"
+            />
         </article>
 
         <aside class="hidden lg:block">

@@ -23,6 +23,16 @@
         </div>
     </section>
 
+    <section class="content-section">
+        <x-adsense.unit
+            slot="8082861654"
+            format="auto"
+            :full-width-responsive="true"
+            style="display:block"
+            wrapperClass="info-card"
+        />
+    </section>
+
     @if(!empty($tutorialVideos))
         <section class="content-section grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             @foreach($tutorialVideos as $video)
@@ -55,6 +65,15 @@
             </article>
         </section>
     @endif
+
+    <section class="content-section">
+        <x-adsense.unit
+            slot="4422776996"
+            format="autorelaxed"
+            style="display:block"
+            wrapperClass="info-card"
+        />
+    </section>
 
     @if(!empty($tutorialPlaylists))
         <section class="content-section">
