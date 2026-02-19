@@ -75,11 +75,8 @@ class BlogPost extends Model
     public function scopePubliclyVisible(Builder $query): Builder
     {
         return $query->where(function (Builder $query): void {
-            $query->where(function (Builder $query): void {
-                $query->where('status', 'published')
-                    ->whereNotNull('published_at')
-                    ->where('published_at', '<=', now());
-            })->orWhere(function (Builder $query): void {
+            $query->where('status', 'published')
+                ->orWhere(function (Builder $query): void {
                 $query->where('status', 'scheduled')
                     ->whereNotNull('published_at')
                     ->where('published_at', '<=', now());
@@ -89,11 +86,12 @@ class BlogPost extends Model
 
     public function isPubliclyVisible(): bool
     {
-        if (!$this->published_at instanceof Carbon) {
-            return false;
+        if ($this->status === 'published') {
+            return true;
         }
 
-        return in_array($this->status, ['published', 'scheduled'], true)
+        return $this->status === 'scheduled'
+            && $this->published_at instanceof Carbon
             && $this->published_at->isPast();
     }
 

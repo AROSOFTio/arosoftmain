@@ -13,13 +13,18 @@ class BlogDashboardController extends Controller
         $metrics = [
             'total_posts' => BlogPost::query()->count(),
             'published_posts' => BlogPost::query()
-                ->whereIn('status', ['published', 'scheduled'])
-                ->whereNotNull('published_at')
-                ->where('published_at', '<=', now())
+                ->where(function ($query): void {
+                    $query->where('status', 'published')
+                        ->orWhere(function ($query): void {
+                            $query->where('status', 'scheduled')
+                                ->whereNotNull('published_at')
+                                ->where('published_at', '<=', now());
+                        });
+                })
                 ->count(),
             'draft_posts' => BlogPost::query()->where('status', 'draft')->count(),
             'scheduled_posts' => BlogPost::query()
-                ->whereIn('status', ['published', 'scheduled'])
+                ->where('status', 'scheduled')
                 ->whereNotNull('published_at')
                 ->where('published_at', '>', now())
                 ->count(),
