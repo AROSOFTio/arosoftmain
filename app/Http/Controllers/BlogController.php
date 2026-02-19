@@ -152,10 +152,14 @@ class BlogController extends Controller
                 });
             });
 
-        $featuredPost = (clone $baseQuery)
-            ->where('is_featured', true)
-            ->orderByDesc('published_at')
-            ->first();
+        $featuredPost = null;
+
+        if (BlogPost::supportsFeaturedFlag()) {
+            $featuredPost = (clone $baseQuery)
+                ->where('is_featured', true)
+                ->orderByDesc('published_at')
+                ->first();
+        }
 
         $postsQuery = (clone $baseQuery)
             ->when($featuredPost, fn ($query) => $query->where('id', '!=', $featuredPost->id));

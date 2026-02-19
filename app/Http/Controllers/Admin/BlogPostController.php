@@ -178,7 +178,7 @@ class BlogPostController extends Controller
         $validated = $request->validated();
 
         DB::transaction(function () use ($validated, $request, $post): void {
-            $post->fill([
+            $attributes = [
                 'user_id' => (int) ($validated['user_id'] ?? $request->user()->id),
                 'category_id' => $this->resolveCategoryId($validated),
                 'title' => $validated['title'],
@@ -190,7 +190,6 @@ class BlogPostController extends Controller
                 'excerpt' => $validated['excerpt'] ?? null,
                 'body' => $this->sanitizer->sanitizeForStorage($validated['body']),
                 'featured_image_alt' => $validated['featured_image_alt'] ?? null,
-                'is_featured' => $request->boolean('is_featured'),
                 'status' => $this->resolveStatus($validated),
                 'published_at' => $this->resolvePublishedAt($validated),
                 'meta_title' => $validated['meta_title'] ?? null,
@@ -200,7 +199,13 @@ class BlogPostController extends Controller
                 'robots' => $validated['robots'] ?? 'index,follow',
                 'og_title' => $validated['og_title'] ?? null,
                 'og_description' => $validated['og_description'] ?? null,
-            ]);
+            ];
+
+            if (BlogPost::supportsFeaturedFlag()) {
+                $attributes['is_featured'] = $request->boolean('is_featured');
+            }
+
+            $post->fill($attributes);
 
             $post->reading_time_minutes = $this->readingTimeService->calculateMinutes($post->body);
 
@@ -226,7 +231,7 @@ class BlogPostController extends Controller
 
             $post->save();
 
-            if ($post->is_featured) {
+            if (BlogPost::supportsFeaturedFlag() && $post->is_featured) {
                 BlogPost::query()
                     ->whereKeyNot($post->id)
                     ->where('is_featured', true)

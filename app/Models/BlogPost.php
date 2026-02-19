@@ -8,11 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class BlogPost extends Model
 {
     use HasFactory;
+
+    private static ?bool $supportsFeaturedFlag = null;
 
     /**
      * @var list<string>
@@ -120,5 +123,10 @@ class BlogPost extends Model
         }
 
         return $this->featuredImageUrl();
+    }
+
+    public static function supportsFeaturedFlag(): bool
+    {
+        return self::$supportsFeaturedFlag ??= Schema::hasColumn((new self())->getTable(), 'is_featured');
     }
 }
