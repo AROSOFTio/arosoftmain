@@ -3,6 +3,7 @@
         ->map(fn ($id) => (int) $id)
         ->all();
     $selectedCategoryId = (int) old('category_id', $post->category_id ?: 0);
+    $initialStatus = old('status', $post->status === 'draft' ? 'draft' : 'published');
 @endphp
 
 <form
@@ -15,31 +16,21 @@
     @if($post->exists)
         @method('put')
     @endif
+    <input type="hidden" id="post_status" name="status" value="{{ $initialStatus }}">
 
     <section class="admin-card p-5">
         <h2 class="font-heading text-xl">Content</h2>
 
-        <div class="mt-4 grid gap-4 lg:grid-cols-2">
-            <div>
-                <label for="user_id" class="form-label">Author</label>
-                <select id="user_id" name="user_id" class="form-field">
-                    @foreach($authors as $author)
-                        <option value="{{ $author->id }}" @selected((int) old('user_id', $post->user_id ?: auth()->id()) === (int) $author->id)>
-                            {{ $author->name }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('user_id')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
-            </div>
-
-            <div>
-                <label for="status" class="form-label">Status</label>
-                <select id="status" name="status" class="form-field">
-                    <option value="published" @selected(old('status', $post->status) === 'published' || old('status', $post->status) === 'scheduled')>Publish</option>
-                    <option value="draft" @selected(old('status', $post->status) === 'draft')>Save Draft</option>
-                </select>
-                @error('status')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
-            </div>
+        <div class="mt-4">
+            <label for="user_id" class="form-label">Author</label>
+            <select id="user_id" name="user_id" class="form-field">
+                @foreach($authors as $author)
+                    <option value="{{ $author->id }}" @selected((int) old('user_id', $post->user_id ?: auth()->id()) === (int) $author->id)>
+                        {{ $author->name }}
+                    </option>
+                @endforeach
+            </select>
+            @error('user_id')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
         </div>
 
         <div class="mt-4">
@@ -78,7 +69,7 @@
                 value="{{ old('published_at', optional($post->published_at)->format('Y-m-d\TH:i')) }}"
                 class="form-field"
             >
-            <p class="mt-1 text-xs muted-faint">Set a future datetime to auto-schedule while status is Publish.</p>
+            <p class="mt-1 text-xs muted-faint">Set date/time for publish. Future time delays visibility until that time.</p>
             @error('published_at')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
         </div>
 
@@ -269,12 +260,17 @@
     </section>
 
     <div class="flex flex-wrap items-center gap-3">
-        <button type="submit" class="btn-solid !w-auto !px-5 !py-3 !text-[0.68rem]">Save Post</button>
+        <button type="submit" class="btn-solid !w-auto !px-5 !py-3 !text-[0.68rem]" data-submit-status="published">Publish</button>
+        <button type="submit" class="btn-outline !w-auto !px-5 !py-3 !text-[0.68rem]" data-submit-status="draft">Save Draft</button>
         @if($post->exists)
-            <a href="{{ route('admin.blog.posts.preview', $post) }}" target="_blank" class="btn-outline !w-auto !px-5 !py-3 !text-[0.68rem]">Preview</a>
+            <button type="button" class="btn-outline !w-auto !px-4 !py-3 !text-[0.68rem]" data-preview-device="mobile" data-preview-url="{{ route('admin.blog.posts.preview', $post) }}">Preview Mobile</button>
+            <button type="button" class="btn-outline !w-auto !px-4 !py-3 !text-[0.68rem]" data-preview-device="tab" data-preview-url="{{ route('admin.blog.posts.preview', $post) }}">Preview Tab</button>
+            <button type="button" class="btn-outline !w-auto !px-4 !py-3 !text-[0.68rem]" data-preview-device="lap" data-preview-url="{{ route('admin.blog.posts.preview', $post) }}">Preview Lap</button>
+            <button type="button" class="btn-outline !w-auto !px-4 !py-3 !text-[0.68rem]" data-preview-device="desktop" data-preview-url="{{ route('admin.blog.posts.preview', $post) }}">Preview Desktop</button>
         @endif
         <a href="{{ route('admin.blog.posts.index') }}" class="nav-link-sm">Back to list</a>
     </div>
+    @error('status')<p class="text-xs text-red-700">{{ $message }}</p>@enderror
 </form>
 
 @once
@@ -284,7 +280,14 @@
             document.addEventListener('DOMContentLoaded', function () {
                 const titleInput = document.getElementById('title');
                 const slugInput = document.getElementById('slug');
+                const statusInput = document.getElementById('post_status');
                 const initialSlug = slugInput ? slugInput.value.trim() : '';
+                const previewSizes = {
+                    mobile: { width: 390, height: 844 },
+                    tab: { width: 834, height: 1112 },
+                    lap: { width: 1366, height: 768 },
+                    desktop: { width: 1920, height: 1080 },
+                };
 
                 const slugify = (value) => value
                     .toLowerCase()
@@ -302,6 +305,32 @@
                         slugInput.value = slugify(titleInput.value);
                     });
                 }
+
+                document.querySelectorAll('[data-submit-status]').forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        if (statusInput) {
+                            statusInput.value = button.getAttribute('data-submit-status') || 'published';
+                        }
+                    });
+                });
+
+                document.querySelectorAll('[data-preview-device]').forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        const device = button.getAttribute('data-preview-device') || 'desktop';
+                        const url = button.getAttribute('data-preview-url');
+
+                        if (!url) {
+                            return;
+                        }
+
+                        const size = previewSizes[device] || previewSizes.desktop;
+                        window.open(
+                            url,
+                            'preview-' + device,
+                            'width=' + size.width + ',height=' + size.height + ',resizable=yes,scrollbars=yes'
+                        );
+                    });
+                });
 
                 if (window.tinymce) {
                     tinymce.init({

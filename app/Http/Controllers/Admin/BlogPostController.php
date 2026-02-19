@@ -45,6 +45,10 @@ class BlogPostController extends Controller
             'search' => trim((string) $request->query('search', '')),
         ];
 
+        if (!in_array($filters['status'], ['', 'draft', 'published'], true)) {
+            $filters['status'] = '';
+        }
+
         $posts = BlogPost::query()
             ->with(['author:id,name', 'category:id,name'])
             ->when(
@@ -352,16 +356,7 @@ class BlogPostController extends Controller
      */
     private function resolveStatus(array $validated): string
     {
-        $status = (string) $validated['status'];
-        $publishedAt = !empty($validated['published_at'])
-            ? Carbon::parse((string) $validated['published_at'])
-            : null;
-
-        if ($status === 'published' && $publishedAt?->isFuture()) {
-            return 'scheduled';
-        }
-
-        return $status;
+        return ((string) $validated['status']) === 'draft' ? 'draft' : 'published';
     }
 
     /**
@@ -380,10 +375,6 @@ class BlogPostController extends Controller
 
         if ($publishedAt instanceof Carbon) {
             return $publishedAt;
-        }
-
-        if ($status === 'scheduled') {
-            return now()->addHour();
         }
 
         return now();

@@ -19,7 +19,7 @@ class BlogDashboardController extends Controller
                 ->count(),
             'draft_posts' => BlogPost::query()->where('status', 'draft')->count(),
             'scheduled_posts' => BlogPost::query()
-                ->where('status', 'scheduled')
+                ->whereIn('status', ['published', 'scheduled'])
                 ->whereNotNull('published_at')
                 ->where('published_at', '>', now())
                 ->count(),
@@ -38,4 +38,3 @@ class BlogDashboardController extends Controller
         ]);
     }
 }
-

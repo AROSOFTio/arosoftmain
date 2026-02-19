@@ -25,7 +25,7 @@
             <p class="mt-2 font-heading text-3xl">{{ number_format($metrics['draft_posts']) }}</p>
         </article>
         <article class="admin-card p-5">
-            <p class="text-xs uppercase tracking-[0.12em] muted-faint">Scheduled</p>
+            <p class="text-xs uppercase tracking-[0.12em] muted-faint">Queued publish</p>
             <p class="mt-2 font-heading text-3xl">{{ number_format($metrics['scheduled_posts']) }}</p>
         </article>
         <article class="admin-card p-5">
@@ -57,7 +57,7 @@
                                 <div class="font-semibold">{{ $post->title }}</div>
                                 <div class="text-xs muted-faint">{{ $post->slug }}</div>
                             </td>
-                            <td class="px-5 py-3">{{ ucfirst($post->status) }}</td>
+                            <td class="px-5 py-3">{{ $post->status === 'draft' ? 'Draft' : 'Published' }}</td>
                             <td class="px-5 py-3">{{ $post->author?->name ?? '-' }}</td>
                             <td class="px-5 py-3">{{ optional($post->published_at)->format('M d, Y H:i') ?: '-' }}</td>
                             <td class="px-5 py-3">{{ number_format((int) $post->view_count) }}</td>
@@ -75,4 +75,3 @@
         </div>
     </section>
 @endsection
-

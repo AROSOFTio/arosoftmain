@@ -19,7 +19,6 @@
                     <option value="">All</option>
                     <option value="draft" @selected($filters['status'] === 'draft')>Draft</option>
                     <option value="published" @selected($filters['status'] === 'published')>Published</option>
-                    <option value="scheduled" @selected($filters['status'] === 'scheduled')>Scheduled</option>
                 </select>
             </div>
             <div>
@@ -88,7 +87,7 @@
                                 @endif
                                 <div class="text-xs muted-faint">{{ $post->slug }}</div>
                             </td>
-                            <td class="px-5 py-3">{{ ucfirst($post->status) }}</td>
+                            <td class="px-5 py-3">{{ $post->status === 'draft' ? 'Draft' : 'Published' }}</td>
                             <td class="px-5 py-3">{{ $post->category?->name ?: '-' }}</td>
                             <td class="px-5 py-3">{{ $post->author?->name ?: '-' }}</td>
                             <td class="px-5 py-3">{{ optional($post->published_at)->format('M d, Y H:i') ?: '-' }}</td>

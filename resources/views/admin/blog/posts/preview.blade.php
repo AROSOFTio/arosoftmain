@@ -14,7 +14,7 @@
     <article class="space-y-6">
         <div class="admin-card p-5">
             <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm muted-faint">
-                <span>Status: {{ ucfirst($post->status) }}</span>
+                <span>Status: {{ $post->status === 'draft' ? 'Draft' : 'Published' }}</span>
                 <span>{{ optional($post->published_at)->format('M d, Y H:i') ?: 'No publish date' }}</span>
                 <span>{{ $post->reading_time_minutes ?: 1 }} min read</span>
                 <span>{{ number_format((int) $post->view_count) }} views</span>
@@ -45,4 +45,3 @@
         @endif
     </article>
 @endsection
-
