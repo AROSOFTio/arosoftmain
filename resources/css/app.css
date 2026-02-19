@@ -724,6 +724,27 @@ a {
     border-radius: 0.9rem;
 }
 
+.blog-prose .adsense-inline {
+    margin: 1.6rem 0;
+    border: 1px solid rgba(17, 24, 39, 0.1);
+    border-radius: 0.9rem;
+    background: rgba(17, 24, 39, 0.02);
+    padding: 0.8rem;
+}
+
+.blog-prose .adsense-inline-label {
+    margin: 0 0 0.45rem;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(17, 24, 39, 0.56);
+}
+
+.blog-prose .adsense-inline .adsbygoogle {
+    max-width: 100%;
+}
+
 .admin-shell {
     --admin-bg: #f3f6fa;
     --admin-surface: #ffffff;

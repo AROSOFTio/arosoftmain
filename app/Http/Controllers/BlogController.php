@@ -115,6 +115,7 @@ class BlogController extends Controller
             $post->body,
             $relatedPosts->take(2)
         );
+        $bodyWithInline = $this->injectInArticleAds($bodyWithInline);
 
         $breadcrumbs = [
             ['name' => 'Home', 'url' => route('home')],
@@ -201,5 +202,101 @@ class BlogController extends Controller
     private function resolveSort(string $sort): string
     {
         return in_array($sort, ['latest', 'popular', 'oldest'], true) ? $sort : 'latest';
+    }
+
+    private function injectInArticleAds(string $html): string
+    {
+        $content = trim($html);
+
+        if ($content === '') {
+            return $html;
+        }
+
+        preg_match_all('/<\/p>/i', $content, $paragraphMatches, PREG_OFFSET_CAPTURE);
+        $paragraphClosings = $paragraphMatches[0] ?? [];
+
+        if ($paragraphClosings === []) {
+            return $content;
+        }
+
+        $insertions = [];
+        $placementConfig = [
+            4 => $this->renderInlineAdMarkup(
+                slot: '8137319086',
+                format: 'fluid',
+                layout: 'in-article',
+                style: 'display:block; text-align:center;'
+            ),
+            9 => $this->renderInlineAdMarkup(
+                slot: '8082861654',
+                format: 'auto',
+                style: 'display:block;',
+                fullWidthResponsive: true
+            ),
+        ];
+
+        foreach ($placementConfig as $paragraphNumber => $adMarkup) {
+            if (count($paragraphClosings) < $paragraphNumber) {
+                continue;
+            }
+
+            $closingTag = $paragraphClosings[$paragraphNumber - 1];
+            $insertions[] = [
+                'offset' => $closingTag[1] + strlen($closingTag[0]),
+                'markup' => $adMarkup,
+            ];
+        }
+
+        if ($insertions === []) {
+            return $content;
+        }
+
+        usort(
+            $insertions,
+            fn (array $a, array $b): int => $b['offset'] <=> $a['offset']
+        );
+
+        foreach ($insertions as $insertion) {
+            $content = substr_replace($content, $insertion['markup'], $insertion['offset'], 0);
+        }
+
+        return $content;
+    }
+
+    private function renderInlineAdMarkup(
+        string $slot,
+        string $format = 'auto',
+        ?string $layout = null,
+        ?string $layoutKey = null,
+        string $style = 'display:block;',
+        ?bool $fullWidthResponsive = null,
+    ): string {
+        $attributes = [
+            'class="adsbygoogle"',
+            'style="'.e($style).'"',
+            'data-ad-client="ca-pub-6208436737131241"',
+            'data-ad-slot="'.e($slot).'"',
+            'data-ad-format="'.e($format).'"',
+        ];
+
+        if ($layout) {
+            $attributes[] = 'data-ad-layout="'.e($layout).'"';
+        }
+
+        if ($layoutKey) {
+            $attributes[] = 'data-ad-layout-key="'.e($layoutKey).'"';
+        }
+
+        if (!is_null($fullWidthResponsive)) {
+            $attributes[] = 'data-full-width-responsive="'.($fullWidthResponsive ? 'true' : 'false').'"';
+        }
+
+        $ins = '<ins '.implode(' ', $attributes).'></ins>';
+
+        return '<div class="adsense-inline" aria-label="Sponsored">'.
+            '<p class="adsense-inline-label">Sponsored</p>'.
+            $ins.
+            '</div>'.
+            '<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>';
     }
 }
