@@ -89,7 +89,7 @@ class BlogPostController extends Controller
         $this->authorize('create', BlogPost::class);
 
         return view('admin.blog.posts.create', $this->formData(new BlogPost([
-            'status' => 'draft',
+            'status' => 'published',
             'robots' => 'index,follow',
         ])));
     }

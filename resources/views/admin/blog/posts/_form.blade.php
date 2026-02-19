@@ -35,9 +35,8 @@
             <div>
                 <label for="status" class="form-label">Status</label>
                 <select id="status" name="status" class="form-field">
-                    <option value="draft" @selected(old('status', $post->status) === 'draft')>Draft</option>
-                    <option value="published" @selected(old('status', $post->status) === 'published')>Published</option>
-                    <option value="scheduled" @selected(old('status', $post->status) === 'scheduled')>Scheduled</option>
+                    <option value="published" @selected(old('status', $post->status) === 'published' || old('status', $post->status) === 'scheduled')>Publish</option>
+                    <option value="draft" @selected(old('status', $post->status) === 'draft')>Save Draft</option>
                 </select>
                 @error('status')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
             </div>
@@ -79,7 +78,7 @@
                 value="{{ old('published_at', optional($post->published_at)->format('Y-m-d\TH:i')) }}"
                 class="form-field"
             >
-            <p class="mt-1 text-xs muted-faint">For scheduled posts, set a future datetime.</p>
+            <p class="mt-1 text-xs muted-faint">Set a future datetime to auto-schedule while status is Publish.</p>
             @error('published_at')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
         </div>
 

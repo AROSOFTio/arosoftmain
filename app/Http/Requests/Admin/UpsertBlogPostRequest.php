@@ -27,7 +27,7 @@ class UpsertBlogPostRequest extends FormRequest
             'featured_image_alt' => ['nullable', 'string', 'max:255'],
             'is_featured' => ['nullable', 'boolean'],
             'remove_featured_image' => ['nullable', 'boolean'],
-            'status' => ['required', Rule::in(['draft', 'published', 'scheduled'])],
+            'status' => ['required', Rule::in(['draft', 'published'])],
             'published_at' => ['nullable', 'date'],
             'category_id' => ['nullable', 'integer', 'exists:blog_categories,id'],
             'new_category' => ['nullable', 'string', 'max:255'],
