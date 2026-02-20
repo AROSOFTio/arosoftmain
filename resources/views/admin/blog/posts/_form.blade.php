@@ -192,8 +192,8 @@
         <div class="mt-4 grid gap-4 lg:grid-cols-2">
             <div>
                 <label for="featured_image" class="form-label">Featured image</label>
-                <input id="featured_image" type="file" name="featured_image" accept="image/*" class="form-field !p-2">
-                <p class="mt-1 text-xs muted-faint">Accepted: JPG, PNG, GIF, WEBP, SVG (max 10 MB).</p>
+                <input id="featured_image" type="file" name="featured_image" accept="image/jpeg,image/png,image/webp" class="form-field !p-2">
+                <p class="mt-1 text-xs muted-faint">Accepted: JPG, PNG, WEBP (max 10 MB). Uploaded featured images are auto-cropped to 1200x630.</p>
                 @error('featured_image')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
                 @if($post->featuredImageUrl())
                     <img src="{{ $post->featuredImageUrl() }}" alt="" class="mt-3 h-36 w-full rounded-lg object-cover">
@@ -284,11 +284,26 @@
             <button type="button" class="btn-outline !w-auto !px-4 !py-3 !text-[0.68rem]" data-preview-device="tab" data-preview-url="{{ route('admin.blog.posts.preview', $post) }}">Preview Tab</button>
             <button type="button" class="btn-outline !w-auto !px-4 !py-3 !text-[0.68rem]" data-preview-device="lap" data-preview-url="{{ route('admin.blog.posts.preview', $post) }}">Preview Lap</button>
             <button type="button" class="btn-outline !w-auto !px-4 !py-3 !text-[0.68rem]" data-preview-device="desktop" data-preview-url="{{ route('admin.blog.posts.preview', $post) }}">Preview Desktop</button>
+            <button
+                type="submit"
+                form="delete-post-form"
+                class="btn-outline !w-auto !border-red-500 !px-4 !py-3 !text-[0.68rem] !text-red-700 hover:!border-red-600 hover:!bg-red-50"
+                onclick="return confirm('Delete this post permanently?');"
+            >
+                Delete Post
+            </button>
         @endif
         <a href="{{ route('admin.blog.posts.index') }}" class="nav-link-sm">Back to list</a>
     </div>
     @error('status')<p class="text-xs text-red-700">{{ $message }}</p>@enderror
 </form>
+
+@if($post->exists)
+    <form id="delete-post-form" method="post" action="{{ route('admin.blog.posts.destroy', $post) }}">
+        @csrf
+        @method('delete')
+    </form>
+@endif
 
 @once
     @push('head')

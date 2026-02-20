@@ -13,6 +13,7 @@ use App\Services\BlogReadingTimeService;
 use App\Services\BlogRelatedService;
 use App\Services\BlogSidebarService;
 use App\Services\BlogSlugService;
+use App\Services\FeaturedImageService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,6 +32,7 @@ class BlogPostController extends Controller
         private readonly BlogReadingTimeService $readingTimeService,
         private readonly BlogSidebarService $sidebarService,
         private readonly BlogRelatedService $relatedService,
+        private readonly FeaturedImageService $featuredImageService,
     ) {
     }
 
@@ -220,7 +222,9 @@ class BlogPostController extends Controller
 
             if ($request->hasFile('featured_image')) {
                 $this->deleteImageIfPresent($post->featured_image_path);
-                $post->featured_image_path = $request->file('featured_image')?->store('blog', 'public');
+                $post->featured_image_path = $this->featuredImageService->store(
+                    $request->file('featured_image')
+                );
             }
 
             if ($request->boolean('remove_og_image')) {

@@ -23,7 +23,7 @@ class UpsertBlogPostRequest extends FormRequest
             'slug' => ['nullable', 'string', 'max:255'],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'body' => ['required', 'string'],
-            'featured_image' => ['nullable', 'file', 'max:10240', 'extensions:jpg,jpeg,png,gif,webp,svg,avif'],
+            'featured_image' => ['nullable', 'file', 'image', 'max:10240', 'mimes:jpg,jpeg,png,webp'],
             'featured_image_alt' => ['nullable', 'string', 'max:255'],
             'is_featured' => ['nullable', 'boolean'],
             'remove_featured_image' => ['nullable', 'boolean'],
