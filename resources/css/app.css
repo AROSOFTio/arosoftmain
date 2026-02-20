@@ -6,6 +6,8 @@
     --bg: #ffffff;
     --accent: #009d31;
     --ink: #111827;
+    --font-sans: "Segoe UI Variable", "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-heading: "Segoe UI Variable", "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 *,
@@ -23,7 +25,7 @@ body {
     margin: 0;
     background: var(--bg);
     color: var(--ink);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-sans);
     font-size: 1rem;
     line-height: 1.72;
     letter-spacing: 0.005em;
@@ -37,7 +39,7 @@ h5,
 h6,
 .font-heading {
     color: var(--ink);
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     letter-spacing: 0.01em;
 }
 
@@ -337,14 +339,14 @@ a {
 }
 
 .page-title {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: clamp(2rem, 4vw, 3.35rem);
     line-height: 1.16;
     color: rgba(17, 24, 39, 0.98);
 }
 
 .section-title {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: clamp(1.5rem, 2.8vw, 2.2rem);
     line-height: 1.26;
     color: rgba(17, 24, 39, 0.95);
@@ -723,7 +725,7 @@ a {
 .blog-prose h2,
 .blog-prose h3,
 .blog-prose h4 {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     color: rgba(17, 24, 39, 0.98);
     line-height: 1.32;
     margin-top: 1.8rem;
@@ -930,7 +932,7 @@ a {
 
 .admin-brand-title {
     margin: 0;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.98rem;
     letter-spacing: 0.02em;
 }
@@ -1062,7 +1064,7 @@ a {
 
 .admin-page-title {
     margin: 0.1rem 0 0;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1.1rem;
     color: var(--admin-ink);
 }

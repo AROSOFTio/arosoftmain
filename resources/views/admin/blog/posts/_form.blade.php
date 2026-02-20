@@ -386,7 +386,7 @@
                                 xhr.send(formData);
                             });
                         },
-                        content_style: "body { font-family: Montserrat, sans-serif; font-size: 16px; line-height: 1.7; }"
+                        content_style: "body { font-family: 'Segoe UI Variable', 'Segoe UI', Inter, Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; line-height: 1.7; }"
                     });
 
                     document.querySelectorAll('form.blog-post-form').forEach(function (form) {
