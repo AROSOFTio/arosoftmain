@@ -353,13 +353,6 @@ class ToolsController extends Controller
 
     private function convertTiffToPdf(UploadedFile $uploadedFile): array
     {
-        if (!class_exists(\Imagick::class)) {
-            return [
-                'ok' => false,
-                'message' => 'TIFF to PDF conversion requires the PHP Imagick extension on the server.',
-            ];
-        }
-
         $disk = Storage::disk('local');
         $inputPath = $uploadedFile->store('tool-uploads/tiff-to-pdf-converter', 'local');
 
@@ -378,12 +371,27 @@ class ToolsController extends Controller
         $downloadName = $downloadName !== '.pdf' ? $downloadName : 'converted-file.pdf';
 
         try {
-            $imagick = new \Imagick();
-            $imagick->readImage($disk->path($inputPath));
-            $imagick->setImageFormat('pdf');
-            $imagick->writeImages($disk->path($outputPath), true);
-            $imagick->clear();
-            $imagick->destroy();
+            $inputAbsolutePath = $disk->path($inputPath);
+            $outputAbsolutePath = $disk->path($outputPath);
+
+            if (class_exists(\Imagick::class)) {
+                $imagick = new \Imagick();
+                $imagick->readImage($inputAbsolutePath);
+                $imagick->setImageFormat('pdf');
+                $imagick->writeImages($outputAbsolutePath, true);
+                $imagick->clear();
+                $imagick->destroy();
+            } else {
+                $cliConversion = $this->convertTiffToPdfViaCli($inputAbsolutePath, $outputAbsolutePath);
+                if (!$cliConversion['ok']) {
+                    $disk->delete([$inputPath, $outputPath]);
+
+                    return [
+                        'ok' => false,
+                        'message' => $cliConversion['message'],
+                    ];
+                }
+            }
 
             $disk->delete($inputPath);
 
@@ -412,5 +420,84 @@ class ToolsController extends Controller
         }
 
         return 'TIFF to PDF conversion failed. Please try another TIFF file.';
+    }
+
+    private function convertTiffToPdfViaCli(string $inputAbsolutePath, string $outputAbsolutePath): array
+    {
+        if (!function_exists('exec')) {
+            return [
+                'ok' => false,
+                'message' => 'TIFF to PDF requires PHP Imagick or ImageMagick CLI with exec enabled on this server.',
+            ];
+        }
+
+        $binary = $this->detectImageMagickBinary();
+        if ($binary === null) {
+            return [
+                'ok' => false,
+                'message' => 'ImageMagick CLI binary was not found. Install ImageMagick or enable PHP Imagick extension.',
+            ];
+        }
+
+        $command = escapeshellarg($binary)
+            . ' '
+            . escapeshellarg($inputAbsolutePath)
+            . ' -compress Zip '
+            . escapeshellarg($outputAbsolutePath)
+            . ' 2>&1';
+
+        $outputLines = [];
+        $exitCode = 1;
+        exec($command, $outputLines, $exitCode);
+
+        $output = trim(implode("\n", $outputLines));
+
+        if ($exitCode !== 0 || !is_file($outputAbsolutePath) || filesize($outputAbsolutePath) === 0) {
+            return [
+                'ok' => false,
+                'message' => $this->formatTiffCliError($output),
+            ];
+        }
+
+        return [
+            'ok' => true,
+            'message' => 'TIFF converted to PDF successfully via ImageMagick CLI.',
+        ];
+    }
+
+    private function detectImageMagickBinary(): ?string
+    {
+        $candidates = [
+            '/usr/bin/magick',
+            '/usr/local/bin/magick',
+            '/bin/magick',
+            '/usr/bin/convert',
+            '/usr/local/bin/convert',
+            '/bin/convert',
+            '/usr/bin/convert-im6.q16',
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_file($candidate) && is_executable($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
+    private function formatTiffCliError(string $rawOutput): string
+    {
+        $normalized = Str::lower($rawOutput);
+
+        if (Str::contains($normalized, 'not authorized')) {
+            return 'TIFF to PDF conversion is blocked by ImageMagick policy. Enable PDF write in policy.xml, then retry.';
+        }
+
+        if (Str::contains($normalized, 'no decode delegate')) {
+            return 'Server ImageMagick cannot read this TIFF format. Try a different TIFF file or enable the required delegate.';
+        }
+
+        return 'TIFF to PDF conversion failed on this server. Enable PHP Imagick or verify ImageMagick CLI permissions.';
     }
 }
