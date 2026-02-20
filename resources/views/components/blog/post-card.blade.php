@@ -4,8 +4,14 @@
     'compact' => false,
 ])
 
+@php
+    $excerptSource = $post->excerpt ?: strip_tags((string) $post->body);
+    $excerptWords = $compact ? 15 : 28;
+    $cardExcerpt = \Illuminate\Support\Str::words(trim(strip_tags((string) $excerptSource)), $excerptWords);
+@endphp
+
 <article {{ $attributes->class([
-    'shell-card blog-card overflow-hidden rounded-2xl',
+    'shell-card blog-card h-full overflow-hidden rounded-2xl',
     'blog-card--compact' => $compact,
 ]) }}>
     @if($post->featuredImageUrl())
@@ -19,7 +25,7 @@
         </a>
     @endif
 
-    <div class="space-y-3 p-5">
+    <div class="blog-card-body p-5">
         <div class="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.12em] muted-faint">
             @if($post->category)
                 <a href="{{ route('blog.category', $post->category->slug) }}" class="nav-link-sm !px-2 !py-1">{{ $post->category->name }}</a>
@@ -30,19 +36,19 @@
             <span>{{ $post->reading_time_minutes ?: 1 }} min read</span>
         </div>
 
-        <h3 class="font-heading {{ $compact ? 'text-lg' : 'text-2xl' }} leading-snug">
+        <h3 class="blog-card-title font-heading {{ $compact ? 'text-lg' : 'text-2xl' }} leading-snug">
             <a href="{{ route('blog.show', $post->slug) }}" class="hover:text-[color:var(--accent)]">
                 {{ $post->title }}
             </a>
         </h3>
 
         @if($showExcerpt)
-            <p class="text-sm leading-7 muted-copy">
-                {{ $post->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($post->body), 180) }}
+            <p class="blog-card-excerpt text-sm leading-7 muted-copy">
+                {{ $cardExcerpt }}
             </p>
         @endif
 
-        <div class="flex flex-wrap items-center gap-3 text-sm">
+        <div class="blog-card-footer flex flex-wrap items-center gap-3 text-sm">
             <span class="min-w-0 break-words muted-faint">By {{ $post->author?->name ?? 'Arosoft Team' }}</span>
             <a href="{{ route('blog.show', $post->slug) }}" class="btn-outline !w-auto !px-4 !py-2 !text-[0.68rem]">Read</a>
         </div>

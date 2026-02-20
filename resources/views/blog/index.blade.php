@@ -104,7 +104,7 @@
             @endif
 
             @if($posts->count())
-                <div class="blog-card-grid grid min-w-0 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                <div class="blog-card-grid grid min-w-0 gap-6 md:grid-cols-2 xl:grid-cols-3">
                     @foreach($posts as $post)
                         <x-blog.post-card
                             :post="$post"
