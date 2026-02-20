@@ -39,12 +39,53 @@
             return 'tool-nav-icon--amber';
         };
 
-        $toolIconLabel = static function (string $name): string {
-            $parts = explode(' ', trim($name));
+        $toolIconLabel = static function (array $tool): string {
+            $slug = strtolower((string) ($tool['slug'] ?? ''));
+
+            if (str_contains($slug, 'pdf')) {
+                return 'PDF';
+            }
+
+            if (str_contains($slug, 'word') || str_contains($slug, 'doc')) {
+                return 'DOC';
+            }
+
+            if (str_contains($slug, 'excel') || str_contains($slug, 'xls')) {
+                return 'XLS';
+            }
+
+            if (str_contains($slug, 'image') || str_contains($slug, 'jpg') || str_contains($slug, 'png') || str_contains($slug, 'tiff') || str_contains($slug, 'svg')) {
+                return 'IMG';
+            }
+
+            if (str_contains($slug, 'hash') || str_contains($slug, 'uuid') || str_contains($slug, 'json') || str_contains($slug, 'base64') || str_contains($slug, 'qr')) {
+                return 'GEN';
+            }
+
+            $name = trim((string) ($tool['name'] ?? 'Tool'));
+            $parts = explode(' ', $name);
             $head = $parts[0] ?? 'Tool';
-            $normalized = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $head), 0, 3));
+            $normalized = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $head), 0, 2));
 
             return $normalized !== '' ? $normalized : 'TOOL';
+        };
+
+        $categoryIconTone = static function (string $key): string {
+            return match ($key) {
+                'converter' => 'tool-group-icon--green',
+                'password-remover' => 'tool-group-icon--amber',
+                'generators' => 'tool-group-icon--blue',
+                default => 'tool-group-icon--teal',
+            };
+        };
+
+        $categoryIconLabel = static function (string $key): string {
+            return match ($key) {
+                'converter' => 'CV',
+                'password-remover' => 'PW',
+                'generators' => 'GN',
+                default => 'TL',
+            };
         };
     @endphp
 
@@ -85,22 +126,39 @@
             <aside class="border-b border-[color:rgba(17,24,39,0.18)] bg-[color:rgba(17,24,39,0.02)] lg:col-span-4 lg:border-b-0 lg:border-r">
                 <div class="p-5 sm:p-6">
                     @foreach ($categories as $category)
-                        <section class="mb-8 last:mb-0">
-                            <h2 class="font-heading text-2xl text-[color:rgba(17,24,39,0.95)]">{{ $category['name'] }}</h2>
+                        @php
+                            $categoryKey = (string) ($category['key'] ?? 'general');
+                            $isActiveCategory = $activeTool['category_key'] === $categoryKey;
+                        @endphp
+                        <details class="tool-group mb-3 last:mb-0" @if ($isActiveCategory) open @endif>
+                            <summary class="tool-group-summary">
+                                <span class="tool-group-head">
+                                    <span class="tool-group-icon {{ $categoryIconTone($categoryKey) }}">
+                                        {{ $categoryIconLabel($categoryKey) }}
+                                    </span>
+                                    <span class="tool-group-title">{{ $category['name'] }}</span>
+                                </span>
+                                <span class="tool-group-meta">
+                                    <span class="tool-group-count">{{ count($category['tools']) }}</span>
+                                    <span class="tool-group-caret" aria-hidden="true"></span>
+                                </span>
+                            </summary>
 
-                            <ul class="tool-nav-list mt-3 {{ ($category['key'] ?? '') === 'converter' ? 'tool-nav-list--grid' : '' }}">
-                                @foreach ($category['tools'] as $tool)
-                                    <li>
-                                        <a href="{{ route('tools.show', ['slug' => $tool['slug']]) }}" class="tool-nav-link {{ $activeTool['slug'] === $tool['slug'] ? 'is-active' : '' }}">
-                                            <span class="tool-nav-icon {{ $toolIconTone($tool['slug']) }}">
-                                                {{ $toolIconLabel($tool['name']) }}
-                                            </span>
-                                            <span class="tool-nav-name">{{ $tool['name'] }}</span>
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </section>
+                            <div class="tool-group-body">
+                                <ul class="tool-nav-list">
+                                    @foreach ($category['tools'] as $tool)
+                                        <li>
+                                            <a href="{{ route('tools.show', ['slug' => $tool['slug']]) }}" class="tool-nav-link {{ $activeTool['slug'] === $tool['slug'] ? 'is-active' : '' }}">
+                                                <span class="tool-nav-icon {{ $toolIconTone($tool['slug']) }}">
+                                                    {{ $toolIconLabel($tool) }}
+                                                </span>
+                                                <span class="tool-nav-name">{{ $tool['name'] }}</span>
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </details>
                     @endforeach
                 </div>
             </aside>
