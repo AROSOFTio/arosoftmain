@@ -369,6 +369,7 @@
                         ],
                         browser_spellcheck: true,
                         branding: false,
+                        promotion: false,
                         automatic_uploads: true,
                         image_title: true,
                         images_upload_handler: function (blobInfo, progress) {
