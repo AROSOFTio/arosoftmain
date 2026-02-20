@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Throwable;
 
 class ToolsController extends Controller
 {
@@ -19,7 +23,7 @@ class ToolsController extends Controller
         return $this->renderCatalog($slug);
     }
 
-    public function process(Request $request, string $slug): RedirectResponse
+    public function process(Request $request, string $slug): RedirectResponse|BinaryFileResponse
     {
         $catalog = $this->catalog();
         abort_unless(isset($catalog['tools'][$slug]), 404);
@@ -60,23 +64,27 @@ class ToolsController extends Controller
         ]);
 
         $uploadedFile = $validated['upload_file'];
-        $storedPath = $uploadedFile->store("tool-uploads/{$slug}");
+        $result = $this->runFileProcessor($tool, $uploadedFile);
 
-        $modeLabel = $tool['processing_mode'] === 'instant'
-            ? 'instant processing'
-            : 'assisted processing';
+        if (!$result['ok']) {
+            return redirect()
+                ->route('tools.show', ['slug' => $slug])
+                ->withInput()
+                ->with('tool_error', $result['message']);
+        }
 
-        $status = sprintf(
-            'Received "%s" for %s (%s). Reference: %s',
-            $uploadedFile->getClientOriginalName(),
-            $tool['name'],
-            $modeLabel,
-            $storedPath
-        );
+        if (isset($result['download_relative_path'])) {
+            $downloadPath = Storage::disk('local')->path($result['download_relative_path']);
+            $downloadName = $result['download_name'] ?? 'converted-file.pdf';
+
+            return response()->download($downloadPath, $downloadName, [
+                'Content-Type' => 'application/pdf',
+            ])->deleteFileAfterSend(true);
+        }
 
         return redirect()
             ->route('tools.show', ['slug' => $slug])
-            ->with('tool_status', $status);
+            ->with('tool_status', $result['message']);
     }
 
     private function renderCatalog(?string $slug = null): View
@@ -309,5 +317,100 @@ class ToolsController extends Controller
             'label' => 'Unsupported Processor',
             'output' => null,
         ];
+    }
+
+    private function runFileProcessor(array $tool, UploadedFile $uploadedFile): array
+    {
+        $processor = $tool['processor'] ?? '';
+
+        if ($processor === 'tiff_to_pdf') {
+            return $this->convertTiffToPdf($uploadedFile);
+        }
+
+        $storedPath = $uploadedFile->store("tool-uploads/{$tool['slug']}", 'local');
+        if ($storedPath === false) {
+            return [
+                'ok' => false,
+                'message' => 'Upload failed. Please try again.',
+            ];
+        }
+
+        $modeLabel = $tool['processing_mode'] === 'instant'
+            ? 'instant processing'
+            : 'assisted processing';
+
+        return [
+            'ok' => true,
+            'message' => sprintf(
+                'Received "%s" for %s (%s). Reference: %s',
+                $uploadedFile->getClientOriginalName(),
+                $tool['name'],
+                $modeLabel,
+                $storedPath
+            ),
+        ];
+    }
+
+    private function convertTiffToPdf(UploadedFile $uploadedFile): array
+    {
+        if (!class_exists(\Imagick::class)) {
+            return [
+                'ok' => false,
+                'message' => 'TIFF to PDF conversion requires the PHP Imagick extension on the server.',
+            ];
+        }
+
+        $disk = Storage::disk('local');
+        $inputPath = $uploadedFile->store('tool-uploads/tiff-to-pdf-converter', 'local');
+
+        if ($inputPath === false) {
+            return [
+                'ok' => false,
+                'message' => 'Unable to store uploaded TIFF file.',
+            ];
+        }
+
+        $resultDirectory = 'tool-results/tiff-to-pdf-converter';
+        $disk->makeDirectory($resultDirectory);
+
+        $outputPath = $resultDirectory . '/' . Str::uuid() . '.pdf';
+        $downloadName = Str::slug(pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME)) . '.pdf';
+        $downloadName = $downloadName !== '.pdf' ? $downloadName : 'converted-file.pdf';
+
+        try {
+            $imagick = new \Imagick();
+            $imagick->readImage($disk->path($inputPath));
+            $imagick->setImageFormat('pdf');
+            $imagick->writeImages($disk->path($outputPath), true);
+            $imagick->clear();
+            $imagick->destroy();
+
+            $disk->delete($inputPath);
+
+            return [
+                'ok' => true,
+                'message' => 'TIFF converted to PDF successfully.',
+                'download_relative_path' => $outputPath,
+                'download_name' => $downloadName,
+            ];
+        } catch (Throwable $error) {
+            $disk->delete([$inputPath, $outputPath]);
+
+            return [
+                'ok' => false,
+                'message' => $this->formatTiffConversionError($error),
+            ];
+        }
+    }
+
+    private function formatTiffConversionError(Throwable $error): string
+    {
+        $normalized = Str::lower($error->getMessage());
+
+        if (Str::contains($normalized, 'not authorized')) {
+            return 'TIFF to PDF conversion is blocked by ImageMagick policy. Enable PDF write in policy.xml, then retry.';
+        }
+
+        return 'TIFF to PDF conversion failed. Please try another TIFF file.';
     }
 }

@@ -22,6 +22,30 @@
             'base64_encode' => 'Paste text to encode...',
             default => 'Paste text input...',
         };
+
+        $toolIconTone = static function (string $slug): string {
+            if (str_contains($slug, 'pdf-to-')) {
+                return 'tool-nav-icon--blue';
+            }
+
+            if (str_contains($slug, '-to-pdf') || str_contains($slug, 'scan-to-pdf')) {
+                return 'tool-nav-icon--green';
+            }
+
+            if (str_contains($slug, 'image') || str_contains($slug, 'jpg') || str_contains($slug, 'png') || str_contains($slug, 'tiff') || str_contains($slug, 'svg')) {
+                return 'tool-nav-icon--teal';
+            }
+
+            return 'tool-nav-icon--amber';
+        };
+
+        $toolIconLabel = static function (string $name): string {
+            $parts = explode(' ', trim($name));
+            $head = $parts[0] ?? 'Tool';
+            $normalized = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $head), 0, 3));
+
+            return $normalized !== '' ? $normalized : 'TOOL';
+        };
     @endphp
 
     @if (session('tool_status'))
@@ -64,15 +88,14 @@
                         <section class="mb-8 last:mb-0">
                             <h2 class="font-heading text-2xl text-[color:rgba(17,24,39,0.95)]">{{ $category['name'] }}</h2>
 
-                            <ul class="mt-3 space-y-1.5">
+                            <ul class="tool-nav-list mt-3 {{ ($category['key'] ?? '') === 'converter' ? 'tool-nav-list--grid' : '' }}">
                                 @foreach ($category['tools'] as $tool)
                                     <li>
-                                        <a
-                                            href="{{ route('tools.show', ['slug' => $tool['slug']]) }}"
-                                            class="flex items-start rounded-md px-2 py-1.5 text-base leading-7 transition {{ $activeTool['slug'] === $tool['slug'] ? 'bg-[color:rgba(0,157,49,0.12)] font-semibold text-[color:rgba(17,24,39,0.96)]' : 'text-[color:rgba(17,24,39,0.86)] hover:bg-[color:rgba(0,157,49,0.08)]' }}"
-                                        >
-                                            <span class="mr-2 mt-[0.1rem] text-[var(--accent)]">✓</span>
-                                            <span>{{ $tool['name'] }}</span>
+                                        <a href="{{ route('tools.show', ['slug' => $tool['slug']]) }}" class="tool-nav-link {{ $activeTool['slug'] === $tool['slug'] ? 'is-active' : '' }}">
+                                            <span class="tool-nav-icon {{ $toolIconTone($tool['slug']) }}">
+                                                {{ $toolIconLabel($tool['name']) }}
+                                            </span>
+                                            <span class="tool-nav-name">{{ $tool['name'] }}</span>
                                         </a>
                                     </li>
                                 @endforeach
@@ -98,6 +121,57 @@
                         </a>
                     </article>
 
+                    <article id="tool-workspace" class="rounded-lg border border-[color:rgba(17,24,39,0.14)] p-4">
+                        <h3 class="font-heading text-xl">Process {{ $activeTool['name'] }}</h3>
+
+                        @if ($activeTool['input_type'] === 'text')
+                            <form action="{{ route('tools.process', ['slug' => $activeTool['slug']]) }}" method="POST" class="mt-3 space-y-3">
+                                @csrf
+                                <div>
+                                    <label class="form-label" for="text_payload">Input</label>
+                                    <textarea id="text_payload" name="text_payload" rows="8" class="form-field @error('text_payload') border-[color:rgba(0,157,49,0.85)] @enderror" placeholder="{{ $textPlaceholder }}">{{ old('text_payload') }}</textarea>
+                                    @error('text_payload')
+                                        <p class="mt-2 text-sm text-[var(--accent)]">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <button type="submit" class="btn-solid">{{ $activeTool['button_label'] }}</button>
+                            </form>
+
+                            @if (session('tool_result'))
+                                <div class="mt-3 rounded-lg border border-[color:rgba(17,24,39,0.14)] bg-[color:rgba(17,24,39,0.03)] p-4">
+                                    <p class="text-[0.68rem] uppercase tracking-[0.13em] muted-faint">{{ session('tool_result_label', 'Result') }}</p>
+                                    <pre class="mt-2 overflow-x-auto whitespace-pre-wrap text-sm leading-7 text-[color:rgba(17,24,39,0.9)]">{{ session('tool_result') }}</pre>
+
+                                    @if (str_starts_with((string) session('tool_result'), 'https://'))
+                                        <a href="{{ session('tool_result') }}" target="_blank" rel="noopener noreferrer" class="nav-link-sm mt-3 inline-flex">
+                                            Open generated link
+                                        </a>
+                                    @endif
+                                </div>
+                            @endif
+                        @else
+                            <form action="{{ route('tools.process', ['slug' => $activeTool['slug']]) }}" method="POST" enctype="multipart/form-data" class="mt-3 space-y-3">
+                                @csrf
+                                <div>
+                                    <label class="form-label" for="upload_file">Upload file</label>
+                                    <input id="upload_file" type="file" name="upload_file" class="form-field @error('upload_file') border-[color:rgba(0,157,49,0.85)] @enderror" accept="{{ $activeTool['accept'] }}">
+                                    @error('upload_file')
+                                        <p class="mt-2 text-sm text-[var(--accent)]">{{ $message }}</p>
+                                    @enderror
+                                    <p class="mt-2 text-xs muted-faint">Accepted input: {{ $activeTool['accept'] ?: 'File upload' }}</p>
+                                </div>
+
+                                <button type="submit" class="btn-solid">{{ $activeTool['button_label'] }}</button>
+
+                                <div>
+                                    <label class="form-label" for="processing_note">Notes (optional)</label>
+                                    <textarea id="processing_note" name="processing_note" rows="3" class="form-field" placeholder="Add notes for output preferences...">{{ old('processing_note') }}</textarea>
+                                </div>
+                            </form>
+                        @endif
+                    </article>
+
                     <div class="grid gap-4 lg:grid-cols-2">
                         <article class="rounded-lg border border-[color:rgba(17,24,39,0.14)] p-4">
                             <h3 class="font-heading text-xl">All tool details</h3>
@@ -105,7 +179,7 @@
                                 <ul class="mt-3 space-y-2 text-sm leading-7 text-[color:rgba(17,24,39,0.84)]">
                                     @foreach ($activeTool['use_cases'] as $useCase)
                                         <li class="flex items-start">
-                                            <span class="mr-2 mt-[0.08rem] text-[var(--accent)]">✓</span>
+                                            <span class="mr-2 mt-[0.08rem] text-[var(--accent)]">+</span>
                                             <span>{{ $useCase }}</span>
                                         </li>
                                     @endforeach
@@ -133,57 +207,6 @@
                         style="display:block"
                         wrapperClass="info-card"
                     />
-
-                    <article id="tool-workspace" class="rounded-lg border border-[color:rgba(17,24,39,0.14)] p-4">
-                        <h3 class="font-heading text-xl">Process {{ $activeTool['name'] }}</h3>
-
-                        @if ($activeTool['input_type'] === 'text')
-                            <form action="{{ route('tools.process', ['slug' => $activeTool['slug']]) }}" method="POST" class="mt-4 space-y-4">
-                                @csrf
-                                <div>
-                                    <label class="form-label" for="text_payload">Input</label>
-                                    <textarea id="text_payload" name="text_payload" rows="8" class="form-field @error('text_payload') border-[color:rgba(0,157,49,0.85)] @enderror" placeholder="{{ $textPlaceholder }}">{{ old('text_payload') }}</textarea>
-                                    @error('text_payload')
-                                        <p class="mt-2 text-sm text-[var(--accent)]">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <button type="submit" class="btn-solid">{{ $activeTool['button_label'] }}</button>
-                            </form>
-
-                            @if (session('tool_result'))
-                                <div class="mt-4 rounded-lg border border-[color:rgba(17,24,39,0.14)] bg-[color:rgba(17,24,39,0.03)] p-4">
-                                    <p class="text-[0.68rem] uppercase tracking-[0.13em] muted-faint">{{ session('tool_result_label', 'Result') }}</p>
-                                    <pre class="mt-2 overflow-x-auto whitespace-pre-wrap text-sm leading-7 text-[color:rgba(17,24,39,0.9)]">{{ session('tool_result') }}</pre>
-
-                                    @if (str_starts_with((string) session('tool_result'), 'https://'))
-                                        <a href="{{ session('tool_result') }}" target="_blank" rel="noopener noreferrer" class="nav-link-sm mt-3 inline-flex">
-                                            Open generated link
-                                        </a>
-                                    @endif
-                                </div>
-                            @endif
-                        @else
-                            <form action="{{ route('tools.process', ['slug' => $activeTool['slug']]) }}" method="POST" enctype="multipart/form-data" class="mt-4 space-y-4">
-                                @csrf
-                                <div>
-                                    <label class="form-label" for="upload_file">Upload file</label>
-                                    <input id="upload_file" type="file" name="upload_file" class="form-field @error('upload_file') border-[color:rgba(0,157,49,0.85)] @enderror" accept="{{ $activeTool['accept'] }}">
-                                    @error('upload_file')
-                                        <p class="mt-2 text-sm text-[var(--accent)]">{{ $message }}</p>
-                                    @enderror
-                                    <p class="mt-2 text-xs muted-faint">Accepted input: {{ $activeTool['accept'] ?: 'File upload' }}</p>
-                                </div>
-
-                                <div>
-                                    <label class="form-label" for="processing_note">Notes (optional)</label>
-                                    <textarea id="processing_note" name="processing_note" rows="3" class="form-field" placeholder="Add notes for output preferences...">{{ old('processing_note') }}</textarea>
-                                </div>
-
-                                <button type="submit" class="btn-solid">{{ $activeTool['button_label'] }}</button>
-                            </form>
-                        @endif
-                    </article>
                 </div>
             </section>
         </div>
