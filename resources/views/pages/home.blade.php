@@ -50,21 +50,47 @@
         </div>
 
         @if($latestPosts->isNotEmpty())
-            @php
-                $leadPost = $latestPosts->first();
-                $supportingPosts = $latestPosts->slice(1);
-            @endphp
+            <div class="home-card-list">
+                @foreach($latestPosts as $post)
+                    <article class="home-compact-card {{ $loop->even ? 'is-reverse' : '' }}">
+                        <a href="{{ route('blog.show', $post->slug) }}" class="home-compact-media">
+                            @if($post->featuredImageUrl())
+                                <span class="home-compact-thumb" style="background-image:url('{{ $post->featuredImageUrl() }}')">
+                                    <span class="home-compact-badge">Article</span>
+                                </span>
+                            @else
+                                <span class="home-compact-placeholder">
+                                    <span class="home-compact-placeholder-label">Blog</span>
+                                </span>
+                            @endif
+                        </a>
 
-            <div class="grid gap-5 xl:grid-cols-[minmax(0,1.28fr)_minmax(0,1fr)]">
-                <x-blog.post-card :post="$leadPost" />
+                        <div class="home-compact-body">
+                            <div class="home-compact-meta">
+                                @if($post->category)
+                                    <span>{{ $post->category->name }}</span>
+                                @endif
+                                @if($post->published_at)
+                                    <span>{{ $post->published_at->format('M d, Y') }}</span>
+                                @endif
+                                <span>{{ $post->reading_time_minutes ?: 1 }} min read</span>
+                            </div>
 
-                @if($supportingPosts->isNotEmpty())
-                    <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-1">
-                        @foreach($supportingPosts as $post)
-                            <x-blog.post-card :post="$post" :compact="true" :show-excerpt="false" />
-                        @endforeach
-                    </div>
-                @endif
+                            <h3 class="home-compact-title">
+                                <a href="{{ route('blog.show', $post->slug) }}">{{ \Illuminate\Support\Str::limit($post->title, 95) }}</a>
+                            </h3>
+
+                            <p class="home-compact-excerpt">
+                                {{ \Illuminate\Support\Str::words(strip_tags($post->excerpt ?: (string) $post->body), 18) }}
+                            </p>
+
+                            <div class="home-compact-footer">
+                                <span class="home-compact-author">By {{ $post->author?->name ?? 'Arosoft Team' }}</span>
+                                <a href="{{ route('blog.show', $post->slug) }}" class="home-compact-link">Read -></a>
+                            </div>
+                        </div>
+                    </article>
+                @endforeach
             </div>
         @else
             <article class="info-card">
@@ -86,26 +112,32 @@
         </div>
 
         @if(!empty($tutorialVideos))
-            <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            <div class="home-card-list home-card-list--two">
                 @foreach($tutorialVideos as $video)
                     <a
                         href="{{ $video['url'] }}"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="home-media-card"
+                        class="home-compact-card {{ $loop->even ? 'is-reverse' : '' }}"
                     >
-                        <div
-                            class="home-media-thumb"
-                            style="background-image:url('{{ $video['thumb'] }}')"
-                        >
-                            <span class="home-media-badge">Video</span>
-                        </div>
-                        <div class="space-y-2 p-4">
-                            <p class="text-sm font-semibold leading-6 text-[color:rgba(17,24,39,0.95)]">
-                                {{ \Illuminate\Support\Str::limit($video['title'], 72) }}
-                            </p>
-                            <p class="text-[0.68rem] uppercase tracking-[0.14em] muted-faint">{{ $video['date'] }}</p>
-                        </div>
+                        <span class="home-compact-media">
+                            <span class="home-compact-thumb" style="background-image:url('{{ $video['thumb'] }}')">
+                                <span class="home-compact-badge">Video</span>
+                            </span>
+                        </span>
+
+                        <span class="home-compact-body">
+                            <span class="home-compact-meta">
+                                <span>Tutorial</span>
+                                <span>{{ $video['date'] }}</span>
+                            </span>
+                            <span class="home-compact-title">{{ \Illuminate\Support\Str::limit($video['title'], 92) }}</span>
+                            <span class="home-compact-excerpt">Watch practical implementation and deployment walkthroughs from our channel.</span>
+                            <span class="home-compact-footer">
+                                <span class="home-compact-author">YouTube</span>
+                                <span class="home-compact-link">Watch -></span>
+                            </span>
+                        </span>
                     </a>
                 @endforeach
             </div>
@@ -145,29 +177,40 @@
             <a href="{{ route('contact') }}" class="btn-outline !w-auto !px-4 !py-2 !text-[0.68rem]">Request a live demo</a>
         </div>
 
-        <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <div class="home-card-list home-card-list--two">
             @foreach($systems as $system)
-                <article class="home-system-card">
-                    <div class="flex items-center justify-between gap-3">
-                        <p class="text-[0.66rem] uppercase tracking-[0.16em] muted-faint">{{ $system['label'] }}</p>
-                        <span class="home-system-status">{{ $system['status'] }}</span>
+                <article class="home-compact-card {{ $loop->even ? 'is-reverse' : '' }}">
+                    <div class="home-compact-media">
+                        <div class="home-compact-placeholder">
+                            <span class="home-compact-placeholder-label">{{ $system['label'] }}</span>
+                        </div>
                     </div>
-                    <h3 class="mt-2 font-heading text-xl">{{ $system['name'] }}</h3>
-                    <p class="mt-2 text-sm leading-7 muted-copy">{{ $system['summary'] }}</p>
 
-                    <ul class="home-system-modules mt-4">
-                        @foreach($system['modules'] as $module)
-                            <li>{{ $module }}</li>
-                        @endforeach
-                    </ul>
+                    <div class="home-compact-body">
+                        <div class="home-compact-meta">
+                            <span>System</span>
+                            <span>{{ $system['status'] }}</span>
+                        </div>
+                        <h3 class="home-compact-title">{{ $system['name'] }}</h3>
+                        <p class="home-compact-excerpt">{{ \Illuminate\Support\Str::words($system['summary'], 17) }}</p>
 
-                    <a
-                        href="{{ $system['url'] }}"
-                        @if($system['external']) target="_blank" rel="noopener noreferrer" @endif
-                        class="btn-outline mt-5 !w-auto !px-4 !py-2 !text-[0.66rem]"
-                    >
-                        {{ $system['cta'] }}
-                    </a>
+                        <div class="home-chip-row">
+                            @foreach($system['modules'] as $module)
+                                <span class="home-chip">{{ $module }}</span>
+                            @endforeach
+                        </div>
+
+                        <div class="home-compact-footer">
+                            <span class="home-compact-author">{{ $system['label'] }}</span>
+                            <a
+                                href="{{ $system['url'] }}"
+                                @if($system['external']) target="_blank" rel="noopener noreferrer" @endif
+                                class="home-compact-link"
+                            >
+                                {{ $system['cta'] }} ->
+                            </a>
+                        </div>
+                    </div>
                 </article>
             @endforeach
         </div>
@@ -183,16 +226,27 @@
         </div>
 
         @if(!empty($toolHighlights))
-            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div class="home-card-list home-card-list--two">
                 @foreach($toolHighlights as $tool)
-                    <a href="{{ route('tools.show', ['slug' => $tool['slug']]) }}" class="home-tool-tile">
-                        <div class="flex items-center justify-between gap-3">
-                            <p class="text-[0.64rem] uppercase tracking-[0.16em] muted-faint">{{ $tool['category'] }}</p>
-                            <span class="home-tool-status">{{ $tool['status'] }}</span>
-                        </div>
-                        <h3 class="mt-2 font-heading text-xl text-[color:rgba(17,24,39,0.95)]">{{ $tool['name'] }}</h3>
-                        <p class="mt-2 text-sm leading-7 muted-copy">{{ \Illuminate\Support\Str::limit($tool['tagline'], 92) }}</p>
-                        <span class="home-tool-link mt-4 inline-flex">Open tool -></span>
+                    <a href="{{ route('tools.show', ['slug' => $tool['slug']]) }}" class="home-compact-card {{ $loop->even ? 'is-reverse' : '' }}">
+                        <span class="home-compact-media">
+                            <span class="home-compact-placeholder">
+                                <span class="home-compact-placeholder-label">{{ $tool['category'] }}</span>
+                            </span>
+                        </span>
+
+                        <span class="home-compact-body">
+                            <span class="home-compact-meta">
+                                <span>Tool</span>
+                                <span>{{ $tool['status'] }}</span>
+                            </span>
+                            <span class="home-compact-title">{{ $tool['name'] }}</span>
+                            <span class="home-compact-excerpt">{{ \Illuminate\Support\Str::words($tool['tagline'], 16) }}</span>
+                            <span class="home-compact-footer">
+                                <span class="home-compact-author">{{ $tool['category'] }}</span>
+                                <span class="home-compact-link">Open tool -></span>
+                            </span>
+                        </span>
                     </a>
                 @endforeach
             </div>
