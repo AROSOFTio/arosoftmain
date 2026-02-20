@@ -292,7 +292,6 @@
 
 @once
     @push('head')
-        <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.6/tinymce.min.js" referrerpolicy="origin"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const titleInput = document.getElementById('title');
@@ -349,7 +348,107 @@
                     });
                 });
 
-                if (window.tinymce) {
+                const getBodyEditor = () => (window.tinymce ? window.tinymce.get('body-editor') : null);
+
+                const applyBlockFormat = (format) => {
+                    const editor = getBodyEditor();
+                    if (!editor || !format) {
+                        return;
+                    }
+
+                    editor.focus();
+                    editor.execCommand('FormatBlock', false, format);
+                };
+
+                const applyInlineFormat = (format) => {
+                    const editor = getBodyEditor();
+                    if (!editor || !format) {
+                        return;
+                    }
+
+                    const commandMap = {
+                        bold: 'Bold',
+                        italic: 'Italic',
+                        underline: 'Underline',
+                    };
+
+                    const command = commandMap[format];
+                    if (!command) {
+                        return;
+                    }
+
+                    editor.focus();
+                    editor.execCommand(command);
+                };
+
+                const applyListFormat = (type) => {
+                    const editor = getBodyEditor();
+                    if (!editor || !type) {
+                        return;
+                    }
+
+                    editor.focus();
+                    if (type === 'bullet') {
+                        editor.execCommand('InsertUnorderedList');
+                        return;
+                    }
+
+                    if (type === 'number') {
+                        editor.execCommand('InsertOrderedList');
+                    }
+                };
+
+                document.querySelectorAll('[data-editor-block]').forEach(function (button) {
+                    if (button.dataset.editorQuickBound === '1') {
+                        return;
+                    }
+
+                    button.dataset.editorQuickBound = '1';
+                    button.addEventListener('click', function () {
+                        applyBlockFormat(button.getAttribute('data-editor-block'));
+                    });
+                });
+
+                document.querySelectorAll('[data-editor-inline]').forEach(function (button) {
+                    if (button.dataset.editorQuickBound === '1') {
+                        return;
+                    }
+
+                    button.dataset.editorQuickBound = '1';
+                    button.addEventListener('click', function () {
+                        applyInlineFormat(button.getAttribute('data-editor-inline'));
+                    });
+                });
+
+                document.querySelectorAll('[data-editor-list]').forEach(function (button) {
+                    if (button.dataset.editorQuickBound === '1') {
+                        return;
+                    }
+
+                    button.dataset.editorQuickBound = '1';
+                    button.addEventListener('click', function () {
+                        applyListFormat(button.getAttribute('data-editor-list'));
+                    });
+                });
+
+                document.querySelectorAll('form.blog-post-form').forEach(function (form) {
+                    if (form.dataset.tinymceSubmitBound === '1') {
+                        return;
+                    }
+
+                    form.dataset.tinymceSubmitBound = '1';
+                    form.addEventListener('submit', function () {
+                        if (window.tinymce) {
+                            tinymce.triggerSave();
+                        }
+                    });
+                });
+
+                const initEditor = function () {
+                    if (!window.tinymce || getBodyEditor()) {
+                        return;
+                    }
+
                     tinymce.init({
                         selector: '#body-editor',
                         menubar: 'edit insert format table tools',
@@ -419,80 +518,12 @@
                         },
                         content_style: "body { font-family: 'Segoe UI Variable', 'Segoe UI', Inter, Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 16px; line-height: 1.7; } .lead-copy { font-size: 1.08rem; line-height: 1.85; } .info-note { border-left: 3px solid #009d31; padding-left: 0.75rem; }"
                     });
+                };
 
-                    const getBodyEditor = () => tinymce.get('body-editor');
-
-                    const applyBlockFormat = (format) => {
-                        const editor = getBodyEditor();
-                        if (!editor || !format) {
-                            return;
-                        }
-
-                        editor.focus();
-                        editor.execCommand('FormatBlock', false, format);
-                    };
-
-                    const applyInlineFormat = (format) => {
-                        const editor = getBodyEditor();
-                        if (!editor || !format) {
-                            return;
-                        }
-
-                        const commandMap = {
-                            bold: 'Bold',
-                            italic: 'Italic',
-                            underline: 'Underline',
-                        };
-
-                        const command = commandMap[format];
-                        if (!command) {
-                            return;
-                        }
-
-                        editor.focus();
-                        editor.execCommand(command);
-                    };
-
-                    const applyListFormat = (type) => {
-                        const editor = getBodyEditor();
-                        if (!editor || !type) {
-                            return;
-                        }
-
-                        editor.focus();
-                        if (type === 'bullet') {
-                            editor.execCommand('InsertUnorderedList');
-                            return;
-                        }
-
-                        if (type === 'number') {
-                            editor.execCommand('InsertOrderedList');
-                        }
-                    };
-
-                    document.querySelectorAll('[data-editor-block]').forEach(function (button) {
-                        button.addEventListener('click', function () {
-                            applyBlockFormat(button.getAttribute('data-editor-block'));
-                        });
-                    });
-
-                    document.querySelectorAll('[data-editor-inline]').forEach(function (button) {
-                        button.addEventListener('click', function () {
-                            applyInlineFormat(button.getAttribute('data-editor-inline'));
-                        });
-                    });
-
-                    document.querySelectorAll('[data-editor-list]').forEach(function (button) {
-                        button.addEventListener('click', function () {
-                            applyListFormat(button.getAttribute('data-editor-list'));
-                        });
-                    });
-
-                    document.querySelectorAll('form.blog-post-form').forEach(function (form) {
-                        form.addEventListener('submit', function () {
-                            tinymce.triggerSave();
-                        });
-                    });
+                if (window.tinymce) {
+                    initEditor();
+                } else {
+                    document.addEventListener('tinymce:ready', initEditor, { once: true });
                 }
             });
         </script>
