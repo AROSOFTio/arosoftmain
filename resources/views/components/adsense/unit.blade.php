@@ -12,15 +12,16 @@
 
 @php
     $publisherId = 'ca-pub-6208436737131241';
+    $resolvedWrapperClass = trim($wrapperClass.' adsense-unit');
 @endphp
 
-<div class="{{ $wrapperClass }}">
+<div class="{{ $resolvedWrapperClass }}">
     @if($label !== '')
         <p class="mb-2 text-[0.62rem] font-semibold uppercase tracking-[0.14em] muted-faint">{{ $label }}</p>
     @endif
 
     <ins
-        class="adsbygoogle {{ $insClass }}"
+        class="adsbygoogle adsense-slot {{ $insClass }}"
         style="{{ $style }}"
         data-ad-client="{{ $publisherId }}"
         data-ad-slot="{{ $slot }}"

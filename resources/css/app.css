@@ -5,6 +5,7 @@
 :root {
     --bg: #ffffff;
     --accent: #009d31;
+    --accent-deep: #007a2b;
     --ink: #111827;
     --font-sans: "Segoe UI Variable", "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
     --font-heading: "Segoe UI Variable", "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -360,6 +361,16 @@ a {
 
 .content-section {
     margin-top: 2.6rem;
+}
+
+.content-section a:not(.btn-outline):not(.btn-solid):not(.nav-link):not(.nav-link-sm):not(.icon-button) {
+    color: var(--accent-deep);
+    transition: color 180ms ease;
+}
+
+.content-section a:not(.btn-outline):not(.btn-solid):not(.nav-link):not(.nav-link-sm):not(.icon-button):hover,
+.content-section a:not(.btn-outline):not(.btn-solid):not(.nav-link):not(.nav-link-sm):not(.icon-button):focus-visible {
+    color: var(--accent);
 }
 
 .hero-surface {
@@ -757,6 +768,41 @@ a {
     word-break: break-word;
 }
 
+.blog-prose p a,
+.blog-prose li a,
+.blog-prose td a,
+.blog-prose blockquote a {
+    color: var(--accent-deep);
+    font-weight: 600;
+    text-decoration-line: underline;
+    text-decoration-thickness: 0.09em;
+    text-decoration-color: rgba(0, 122, 43, 0.45);
+    text-underline-offset: 0.16em;
+}
+
+.blog-prose p a:hover,
+.blog-prose p a:focus-visible,
+.blog-prose li a:hover,
+.blog-prose li a:focus-visible,
+.blog-prose td a:hover,
+.blog-prose td a:focus-visible,
+.blog-prose blockquote a:hover,
+.blog-prose blockquote a:focus-visible {
+    color: var(--accent);
+    text-decoration-color: rgba(0, 157, 49, 0.75);
+}
+
+.blog-prose p a[href]::after,
+.blog-prose li a[href]::after,
+.blog-prose td a[href]::after,
+.blog-prose blockquote a[href]::after {
+    content: " ↗";
+    font-size: 0.74em;
+    font-weight: 700;
+    vertical-align: text-top;
+    color: var(--accent);
+}
+
 .blog-prose table {
     display: block;
     width: 100%;
@@ -814,6 +860,10 @@ a {
     border-radius: 0.9rem;
     background: rgba(17, 24, 39, 0.02);
     padding: 0.8rem;
+    clear: both;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
 }
 
 .blog-prose .adsense-inline-label {
@@ -825,8 +875,23 @@ a {
     color: rgba(17, 24, 39, 0.56);
 }
 
+.adsense-unit,
+.blog-prose .related-inline-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+}
+
+.blog-prose .related-inline-card {
+    clear: both;
+}
+
+.adsense-unit .adsbygoogle,
 .blog-prose .adsense-inline .adsbygoogle {
-    max-width: 100%;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 100px;
 }
 
 .info-card .adsbygoogle,

@@ -1,6 +1,6 @@
 @props(['post'])
 
-<aside class="my-8 rounded-2xl border border-[color:rgba(0,157,49,0.28)] bg-[color:rgba(0,157,49,0.08)] p-5">
+<aside class="related-inline-card my-8 rounded-2xl border border-[color:rgba(0,157,49,0.28)] bg-[color:rgba(0,157,49,0.08)] p-5">
     <p class="page-kicker">Related read</p>
     <h4 class="mt-2 font-heading text-xl leading-snug">
         <a href="{{ route('blog.show', $post->slug) }}" class="hover:text-[color:var(--accent)]">
@@ -12,4 +12,3 @@
     </p>
     <a href="{{ route('blog.show', $post->slug) }}" class="btn-outline mt-4 !w-auto !px-4 !py-2 !text-[0.68rem]">Open article</a>
 </aside>
-
