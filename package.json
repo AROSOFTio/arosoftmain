@@ -6,8 +6,7 @@
         "dev": "vite"
     },
     "dependencies": {
-        "alpinejs": "^3.14.9",
-        "tinymce": "^6.8.6"
+        "alpinejs": "^3.14.9"
     },
     "devDependencies": {
         "autoprefixer": "^10.4.20",
