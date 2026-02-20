@@ -112,31 +112,22 @@
         </div>
 
         @if(!empty($tutorialVideos))
-            <div class="home-card-list home-card-list--two">
-                @foreach($tutorialVideos as $video)
+            <div class="home-video-grid">
+                @foreach(array_slice($tutorialVideos, 0, 4) as $video)
                     <a
                         href="{{ $video['url'] }}"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="home-compact-card {{ $loop->even ? 'is-reverse' : '' }}"
+                        class="home-video-card"
                     >
-                        <span class="home-compact-media">
-                            <span class="home-compact-thumb" style="background-image:url('{{ $video['thumb'] }}')">
-                                <span class="home-compact-badge">Video</span>
-                            </span>
+                        <span class="home-video-title">{{ \Illuminate\Support\Str::limit($video['title'], 96) }}</span>
+                        <span class="home-video-thumb" style="background-image:url('{{ $video['thumb'] }}')">
+                            <span class="home-video-badge">Video</span>
                         </span>
-
-                        <span class="home-compact-body">
-                            <span class="home-compact-meta">
-                                <span>Tutorial</span>
-                                <span>{{ $video['date'] }}</span>
-                            </span>
-                            <span class="home-compact-title">{{ \Illuminate\Support\Str::limit($video['title'], 92) }}</span>
-                            <span class="home-compact-excerpt">Watch practical implementation and deployment walkthroughs from our channel.</span>
-                            <span class="home-compact-footer">
-                                <span class="home-compact-author">YouTube</span>
-                                <span class="home-compact-link">Watch -></span>
-                            </span>
+                        <span class="home-video-meta">
+                            <span>YouTube Tutorial</span>
+                            <span>{{ $video['date'] }}</span>
+                            <span class="home-video-link">Watch -></span>
                         </span>
                     </a>
                 @endforeach
