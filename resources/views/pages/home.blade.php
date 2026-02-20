@@ -50,9 +50,9 @@
         </div>
 
         @if($latestPosts->isNotEmpty())
-            <div class="home-card-list">
+            <div class="home-card-list home-card-list--321">
                 @foreach($latestPosts as $post)
-                    <article class="home-compact-card {{ $loop->even ? 'is-reverse' : '' }}">
+                    <article class="home-compact-card">
                         <a href="{{ route('blog.show', $post->slug) }}" class="home-compact-media">
                             @if($post->featuredImageUrl())
                                 <span class="home-compact-thumb" style="background-image:url('{{ $post->featuredImageUrl() }}')">
@@ -81,7 +81,7 @@
                             </h3>
 
                             <p class="home-compact-excerpt">
-                                {{ \Illuminate\Support\Str::words(strip_tags($post->excerpt ?: (string) $post->body), 18) }}
+                                {{ \Illuminate\Support\Str::words(strip_tags($post->excerpt ?: (string) $post->body), 12) }}
                             </p>
 
                             <div class="home-compact-footer">

@@ -448,10 +448,26 @@ a {
     gap: 0.85rem;
 }
 
+@media (min-width: 768px) {
+    .home-card-list--321 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1200px) {
+    .home-card-list--321 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
 @media (min-width: 960px) {
     .home-card-list--two {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+}
+
+.home-card-list--321 .home-compact-card {
+    height: 100%;
 }
 
 .home-compact-card {
