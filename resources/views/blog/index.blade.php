@@ -16,7 +16,7 @@
 @section('og_description', $metaDescription)
 
 @section('content')
-    <section class="hero-surface p-8 sm:p-10">
+    <section class="hero-surface blog-hero p-6 sm:p-10">
         <p class="page-kicker">Arosoft Blog</p>
         <h1 class="page-title mt-4">{{ $heading }}</h1>
         <p class="section-copy mt-4 max-w-3xl">
@@ -46,8 +46,8 @@
         />
     </section>
 
-    <section class="content-section grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div class="space-y-7">
+    <section class="content-section blog-content-grid grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-8">
+        <div class="min-w-0 space-y-6 sm:space-y-7">
             <section class="info-card">
                 <form action="{{ route('blog') }}" method="get" class="grid gap-3 md:grid-cols-12">
                     <div class="md:col-span-5">
@@ -104,7 +104,7 @@
             @endif
 
             @if($posts->count())
-                <div class="blog-card-grid grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                <div class="blog-card-grid grid min-w-0 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                     @foreach($posts as $post)
                         <x-blog.post-card
                             :post="$post"
@@ -143,7 +143,7 @@
             </div>
         </div>
 
-        <aside class="hidden lg:block">
+        <aside class="hidden min-w-0 lg:block">
             <x-blog.sidebar
                 :categories="$sidebar['categories']"
                 :tags="$sidebar['tags']"

@@ -42,8 +42,8 @@
             </p>
         @endif
 
-        <div class="flex items-center justify-between gap-3 text-sm">
-            <span class="muted-faint">By {{ $post->author?->name ?? 'Arosoft Team' }}</span>
+        <div class="flex flex-wrap items-center gap-3 text-sm">
+            <span class="min-w-0 break-words muted-faint">By {{ $post->author?->name ?? 'Arosoft Team' }}</span>
             <a href="{{ route('blog.show', $post->slug) }}" class="btn-outline !w-auto !px-4 !py-2 !text-[0.68rem]">Read</a>
         </div>
     </div>

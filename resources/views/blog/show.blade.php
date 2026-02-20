@@ -103,7 +103,7 @@
 @endsection
 
 @section('content')
-    <section class="hero-surface p-8 sm:p-10">
+    <section class="hero-surface blog-hero p-6 sm:p-10">
         <nav aria-label="Breadcrumb" class="text-sm muted-faint">
             <ol class="flex flex-wrap items-center gap-2">
                 @foreach($breadcrumbs as $crumb)
@@ -130,8 +130,8 @@
         </div>
     </section>
 
-    <section class="content-section grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <article class="space-y-7">
+    <section class="content-section blog-content-grid grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-8">
+        <article class="min-w-0 space-y-6 sm:space-y-7">
             @if($post->featuredImageUrl())
                 <figure class="overflow-hidden rounded-2xl border border-[color:rgba(17,24,39,0.1)]">
                     <img
@@ -143,7 +143,7 @@
                 </figure>
             @endif
 
-            <div class="shell-card rounded-2xl p-6 sm:p-8">
+            <div class="shell-card blog-article-card rounded-2xl p-5 sm:p-8">
                 <div class="blog-prose">
                     {!! $bodyWithInline !!}
                 </div>
@@ -215,7 +215,7 @@
             />
         </article>
 
-        <aside class="hidden lg:block">
+        <aside class="hidden min-w-0 lg:block">
             <x-blog.sidebar
                 :categories="$sidebar['categories']"
                 :tags="$sidebar['tags']"
@@ -226,7 +226,7 @@
         </aside>
     </section>
 
-    <section class="mt-8 block lg:hidden">
+    <section class="mt-6 block lg:hidden sm:mt-8">
         <x-blog.sidebar
             :categories="$sidebar['categories']"
             :tags="$sidebar['tags']"

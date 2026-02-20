@@ -623,6 +623,28 @@ a {
 }
 
 @media (max-width: 640px) {
+    .blog-hero {
+        padding: 1rem;
+        border-radius: 1.1rem;
+    }
+
+    .blog-content-grid {
+        gap: 1.1rem;
+    }
+
+    .blog-content-grid .info-card {
+        padding: 1rem;
+        border-radius: 0.85rem;
+    }
+
+    .blog-article-card {
+        padding: 1rem;
+    }
+
+    .blog-card > div {
+        padding: 1rem;
+    }
+
     .page-title {
         line-height: 1.2;
     }
@@ -649,10 +671,16 @@ a {
     color: rgba(17, 24, 39, 0.9);
     font-size: 1.02rem;
     line-height: 1.86;
+    overflow-wrap: anywhere;
+    word-break: normal;
 }
 
 .blog-prose > * + * {
     margin-top: 1.15rem;
+}
+
+.blog-content-grid > * {
+    min-width: 0;
 }
 
 .blog-prose h2,
@@ -677,12 +705,29 @@ a {
     padding-left: 1.25rem;
 }
 
+.blog-prose p,
+.blog-prose li,
+.blog-prose td,
+.blog-prose th,
+.blog-prose a,
+.blog-prose figcaption {
+    overflow-wrap: anywhere;
+}
+
+.blog-prose a {
+    word-break: break-word;
+}
+
 .blog-prose table {
+    display: block;
     width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     border-collapse: collapse;
     border: 1px solid rgba(17, 24, 39, 0.16);
     border-radius: 0.5rem;
-    overflow: hidden;
+    overflow-y: hidden;
 }
 
 .blog-prose th,
@@ -743,6 +788,11 @@ a {
 
 .blog-prose .adsense-inline .adsbygoogle {
     max-width: 100%;
+}
+
+.info-card .adsbygoogle,
+.blog-prose .adsense-inline .adsbygoogle {
+    max-width: 100% !important;
 }
 
 .admin-shell {
