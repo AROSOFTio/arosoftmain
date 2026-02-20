@@ -81,22 +81,6 @@
 
         <div class="mt-4">
             <label for="body-editor" class="form-label">Body</label>
-            <div class="mb-2 flex flex-wrap gap-2" data-editor-quicktools>
-                <button type="button" class="nav-link-sm !px-3 !py-1" data-editor-block="p">Paragraph</button>
-                <button type="button" class="nav-link-sm !px-3 !py-1" data-editor-block="h1">H1</button>
-                <button type="button" class="nav-link-sm !px-3 !py-1" data-editor-block="h2">H2</button>
-                <button type="button" class="nav-link-sm !px-3 !py-1" data-editor-block="h3">H3</button>
-                <button type="button" class="nav-link-sm !px-3 !py-1" data-editor-block="h4">H4</button>
-                <button type="button" class="nav-link-sm !px-3 !py-1" data-editor-block="h5">H5</button>
-                <button type="button" class="nav-link-sm !px-3 !py-1" data-editor-block="h6">H6</button>
-                <button type="button" class="nav-link-sm !px-3 !py-1" data-editor-block="blockquote">Quote</button>
-                <button type="button" class="nav-link-sm !px-3 !py-1" data-editor-block="pre">Preformatted</button>
-                <button type="button" class="nav-link-sm !px-3 !py-1" data-editor-inline="bold">Bold</button>
-                <button type="button" class="nav-link-sm !px-3 !py-1" data-editor-inline="italic">Italic</button>
-                <button type="button" class="nav-link-sm !px-3 !py-1" data-editor-inline="underline">Underline</button>
-                <button type="button" class="nav-link-sm !px-3 !py-1" data-editor-list="bullet">Bullet List</button>
-                <button type="button" class="nav-link-sm !px-3 !py-1" data-editor-list="number">Numbered List</button>
-            </div>
             <textarea id="body-editor" name="body" rows="16" class="form-field">{{ old('body', $post->body) }}</textarea>
             <p class="mt-1 text-xs muted-faint">
                 Supports headings (H1-H6), paragraph blocks, formatted text, links, lists, tables, images, and YouTube/Vimeo embeds.
@@ -350,87 +334,6 @@
 
                 const getBodyEditor = () => (window.tinymce ? window.tinymce.get('body-editor') : null);
 
-                const applyBlockFormat = (format) => {
-                    const editor = getBodyEditor();
-                    if (!editor || !format) {
-                        return;
-                    }
-
-                    editor.focus();
-                    editor.execCommand('FormatBlock', false, format);
-                };
-
-                const applyInlineFormat = (format) => {
-                    const editor = getBodyEditor();
-                    if (!editor || !format) {
-                        return;
-                    }
-
-                    const commandMap = {
-                        bold: 'Bold',
-                        italic: 'Italic',
-                        underline: 'Underline',
-                    };
-
-                    const command = commandMap[format];
-                    if (!command) {
-                        return;
-                    }
-
-                    editor.focus();
-                    editor.execCommand(command);
-                };
-
-                const applyListFormat = (type) => {
-                    const editor = getBodyEditor();
-                    if (!editor || !type) {
-                        return;
-                    }
-
-                    editor.focus();
-                    if (type === 'bullet') {
-                        editor.execCommand('InsertUnorderedList');
-                        return;
-                    }
-
-                    if (type === 'number') {
-                        editor.execCommand('InsertOrderedList');
-                    }
-                };
-
-                document.querySelectorAll('[data-editor-block]').forEach(function (button) {
-                    if (button.dataset.editorQuickBound === '1') {
-                        return;
-                    }
-
-                    button.dataset.editorQuickBound = '1';
-                    button.addEventListener('click', function () {
-                        applyBlockFormat(button.getAttribute('data-editor-block'));
-                    });
-                });
-
-                document.querySelectorAll('[data-editor-inline]').forEach(function (button) {
-                    if (button.dataset.editorQuickBound === '1') {
-                        return;
-                    }
-
-                    button.dataset.editorQuickBound = '1';
-                    button.addEventListener('click', function () {
-                        applyInlineFormat(button.getAttribute('data-editor-inline'));
-                    });
-                });
-
-                document.querySelectorAll('[data-editor-list]').forEach(function (button) {
-                    if (button.dataset.editorQuickBound === '1') {
-                        return;
-                    }
-
-                    button.dataset.editorQuickBound = '1';
-                    button.addEventListener('click', function () {
-                        applyListFormat(button.getAttribute('data-editor-list'));
-                    });
-                });
-
                 document.querySelectorAll('form.blog-post-form').forEach(function (form) {
                     if (form.dataset.tinymceSubmitBound === '1') {
                         return;
@@ -451,11 +354,14 @@
 
                     tinymce.init({
                         selector: '#body-editor',
-                        menubar: 'edit insert format table tools',
+                        menubar: true,
                         height: 560,
                         plugins: 'advlist autolink lists link image table code media charmap searchreplace visualblocks wordcount fullscreen',
-                        toolbar_mode: 'sliding',
+                        toolbar_mode: 'wrap',
                         toolbar_sticky: true,
+                        statusbar: true,
+                        elementpath: true,
+                        resize: true,
                         block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6; Preformatted=pre; Blockquote=blockquote',
                         toolbar: 'undo redo | blocks | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | blockquote | link image media table | removeformat | code fullscreen',
                         style_formats: [
