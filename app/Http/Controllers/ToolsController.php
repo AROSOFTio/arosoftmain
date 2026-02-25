@@ -311,11 +311,101 @@ class ToolsController extends Controller
             ];
         }
 
+        if ($processor === 'youtube_downloader') {
+            if ($trimmedPayload === '') {
+                return [
+                    'ok' => false,
+                    'message' => 'Provide a YouTube video URL to continue.',
+                    'label' => 'YouTube URL Error',
+                    'output' => null,
+                ];
+            }
+
+            $parsed = $this->parseYoutubeVideoUrl($trimmedPayload);
+            if ($parsed === null) {
+                return [
+                    'ok' => false,
+                    'message' => 'Invalid YouTube URL. Paste a valid watch, short, embed, or youtu.be link.',
+                    'label' => 'YouTube URL Error',
+                    'output' => null,
+                ];
+            }
+
+            $normalizedUrl = 'https://www.youtube.com/watch?v=' . $parsed['video_id'];
+
+            $output = implode("\n", [
+                'Video ID: ' . $parsed['video_id'],
+                'Normalized URL: ' . $normalizedUrl,
+                'Request Status: Ready for download processing',
+                'Pipeline: YouTube downloader connected (social downloaders can be added next)',
+            ]);
+
+            return [
+                'ok' => true,
+                'message' => 'YouTube video URL accepted and prepared successfully.',
+                'label' => 'YouTube Download Request',
+                'output' => $output,
+            ];
+        }
+
         return [
             'ok' => false,
             'message' => 'This tool does not support instant text processing yet.',
             'label' => 'Unsupported Processor',
             'output' => null,
+        ];
+    }
+
+    private function parseYoutubeVideoUrl(string $input): ?array
+    {
+        $sanitized = trim($input);
+        if ($sanitized === '') {
+            return null;
+        }
+
+        if (!str_starts_with(Str::lower($sanitized), 'http://') && !str_starts_with(Str::lower($sanitized), 'https://')) {
+            $sanitized = 'https://' . $sanitized;
+        }
+
+        $parts = parse_url($sanitized);
+        if ($parts === false) {
+            return null;
+        }
+
+        $host = Str::lower((string) ($parts['host'] ?? ''));
+        $path = trim((string) ($parts['path'] ?? ''), '/');
+        $query = (string) ($parts['query'] ?? '');
+
+        $isYoutubeHost = Str::contains($host, 'youtube.com')
+            || Str::contains($host, 'youtu.be')
+            || Str::contains($host, 'youtube-nocookie.com');
+
+        if (!$isYoutubeHost) {
+            return null;
+        }
+
+        $videoId = null;
+
+        if (Str::contains($host, 'youtu.be')) {
+            $videoId = explode('/', $path)[0] ?? null;
+        } elseif ($path === 'watch') {
+            parse_str($query, $queryParams);
+            $videoId = $queryParams['v'] ?? null;
+        } elseif (Str::startsWith($path, 'shorts/')) {
+            $videoId = explode('/', $path)[1] ?? null;
+        } elseif (Str::startsWith($path, 'embed/')) {
+            $videoId = explode('/', $path)[1] ?? null;
+        } elseif (Str::startsWith($path, 'live/')) {
+            $videoId = explode('/', $path)[1] ?? null;
+        }
+
+        if (!is_string($videoId) || !preg_match('/^[A-Za-z0-9_-]{11}$/', $videoId)) {
+            return null;
+        }
+
+        return [
+            'video_id' => $videoId,
+            'url' => $sanitized,
         ];
     }
 

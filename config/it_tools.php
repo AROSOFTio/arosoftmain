@@ -580,5 +580,28 @@ return [
                 ],
             ],
         ],
+        [
+            'key' => 'downloaders',
+            'name' => 'Downloaders',
+            'summary' => 'Prepare and process downloads from supported media platforms.',
+            'tools' => [
+                [
+                    'slug' => 'youtube-video-downloader',
+                    'name' => 'YouTube Video Downloader',
+                    'status' => 'Live',
+                    'tagline' => 'Paste a YouTube video URL and prepare it for download processing.',
+                    'description' => 'Submit a valid YouTube video URL to normalize it, extract the video ID, and prepare the request for the downloader workflow.',
+                    'input_type' => 'text',
+                    'button_label' => 'Prepare YouTube Download',
+                    'processing_mode' => 'instant',
+                    'processor' => 'youtube_downloader',
+                    'use_cases' => [
+                        'Capture YouTube URLs for download workflow.',
+                        'Normalize watch, short, and embed links.',
+                        'Prepare media download queue for future social connectors.',
+                    ],
+                ],
+            ],
+        ],
     ],
 ];

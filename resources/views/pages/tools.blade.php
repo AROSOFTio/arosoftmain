@@ -20,12 +20,17 @@
             'hash_sha256' => 'Paste text for SHA-256 hash...',
             'json_formatter' => 'Paste JSON payload...',
             'base64_encode' => 'Paste text to encode...',
+            'youtube_downloader' => 'Paste YouTube URL (watch, shorts, embed, or youtu.be)...',
             default => 'Paste text input...',
         };
 
         $toolIconTone = static function (string $slug): string {
             if (str_contains($slug, 'pdf-to-')) {
                 return 'tool-nav-icon--blue';
+            }
+
+            if (str_contains($slug, 'youtube') || str_contains($slug, 'download')) {
+                return 'tool-nav-icon--red';
             }
 
             if (str_contains($slug, '-to-pdf') || str_contains($slug, 'scan-to-pdf')) {
@@ -62,6 +67,14 @@
                 return 'GEN';
             }
 
+            if (str_contains($slug, 'youtube')) {
+                return 'YT';
+            }
+
+            if (str_contains($slug, 'download')) {
+                return 'DL';
+            }
+
             $name = trim((string) ($tool['name'] ?? 'Tool'));
             $parts = explode(' ', $name);
             $head = $parts[0] ?? 'Tool';
@@ -75,6 +88,7 @@
                 'converter' => 'tool-group-icon--green',
                 'password-remover' => 'tool-group-icon--amber',
                 'generators' => 'tool-group-icon--blue',
+                'downloaders' => 'tool-group-icon--red',
                 default => 'tool-group-icon--teal',
             };
         };
@@ -84,6 +98,7 @@
                 'converter' => 'CV',
                 'password-remover' => 'PW',
                 'generators' => 'GN',
+                'downloaders' => 'DL',
                 default => 'TL',
             };
         };

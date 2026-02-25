@@ -1027,6 +1027,12 @@ a {
     color: rgba(30, 64, 175, 0.95);
 }
 
+.tool-group-icon--red {
+    border-color: rgba(220, 38, 38, 0.42);
+    background: rgba(239, 68, 68, 0.16);
+    color: rgba(185, 28, 28, 0.95);
+}
+
 .tool-group-icon--teal {
     border-color: rgba(13, 148, 136, 0.38);
     background: rgba(20, 184, 166, 0.16);
@@ -1138,6 +1144,12 @@ a {
     border-color: rgba(37, 99, 235, 0.4);
     background: rgba(59, 130, 246, 0.16);
     color: rgba(30, 64, 175, 0.95);
+}
+
+.tool-nav-icon--red {
+    border-color: rgba(220, 38, 38, 0.42);
+    background: rgba(239, 68, 68, 0.16);
+    color: rgba(185, 28, 28, 0.95);
 }
 
 .tool-nav-icon--teal {
