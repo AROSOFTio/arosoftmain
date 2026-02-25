@@ -801,7 +801,7 @@ class ToolsController extends Controller
 
             $outputLines = $trimmedOutput === ''
                 ? []
-                : preg_split('/\r\n|\r|\n/', $trimmedOutput) ?: [];
+                : (preg_split('/\r\n|\r|\n/', $trimmedOutput) ?: []);
 
             return [
                 'exit_code' => $exitCode,
@@ -844,7 +844,7 @@ class ToolsController extends Controller
             $combined = trim((string) $stdout . "\n" . (string) $stderr);
             $outputLines = $combined === ''
                 ? []
-                : preg_split('/\r\n|\r|\n/', $combined) ?: [];
+                : (preg_split('/\r\n|\r|\n/', $combined) ?: []);
 
             return [
                 'exit_code' => (int) $exitCode,
