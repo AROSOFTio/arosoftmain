@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -85,6 +87,186 @@ class ToolsController extends Controller
         return redirect()
             ->route('tools.show', ['slug' => $slug])
             ->with('tool_status', $result['message']);
+    }
+
+    public function formats(Request $request, string $slug): JsonResponse
+    {
+        $catalog = $this->catalog();
+        abort_unless(isset($catalog['tools'][$slug]), 404);
+
+        $tool = $catalog['tools'][$slug];
+        if (($tool['processor'] ?? '') !== 'youtube_downloader') {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Formats endpoint is only available for downloader tools.',
+            ], 422);
+        }
+
+        $validated = $request->validate([
+            'url' => ['required', 'string', 'max:2048'],
+        ]);
+
+        $parsed = $this->parseYoutubeVideoUrl((string) $validated['url']);
+        if ($parsed === null) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Invalid YouTube URL. Paste a valid watch, short, embed, or youtu.be link.',
+            ], 422);
+        }
+
+        $inspection = $this->inspectYoutubeMedia($parsed['canonical_url']);
+        if (!$inspection['ok']) {
+            return response()->json([
+                'ok' => false,
+                'message' => $inspection['message'],
+            ], 422);
+        }
+
+        $videoOptions = array_map(function (int $height) use ($slug, $parsed): array {
+            return [
+                'label' => $height . 'p',
+                'download_url' => URL::temporarySignedRoute('tools.download', now()->addMinutes(15), [
+                    'slug' => $slug,
+                    'url' => $parsed['canonical_url'],
+                    'type' => 'video',
+                    'quality' => $height,
+                ]),
+            ];
+        }, $inspection['video_heights']);
+
+        $audioBitrates = [320, 256, 192, 128];
+        $audioOptions = array_map(function (int $bitrate) use ($slug, $parsed): array {
+            return [
+                'label' => 'MP3 ' . $bitrate . 'kbps',
+                'download_url' => URL::temporarySignedRoute('tools.download', now()->addMinutes(15), [
+                    'slug' => $slug,
+                    'url' => $parsed['canonical_url'],
+                    'type' => 'audio',
+                    'quality' => $bitrate,
+                ]),
+            ];
+        }, $audioBitrates);
+
+        return response()->json([
+            'ok' => true,
+            'title' => $inspection['title'],
+            'duration' => $inspection['duration'],
+            'thumbnail' => $inspection['thumbnail'],
+            'normalized_url' => $parsed['canonical_url'],
+            'video_options' => $videoOptions,
+            'audio_options' => $audioOptions,
+        ]);
+    }
+
+    public function download(Request $request, string $slug): RedirectResponse|BinaryFileResponse
+    {
+        $catalog = $this->catalog();
+        abort_unless(isset($catalog['tools'][$slug]), 404);
+
+        $tool = $catalog['tools'][$slug];
+        if (($tool['processor'] ?? '') !== 'youtube_downloader') {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'url' => ['required', 'string', 'max:2048'],
+            'type' => ['required', 'in:video,audio'],
+            'quality' => ['required', 'integer'],
+        ]);
+
+        $parsed = $this->parseYoutubeVideoUrl((string) $validated['url']);
+        if ($parsed === null) {
+            return redirect()
+                ->route('tools.show', ['slug' => $slug])
+                ->with('tool_error', 'Invalid YouTube URL for download.');
+        }
+
+        if (!function_exists('exec')) {
+            return redirect()
+                ->route('tools.show', ['slug' => $slug])
+                ->with('tool_error', 'Server download execution is disabled (exec not available).');
+        }
+
+        $ytDlp = $this->detectYtDlpBinary();
+        if ($ytDlp === null) {
+            return redirect()
+                ->route('tools.show', ['slug' => $slug])
+                ->with('tool_error', 'yt-dlp is not installed on the server. Install yt-dlp to enable video downloads.');
+        }
+
+        $resultsDirectory = Storage::disk('local')->path('tool-results/youtube-video-downloader');
+        if (!is_dir($resultsDirectory)) {
+            @mkdir($resultsDirectory, 0775, true);
+        }
+
+        $jobToken = (string) Str::uuid();
+        $outputTemplate = $resultsDirectory . DIRECTORY_SEPARATOR . $jobToken . '.%(ext)s';
+        $urlArgument = escapeshellarg($parsed['canonical_url']);
+
+        $type = (string) $validated['type'];
+        $quality = (int) $validated['quality'];
+        $command = '';
+        $label = '';
+
+        if ($type === 'video') {
+            $allowedHeights = [4320, 2160, 1440, 1080, 720, 480, 360, 240, 144];
+            if (!in_array($quality, $allowedHeights, true)) {
+                return redirect()
+                    ->route('tools.show', ['slug' => $slug])
+                    ->with('tool_error', 'Unsupported video quality requested.');
+            }
+
+            $formatSelector = "bestvideo[height<={$quality}]+bestaudio/best[height<={$quality}]";
+            $label = $quality . 'p';
+
+            $command = escapeshellarg($ytDlp)
+                . ' --no-playlist --no-warnings --restrict-filenames --force-overwrites --merge-output-format mp4'
+                . ' -f ' . escapeshellarg($formatSelector)
+                . ' -o ' . escapeshellarg($outputTemplate)
+                . ' ' . $urlArgument
+                . ' 2>&1';
+        } else {
+            $allowedBitrates = [320, 256, 192, 128];
+            if (!in_array($quality, $allowedBitrates, true)) {
+                return redirect()
+                    ->route('tools.show', ['slug' => $slug])
+                    ->with('tool_error', 'Unsupported MP3 quality requested.');
+            }
+
+            if ($this->detectFfmpegBinary() === null) {
+                return redirect()
+                    ->route('tools.show', ['slug' => $slug])
+                    ->with('tool_error', 'ffmpeg is required for MP3 conversion. Install ffmpeg on the server and retry.');
+            }
+
+            $label = 'mp3-' . $quality . 'kbps';
+            $postprocessorArgs = 'ffmpeg:-b:a ' . $quality . 'k';
+
+            $command = escapeshellarg($ytDlp)
+                . ' --no-playlist --no-warnings --restrict-filenames --force-overwrites'
+                . ' -x --audio-format mp3 --audio-quality 0'
+                . ' --postprocessor-args ' . escapeshellarg($postprocessorArgs)
+                . ' -o ' . escapeshellarg($outputTemplate)
+                . ' ' . $urlArgument
+                . ' 2>&1';
+        }
+
+        $outputLines = [];
+        $exitCode = 1;
+        exec($command, $outputLines, $exitCode);
+
+        $downloadPath = $this->resolveYoutubeDownloadPath($resultsDirectory, $jobToken);
+
+        if ($exitCode !== 0 || $downloadPath === null || !is_file($downloadPath)) {
+            return redirect()
+                ->route('tools.show', ['slug' => $slug])
+                ->with('tool_error', $this->formatYoutubeDownloadError(trim(implode("\n", $outputLines))));
+        }
+
+        $extension = pathinfo($downloadPath, PATHINFO_EXTENSION);
+        $downloadName = 'youtube-' . $parsed['video_id'] . '-' . $label . '.' . $extension;
+
+        return response()->download($downloadPath, $downloadName)->deleteFileAfterSend(true);
     }
 
     private function renderCatalog(?string $slug = null): View
@@ -337,7 +519,7 @@ class ToolsController extends Controller
                 'Video ID: ' . $parsed['video_id'],
                 'Normalized URL: ' . $normalizedUrl,
                 'Request Status: Ready for download processing',
-                'Pipeline: YouTube downloader connected (social downloaders can be added next)',
+                'Pipeline: Auto format generation is ready (video qualities + MP3 options)',
             ]);
 
             return [
@@ -406,7 +588,193 @@ class ToolsController extends Controller
         return [
             'video_id' => $videoId,
             'url' => $sanitized,
+            'canonical_url' => 'https://www.youtube.com/watch?v=' . $videoId,
         ];
+    }
+
+    private function inspectYoutubeMedia(string $url): array
+    {
+        if (!function_exists('exec')) {
+            return [
+                'ok' => false,
+                'message' => 'Server execution is disabled. Enable exec to inspect YouTube formats.',
+            ];
+        }
+
+        $ytDlp = $this->detectYtDlpBinary();
+        if ($ytDlp === null) {
+            return [
+                'ok' => false,
+                'message' => 'yt-dlp is not installed on the server. Install yt-dlp to load quality options.',
+            ];
+        }
+
+        $command = escapeshellarg($ytDlp)
+            . ' --dump-single-json --no-playlist --no-warnings '
+            . escapeshellarg($url)
+            . ' 2>&1';
+
+        $outputLines = [];
+        $exitCode = 1;
+        exec($command, $outputLines, $exitCode);
+
+        $rawOutput = trim(implode("\n", $outputLines));
+        $jsonPayload = $this->extractJsonFromOutput($rawOutput);
+
+        if ($exitCode !== 0 || $jsonPayload === null) {
+            return [
+                'ok' => false,
+                'message' => $this->formatYoutubeDownloadError($rawOutput),
+            ];
+        }
+
+        $decoded = json_decode($jsonPayload, true);
+        if (!is_array($decoded)) {
+            return [
+                'ok' => false,
+                'message' => 'Unable to parse YouTube format data from server response.',
+            ];
+        }
+
+        $heights = [];
+        foreach (($decoded['formats'] ?? []) as $format) {
+            if (!is_array($format)) {
+                continue;
+            }
+
+            $vcodec = (string) ($format['vcodec'] ?? 'none');
+            $height = (int) ($format['height'] ?? 0);
+
+            if ($vcodec !== 'none' && $height > 0) {
+                $heights[$height] = true;
+            }
+        }
+
+        $videoHeights = array_map('intval', array_keys($heights));
+        rsort($videoHeights);
+
+        if (count($videoHeights) === 0) {
+            $videoHeights = [1080, 720, 480, 360];
+        }
+
+        return [
+            'ok' => true,
+            'title' => (string) ($decoded['title'] ?? 'YouTube Video'),
+            'duration' => (int) ($decoded['duration'] ?? 0),
+            'thumbnail' => (string) ($decoded['thumbnail'] ?? ''),
+            'video_heights' => $videoHeights,
+        ];
+    }
+
+    private function detectYtDlpBinary(): ?string
+    {
+        $candidates = [
+            '/usr/local/bin/yt-dlp',
+            '/usr/bin/yt-dlp',
+            '/bin/yt-dlp',
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_file($candidate) && is_executable($candidate)) {
+                return $candidate;
+            }
+        }
+
+        $commandOutput = [];
+        $exitCode = 1;
+        exec('command -v yt-dlp 2>/dev/null', $commandOutput, $exitCode);
+        if ($exitCode === 0) {
+            $detected = trim($commandOutput[0] ?? '');
+            if ($detected !== '' && is_file($detected) && is_executable($detected)) {
+                return $detected;
+            }
+        }
+
+        return null;
+    }
+
+    private function detectFfmpegBinary(): ?string
+    {
+        $candidates = [
+            '/usr/local/bin/ffmpeg',
+            '/usr/bin/ffmpeg',
+            '/bin/ffmpeg',
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_file($candidate) && is_executable($candidate)) {
+                return $candidate;
+            }
+        }
+
+        $commandOutput = [];
+        $exitCode = 1;
+        exec('command -v ffmpeg 2>/dev/null', $commandOutput, $exitCode);
+        if ($exitCode === 0) {
+            $detected = trim($commandOutput[0] ?? '');
+            if ($detected !== '' && is_file($detected) && is_executable($detected)) {
+                return $detected;
+            }
+        }
+
+        return null;
+    }
+
+    private function resolveYoutubeDownloadPath(string $resultsDirectory, string $jobToken): ?string
+    {
+        $matches = glob($resultsDirectory . DIRECTORY_SEPARATOR . $jobToken . '.*') ?: [];
+        if (count($matches) === 0) {
+            return null;
+        }
+
+        $validMatches = array_values(array_filter($matches, static function (string $path): bool {
+            $basename = basename($path);
+
+            return !Str::endsWith($basename, ['.part', '.ytdl', '.temp'])
+                && is_file($path)
+                && filesize($path) > 0;
+        }));
+
+        if (count($validMatches) === 0) {
+            return null;
+        }
+
+        usort($validMatches, static function (string $left, string $right): int {
+            return filemtime($right) <=> filemtime($left);
+        });
+
+        return $validMatches[0];
+    }
+
+    private function extractJsonFromOutput(string $rawOutput): ?string
+    {
+        $start = strpos($rawOutput, '{');
+        $end = strrpos($rawOutput, '}');
+
+        if ($start === false || $end === false || $end <= $start) {
+            return null;
+        }
+
+        return substr($rawOutput, $start, $end - $start + 1);
+    }
+
+    private function formatYoutubeDownloadError(string $rawOutput): string
+    {
+        $normalized = Str::lower($rawOutput);
+
+        if (Str::contains($normalized, 'ffmpeg')) {
+            return 'ffmpeg is required for merge/audio conversion. Install ffmpeg on the server and retry.';
+        }
+
+        if (Str::contains($normalized, 'private video') || Str::contains($normalized, 'sign in to confirm')) {
+            return 'This YouTube video cannot be downloaded publicly (private or restricted).';
+        }
+
+        if (Str::contains($normalized, 'copyright') || Str::contains($normalized, 'unavailable')) {
+            return 'This media is unavailable for download. Use content you own or have permission to process.';
+        }
+
+        return 'Failed to process YouTube download. Verify server tools (yt-dlp/ffmpeg) and try again.';
     }
 
     private function runFileProcessor(array $tool, UploadedFile $uploadedFile): array

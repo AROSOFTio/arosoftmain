@@ -57,6 +57,12 @@ Route::get('/tools/{slug}', [ToolsController::class, 'show'])->name('tools.show'
 Route::post('/tools/{slug}/process', [ToolsController::class, 'process'])
     ->middleware('throttle:12,1')
     ->name('tools.process');
+Route::post('/tools/{slug}/formats', [ToolsController::class, 'formats'])
+    ->middleware('throttle:20,1')
+    ->name('tools.formats');
+Route::get('/tools/{slug}/download', [ToolsController::class, 'download'])
+    ->middleware(['throttle:20,1', 'signed'])
+    ->name('tools.download');
 
 Route::prefix('admin')->name('admin.')->group(function (): void {
     Route::middleware('guest')->group(function (): void {
