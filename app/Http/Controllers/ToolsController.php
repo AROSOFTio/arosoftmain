@@ -181,10 +181,10 @@ class ToolsController extends Controller
                 ->with('tool_error', 'Invalid YouTube URL for download.');
         }
 
-        if (!function_exists('exec')) {
+        if (!$this->canRunShellCommands()) {
             return redirect()
                 ->route('tools.show', ['slug' => $slug])
-                ->with('tool_error', 'Server download execution is disabled (exec not available).');
+                ->with('tool_error', 'Server command execution is disabled. Enable exec/shell_exec/proc_open for downloader tools.');
         }
 
         $ytDlp = $this->detectYtDlpBinary();
@@ -251,9 +251,9 @@ class ToolsController extends Controller
                 . ' 2>&1';
         }
 
-        $outputLines = [];
-        $exitCode = 1;
-        exec($command, $outputLines, $exitCode);
+        $commandRun = $this->runShellCommand($command);
+        $outputLines = $commandRun['output_lines'];
+        $exitCode = $commandRun['exit_code'];
 
         $downloadPath = $this->resolveYoutubeDownloadPath($resultsDirectory, $jobToken);
 
@@ -594,10 +594,10 @@ class ToolsController extends Controller
 
     private function inspectYoutubeMedia(string $url): array
     {
-        if (!function_exists('exec')) {
+        if (!$this->canRunShellCommands()) {
             return [
                 'ok' => false,
-                'message' => 'Server execution is disabled. Enable exec to inspect YouTube formats.',
+                'message' => 'Server command execution is disabled. Enable exec/shell_exec/proc_open to inspect YouTube formats.',
             ];
         }
 
@@ -614,9 +614,9 @@ class ToolsController extends Controller
             . escapeshellarg($url)
             . ' 2>&1';
 
-        $outputLines = [];
-        $exitCode = 1;
-        exec($command, $outputLines, $exitCode);
+        $commandRun = $this->runShellCommand($command);
+        $outputLines = $commandRun['output_lines'];
+        $exitCode = $commandRun['exit_code'];
 
         $rawOutput = trim(implode("\n", $outputLines));
         $jsonPayload = $this->extractJsonFromOutput($rawOutput);
@@ -680,11 +680,9 @@ class ToolsController extends Controller
             }
         }
 
-        $commandOutput = [];
-        $exitCode = 1;
-        exec('command -v yt-dlp 2>/dev/null', $commandOutput, $exitCode);
-        if ($exitCode === 0) {
-            $detected = trim($commandOutput[0] ?? '');
+        $resolved = $this->resolveBinaryFromPath('yt-dlp');
+        if ($resolved !== null) {
+            $detected = trim($resolved);
             if ($detected !== '' && is_file($detected) && is_executable($detected)) {
                 return $detected;
             }
@@ -707,11 +705,9 @@ class ToolsController extends Controller
             }
         }
 
-        $commandOutput = [];
-        $exitCode = 1;
-        exec('command -v ffmpeg 2>/dev/null', $commandOutput, $exitCode);
-        if ($exitCode === 0) {
-            $detected = trim($commandOutput[0] ?? '');
+        $resolved = $this->resolveBinaryFromPath('ffmpeg');
+        if ($resolved !== null) {
+            $detected = trim($resolved);
             if ($detected !== '' && is_file($detected) && is_executable($detected)) {
                 return $detected;
             }
@@ -744,6 +740,122 @@ class ToolsController extends Controller
         });
 
         return $validMatches[0];
+    }
+
+    private function resolveBinaryFromPath(string $binary): ?string
+    {
+        if (!$this->canRunShellCommands()) {
+            return null;
+        }
+
+        $commandRun = $this->runShellCommand('command -v ' . escapeshellarg($binary));
+        if ($commandRun['exit_code'] !== 0) {
+            return null;
+        }
+
+        $firstLine = trim($commandRun['output_lines'][0] ?? '');
+
+        return $firstLine !== '' ? $firstLine : null;
+    }
+
+    private function canRunShellCommands(): bool
+    {
+        return function_exists('exec')
+            || function_exists('shell_exec')
+            || function_exists('proc_open');
+    }
+
+    private function runShellCommand(string $command): array
+    {
+        $commandWithStderr = Str::contains($command, '2>&1')
+            ? $command
+            : $command . ' 2>&1';
+
+        if (function_exists('exec')) {
+            $outputLines = [];
+            $exitCode = 1;
+            exec($commandWithStderr, $outputLines, $exitCode);
+
+            return [
+                'exit_code' => $exitCode,
+                'output_lines' => $outputLines,
+            ];
+        }
+
+        if (function_exists('shell_exec')) {
+            $marker = '__AROSOFT_EXIT__' . str_replace('-', '', (string) Str::uuid());
+            $rawOutput = shell_exec($commandWithStderr . '; printf "\\n' . $marker . ':%s" $?');
+            $rawOutput = is_string($rawOutput) ? $rawOutput : '';
+
+            $exitCode = 1;
+            $trimmedOutput = trim($rawOutput);
+            $markerPosition = strrpos($trimmedOutput, $marker . ':');
+            if ($markerPosition !== false) {
+                $exitSegment = substr($trimmedOutput, $markerPosition + strlen($marker) + 1);
+                if (is_numeric($exitSegment)) {
+                    $exitCode = (int) $exitSegment;
+                }
+
+                $trimmedOutput = trim(substr($trimmedOutput, 0, $markerPosition));
+            }
+
+            $outputLines = $trimmedOutput === ''
+                ? []
+                : preg_split('/\r\n|\r|\n/', $trimmedOutput) ?: [];
+
+            return [
+                'exit_code' => $exitCode,
+                'output_lines' => $outputLines,
+            ];
+        }
+
+        if (function_exists('proc_open')) {
+            $descriptorSpec = [
+                0 => ['pipe', 'r'],
+                1 => ['pipe', 'w'],
+                2 => ['pipe', 'w'],
+            ];
+
+            $pipes = [];
+            $process = @proc_open($commandWithStderr, $descriptorSpec, $pipes);
+            if (!is_resource($process)) {
+                return [
+                    'exit_code' => 1,
+                    'output_lines' => ['Unable to start shell process.'],
+                ];
+            }
+
+            if (isset($pipes[0]) && is_resource($pipes[0])) {
+                fclose($pipes[0]);
+            }
+
+            $stdout = isset($pipes[1]) && is_resource($pipes[1]) ? stream_get_contents($pipes[1]) : '';
+            $stderr = isset($pipes[2]) && is_resource($pipes[2]) ? stream_get_contents($pipes[2]) : '';
+
+            if (isset($pipes[1]) && is_resource($pipes[1])) {
+                fclose($pipes[1]);
+            }
+
+            if (isset($pipes[2]) && is_resource($pipes[2])) {
+                fclose($pipes[2]);
+            }
+
+            $exitCode = proc_close($process);
+            $combined = trim((string) $stdout . "\n" . (string) $stderr);
+            $outputLines = $combined === ''
+                ? []
+                : preg_split('/\r\n|\r|\n/', $combined) ?: [];
+
+            return [
+                'exit_code' => (int) $exitCode,
+                'output_lines' => $outputLines,
+            ];
+        }
+
+        return [
+            'exit_code' => 1,
+            'output_lines' => ['No shell execution function is available.'],
+        ];
     }
 
     private function extractJsonFromOutput(string $rawOutput): ?string
@@ -882,10 +994,10 @@ class ToolsController extends Controller
 
     private function convertTiffToPdfViaCli(string $inputAbsolutePath, string $outputAbsolutePath): array
     {
-        if (!function_exists('exec')) {
+        if (!$this->canRunShellCommands()) {
             return [
                 'ok' => false,
-                'message' => 'TIFF to PDF requires PHP Imagick or ImageMagick CLI with exec enabled on this server.',
+                'message' => 'TIFF to PDF requires PHP Imagick or ImageMagick CLI with command execution enabled on this server.',
             ];
         }
 
@@ -904,9 +1016,9 @@ class ToolsController extends Controller
             . escapeshellarg($outputAbsolutePath)
             . ' 2>&1';
 
-        $outputLines = [];
-        $exitCode = 1;
-        exec($command, $outputLines, $exitCode);
+        $commandRun = $this->runShellCommand($command);
+        $outputLines = $commandRun['output_lines'];
+        $exitCode = $commandRun['exit_code'];
 
         $output = trim(implode("\n", $outputLines));
 
