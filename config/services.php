@@ -35,6 +35,12 @@ return [
         ],
     ],
 
+    'tools_runner' => [
+        'base_url' => env('TOOLS_RUNNER_BASE_URL'),
+        'token' => env('TOOLS_RUNNER_TOKEN'),
+        'timeout' => (int) env('TOOLS_RUNNER_TIMEOUT', 300),
+    ],
+
     'pesapal' => [
         'base_url' => env('PESAPAL_BASE_URL', 'https://pay.pesapal.com/v3'),
         'consumer_key' => env('PESAPAL_CONSUMER_KEY'),

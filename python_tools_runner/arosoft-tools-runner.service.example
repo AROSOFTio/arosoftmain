@@ -1,0 +1,17 @@
+[Unit]
+Description=Arosoft Python Tools Runner
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/www/wwwroot/arosoft.io/python_tools_runner
+Environment="TOOLS_RUNNER_TOKEN=change-me-strong-token"
+Environment="TOOLS_RUNNER_WORKDIR=/tmp/arosoft-tools"
+ExecStart=/www/wwwroot/arosoft.io/python_tools_runner/.venv/bin/uvicorn main:app --host 127.0.0.1 --port 8099
+Restart=always
+RestartSec=3
+User=www
+Group=www
+
+[Install]
+WantedBy=multi-user.target

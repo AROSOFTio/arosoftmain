@@ -6,6 +6,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -181,17 +182,46 @@ class ToolsController extends Controller
                 ->with('tool_error', 'Invalid YouTube URL for download.');
         }
 
+        $type = (string) $validated['type'];
+        $quality = (int) $validated['quality'];
+
         if (!$this->canRunShellCommands()) {
-            return redirect()
-                ->route('tools.show', ['slug' => $slug])
-                ->with('tool_error', 'Server command execution is disabled. Enable exec/shell_exec/proc_open for downloader tools.');
+            $runnerDownload = $this->downloadYoutubeViaRunner(
+                $parsed['canonical_url'],
+                $type,
+                $quality,
+                $parsed['video_id']
+            );
+
+            if (!$runnerDownload['ok']) {
+                return redirect()
+                    ->route('tools.show', ['slug' => $slug])
+                    ->with('tool_error', $runnerDownload['message']);
+            }
+
+            return response()
+                ->download($runnerDownload['download_path'], $runnerDownload['download_name'])
+                ->deleteFileAfterSend(true);
         }
 
         $ytDlp = $this->detectYtDlpBinary();
         if ($ytDlp === null) {
+            $runnerDownload = $this->downloadYoutubeViaRunner(
+                $parsed['canonical_url'],
+                $type,
+                $quality,
+                $parsed['video_id']
+            );
+
+            if ($runnerDownload['ok']) {
+                return response()
+                    ->download($runnerDownload['download_path'], $runnerDownload['download_name'])
+                    ->deleteFileAfterSend(true);
+            }
+
             return redirect()
                 ->route('tools.show', ['slug' => $slug])
-                ->with('tool_error', 'yt-dlp is not installed on the server. Install yt-dlp to enable video downloads.');
+                ->with('tool_error', $runnerDownload['message']);
         }
 
         $resultsDirectory = Storage::disk('local')->path('tool-results/youtube-video-downloader');
@@ -203,8 +233,6 @@ class ToolsController extends Controller
         $outputTemplate = $resultsDirectory . DIRECTORY_SEPARATOR . $jobToken . '.%(ext)s';
         $urlArgument = escapeshellarg($parsed['canonical_url']);
 
-        $type = (string) $validated['type'];
-        $quality = (int) $validated['quality'];
         $command = '';
         $label = '';
 
@@ -234,9 +262,22 @@ class ToolsController extends Controller
             }
 
             if ($this->detectFfmpegBinary() === null) {
+                $runnerDownload = $this->downloadYoutubeViaRunner(
+                    $parsed['canonical_url'],
+                    $type,
+                    $quality,
+                    $parsed['video_id']
+                );
+
+                if ($runnerDownload['ok']) {
+                    return response()
+                        ->download($runnerDownload['download_path'], $runnerDownload['download_name'])
+                        ->deleteFileAfterSend(true);
+                }
+
                 return redirect()
                     ->route('tools.show', ['slug' => $slug])
-                    ->with('tool_error', 'ffmpeg is required for MP3 conversion. Install ffmpeg on the server and retry.');
+                    ->with('tool_error', $runnerDownload['message']);
             }
 
             $label = 'mp3-' . $quality . 'kbps';
@@ -595,14 +636,22 @@ class ToolsController extends Controller
     private function inspectYoutubeMedia(string $url): array
     {
         if (!$this->canRunShellCommands()) {
+            if ($this->hasToolsRunner()) {
+                return $this->inspectYoutubeMediaViaRunner($url);
+            }
+
             return [
                 'ok' => false,
-                'message' => 'Server command execution is disabled. Enable exec/shell_exec/proc_open to inspect YouTube formats.',
+                'message' => 'Server command execution is disabled. Configure TOOLS_RUNNER_BASE_URL (Python runner) or enable exec/shell_exec/proc_open.',
             ];
         }
 
         $ytDlp = $this->detectYtDlpBinary();
         if ($ytDlp === null) {
+            if ($this->hasToolsRunner()) {
+                return $this->inspectYoutubeMediaViaRunner($url);
+            }
+
             return [
                 'ok' => false,
                 'message' => 'yt-dlp is not installed on the server. Install yt-dlp to load quality options.',
@@ -740,6 +789,235 @@ class ToolsController extends Controller
         });
 
         return $validMatches[0];
+    }
+
+    private function hasToolsRunner(): bool
+    {
+        $baseUrl = trim((string) config('services.tools_runner.base_url', ''));
+
+        return $baseUrl !== '';
+    }
+
+    private function toolsRunnerBaseUrl(): string
+    {
+        return rtrim((string) config('services.tools_runner.base_url', ''), '/');
+    }
+
+    private function toolsRunnerRequest()
+    {
+        $request = Http::acceptJson();
+        $token = trim((string) config('services.tools_runner.token', ''));
+
+        if ($token !== '') {
+            $request = $request->withHeaders([
+                'X-Tools-Runner-Token' => $token,
+            ]);
+        }
+
+        return $request;
+    }
+
+    private function inspectYoutubeMediaViaRunner(string $url): array
+    {
+        if (!$this->hasToolsRunner()) {
+            return [
+                'ok' => false,
+                'message' => 'Python tools runner is not configured. Set TOOLS_RUNNER_BASE_URL in .env.',
+            ];
+        }
+
+        $endpoint = $this->toolsRunnerBaseUrl() . '/youtube/formats';
+        $timeout = (int) config('services.tools_runner.timeout', 60);
+
+        try {
+            $response = $this->toolsRunnerRequest()
+                ->timeout(max($timeout, 10))
+                ->asForm()
+                ->post($endpoint, ['url' => $url]);
+        } catch (Throwable $error) {
+            return [
+                'ok' => false,
+                'message' => 'Python tools runner is unreachable. Check runner service status and URL.',
+            ];
+        }
+
+        if (!$response->successful()) {
+            $message = (string) ($response->json('message') ?? '');
+            if ($message === '') {
+                $message = 'Python tools runner returned an error while loading formats.';
+            }
+
+            return [
+                'ok' => false,
+                'message' => $message,
+            ];
+        }
+
+        $payload = $response->json();
+        if (!is_array($payload)) {
+            return [
+                'ok' => false,
+                'message' => 'Python tools runner returned an invalid response.',
+            ];
+        }
+
+        $videoHeights = [];
+        foreach ((array) ($payload['video_heights'] ?? []) as $height) {
+            if (!is_numeric($height)) {
+                continue;
+            }
+
+            $heightValue = (int) $height;
+            if ($heightValue > 0) {
+                $videoHeights[] = $heightValue;
+            }
+        }
+
+        $videoHeights = array_values(array_unique($videoHeights));
+        rsort($videoHeights);
+
+        if (count($videoHeights) === 0) {
+            $videoHeights = [1080, 720, 480, 360];
+        }
+
+        return [
+            'ok' => true,
+            'title' => (string) ($payload['title'] ?? 'YouTube Video'),
+            'duration' => (int) ($payload['duration'] ?? 0),
+            'thumbnail' => (string) ($payload['thumbnail'] ?? ''),
+            'video_heights' => $videoHeights,
+        ];
+    }
+
+    private function downloadYoutubeViaRunner(string $url, string $type, int $quality, string $videoId): array
+    {
+        if (!$this->hasToolsRunner()) {
+            return [
+                'ok' => false,
+                'message' => 'Server command execution is disabled. Configure TOOLS_RUNNER_BASE_URL to use Python runner.',
+            ];
+        }
+
+        if ($type === 'video') {
+            $allowedHeights = [4320, 2160, 1440, 1080, 720, 480, 360, 240, 144];
+            if (!in_array($quality, $allowedHeights, true)) {
+                return [
+                    'ok' => false,
+                    'message' => 'Unsupported video quality requested.',
+                ];
+            }
+
+            $label = $quality . 'p';
+            $defaultExtension = 'mp4';
+        } else {
+            $allowedBitrates = [320, 256, 192, 128];
+            if (!in_array($quality, $allowedBitrates, true)) {
+                return [
+                    'ok' => false,
+                    'message' => 'Unsupported MP3 quality requested.',
+                ];
+            }
+
+            $label = 'mp3-' . $quality . 'kbps';
+            $defaultExtension = 'mp3';
+        }
+
+        $endpoint = $this->toolsRunnerBaseUrl() . '/youtube/download';
+        $timeout = (int) config('services.tools_runner.timeout', 300);
+
+        try {
+            $response = $this->toolsRunnerRequest()
+                ->timeout(max($timeout, 30))
+                ->asForm()
+                ->post($endpoint, [
+                    'url' => $url,
+                    'type' => $type,
+                    'quality' => $quality,
+                ]);
+        } catch (Throwable $error) {
+            return [
+                'ok' => false,
+                'message' => 'Python tools runner is unreachable during download.',
+            ];
+        }
+
+        if (!$response->successful()) {
+            $message = (string) ($response->json('message') ?? '');
+            if ($message === '') {
+                $message = 'Python tools runner failed to download media.';
+            }
+
+            return [
+                'ok' => false,
+                'message' => $message,
+            ];
+        }
+
+        $contentType = Str::lower((string) $response->header('Content-Type', ''));
+        if (Str::contains($contentType, 'application/json')) {
+            $message = (string) ($response->json('message') ?? 'Python tools runner returned JSON instead of media file.');
+
+            return [
+                'ok' => false,
+                'message' => $message,
+            ];
+        }
+
+        $binary = $response->body();
+        if ($binary === '') {
+            return [
+                'ok' => false,
+                'message' => 'Python tools runner returned an empty file.',
+            ];
+        }
+
+        $disposition = (string) $response->header('Content-Disposition', '');
+        $downloadName = $this->extractFilenameFromDisposition($disposition);
+        if ($downloadName === null) {
+            $downloadName = 'youtube-' . $videoId . '-' . $label . '.' . $defaultExtension;
+        }
+
+        $safeBaseName = Str::slug(pathinfo($downloadName, PATHINFO_FILENAME));
+        if ($safeBaseName === '') {
+            $safeBaseName = 'youtube-file';
+        }
+
+        $extension = pathinfo($downloadName, PATHINFO_EXTENSION);
+        if ($extension === '') {
+            $extension = $defaultExtension;
+            $downloadName .= '.' . $extension;
+        }
+
+        $relativePath = 'tool-results/youtube-video-downloader/' . Str::uuid() . '-' . $safeBaseName . '.' . $extension;
+        Storage::disk('local')->put($relativePath, $binary);
+
+        return [
+            'ok' => true,
+            'message' => 'Downloaded successfully through Python tools runner.',
+            'download_path' => Storage::disk('local')->path($relativePath),
+            'download_name' => $downloadName,
+        ];
+    }
+
+    private function extractFilenameFromDisposition(string $header): ?string
+    {
+        if ($header === '') {
+            return null;
+        }
+
+        if (preg_match("/filename\\*=UTF-8''([^;]+)/i", $header, $encodedMatch) === 1) {
+            $decoded = rawurldecode(trim($encodedMatch[1], "\"'"));
+            $decoded = basename($decoded);
+            return $decoded !== '' ? $decoded : null;
+        }
+
+        if (preg_match('/filename=([^;]+)/i', $header, $match) === 1) {
+            $decoded = trim($match[1], "\"' ");
+            $decoded = basename($decoded);
+            return $decoded !== '' ? $decoded : null;
+        }
+
+        return null;
     }
 
     private function resolveBinaryFromPath(string $binary): ?string
