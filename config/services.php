@@ -50,6 +50,11 @@ return [
         'ipn_id' => env('PESAPAL_IPN_ID'),
         'currency' => env('PESAPAL_CURRENCY', 'UGX'),
         'country_code' => env('PESAPAL_COUNTRY_CODE', 'UG'),
+        'final_year_project' => [
+            'callback_url' => env('PESAPAL_FYP_CALLBACK_URL', env('APP_URL').'/payments/pesapal/final-year-project/callback'),
+            'ipn_url' => env('PESAPAL_FYP_IPN_URL', env('APP_URL').'/payments/pesapal/final-year-project/ipn'),
+            'ipn_id' => env('PESAPAL_FYP_IPN_ID'),
+        ],
     ],
 
 ];

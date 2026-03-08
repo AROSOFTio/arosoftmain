@@ -255,6 +255,13 @@ class SearchController extends Controller
                 'keywords' => 'laravel development engineering',
             ],
             [
+                'type' => 'Services',
+                'title' => 'Final Year Project Hosting',
+                'url' => route('final-year-project-hosting'),
+                'meta' => 'Student hosting offer',
+                'keywords' => 'final year project hosting KIU student package domain pesapal',
+            ],
+            [
                 'type' => 'Courses',
                 'title' => 'Training/Courses',
                 'url' => route('services.training-courses'),

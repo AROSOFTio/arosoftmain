@@ -25,20 +25,26 @@ class PesapalService
         ], true);
     }
 
-    public function resolveIpnId(): string
+    public function resolveIpnId(?string $ipnUrl = null): string
     {
-        $configuredIpnId = (string) config('services.pesapal.ipn_id', '');
-        if ($configuredIpnId !== '') {
-            return $configuredIpnId;
+        $resolvedIpnUrl = rtrim((string) ($ipnUrl ?: $this->ipnUrl()), '/');
+        $defaultIpnUrl = $this->ipnUrl();
+
+        if ($resolvedIpnUrl === $defaultIpnUrl) {
+            $configuredIpnId = (string) config('services.pesapal.ipn_id', '');
+            if ($configuredIpnId !== '') {
+                return $configuredIpnId;
+            }
         }
 
-        $cachedIpnId = Cache::get('pesapal:ipn_id');
+        $cacheKey = $this->ipnCacheKey($resolvedIpnUrl);
+        $cachedIpnId = Cache::get($cacheKey);
         if (is_string($cachedIpnId) && $cachedIpnId !== '') {
             return $cachedIpnId;
         }
 
         $response = $this->request('post', '/api/URLSetup/RegisterIPN', [
-            'url' => $this->ipnUrl(),
+            'url' => $resolvedIpnUrl,
             'ipn_notification_type' => 'GET',
         ], true);
 
@@ -47,7 +53,7 @@ class PesapalService
             throw new RuntimeException('Pesapal did not return an IPN ID.');
         }
 
-        Cache::put('pesapal:ipn_id', $ipnId, now()->addDays(7));
+        Cache::put($cacheKey, $ipnId, now()->addDays(7));
 
         return $ipnId;
     }
@@ -151,6 +157,13 @@ class PesapalService
         return rtrim((string) config('services.pesapal.base_url', 'https://pay.pesapal.com/v3'), '/');
     }
 
+    private function ipnCacheKey(string $ipnUrl): string
+    {
+        return $ipnUrl === $this->ipnUrl()
+            ? 'pesapal:ipn_id'
+            : 'pesapal:ipn_id:'.sha1($ipnUrl);
+    }
+
     private function consumerKey(): string
     {
         return (string) config('services.pesapal.consumer_key', '');
@@ -161,4 +174,3 @@ class PesapalService
         return (string) config('services.pesapal.consumer_secret', '');
     }
 }
-

@@ -26,6 +26,7 @@
                         <a href="{{ route('services.website-design') }}" class="inline-block text-sm muted-copy transition hover:text-white">Website Design</a><br>
                         <a href="{{ route('services.web-development') }}" class="inline-block text-sm muted-copy transition hover:text-white">Web Development</a><br>
                         <a href="{{ route('services.training-courses') }}" class="inline-block text-sm muted-copy transition hover:text-white">Training/Courses</a><br>
+                        <a href="{{ route('final-year-project-hosting') }}" class="inline-block text-sm muted-copy transition hover:text-white">Final Year Hosting</a><br>
                         <a href="{{ route('services') }}" class="inline-block text-sm muted-copy transition hover:text-white">System Development</a>
                     </div>
                 </section>
@@ -68,4 +69,3 @@
         </div>
     </div>
 </footer>
-

@@ -37,6 +37,7 @@
             <a href="{{ route('home') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Home</a>
             <a href="{{ route('blog') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Blog</a>
             <a href="{{ route('services') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Services</a>
+            <a href="{{ route('final-year-project-hosting') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">FYP Hosting</a>
             <a href="{{ route('tutorials') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Tutorials</a>
             <a href="{{ route('tools') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Tools</a>
         </nav>
@@ -48,6 +49,7 @@
                 <a href="{{ route('services.website-design') }}" class="shell-card block rounded-xl px-4 py-3 text-sm font-semibold" @click="closeOffcanvas()">Website Design</a>
                 <a href="{{ route('services.web-development') }}" class="shell-card block rounded-xl px-4 py-3 text-sm font-semibold" @click="closeOffcanvas()">Web Development</a>
                 <a href="{{ route('services.training-courses') }}" class="shell-card block rounded-xl px-4 py-3 text-sm font-semibold" @click="closeOffcanvas()">Training/Courses</a>
+                <a href="{{ route('final-year-project-hosting') }}" class="shell-card block rounded-xl px-4 py-3 text-sm font-semibold" @click="closeOffcanvas()">Final Year Hosting</a>
             </div>
         </section>
 
@@ -101,4 +103,3 @@
         </div>
     </aside>
 </div>
-

@@ -7,6 +7,63 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Arosoft Setup (MySQL + Pesapal)
+
+### 1. Clone
+
+```bash
+git clone https://github.com/AROSOFTio/arosoftmain.git
+cd arosoftmain
+```
+
+### 2. Install and app key
+
+```bash
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+```
+
+### 3. Configure MySQL in `.env`
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=arosoftmain
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 4. Add Pesapal keys in `.env`
+
+```env
+PESAPAL_CONSUMER_KEY=your_consumer_key
+PESAPAL_CONSUMER_SECRET=your_consumer_secret
+PESAPAL_CALLBACK_URL="${APP_URL}/payments/pesapal/callback"
+PESAPAL_IPN_URL="${APP_URL}/payments/pesapal/ipn"
+
+PESAPAL_FYP_CALLBACK_URL="${APP_URL}/payments/pesapal/final-year-project/callback"
+PESAPAL_FYP_IPN_URL="${APP_URL}/payments/pesapal/final-year-project/ipn"
+```
+
+You can also set `PESAPAL_IPN_ID` and `PESAPAL_FYP_IPN_ID` if already provisioned.
+
+### 5. Run migrations and build assets
+
+```bash
+php artisan migrate
+npm run build
+```
+
+### 6. Final Year Hosting Offer Page
+
+- Canonical route: `/final-year-project-hosting`
+- Legacy redirect: `/final-yeat-project-hosting`
+- Order flow saves to MySQL table: `final_year_project_orders`
+- Checkout uses Pesapal callback/IPN endpoints dedicated to the final-year flow
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

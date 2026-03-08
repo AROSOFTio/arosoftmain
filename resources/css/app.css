@@ -960,6 +960,158 @@ a {
     padding: 1.25rem;
 }
 
+.fyp-hero {
+    background:
+        radial-gradient(circle at 86% 18%, rgba(0, 157, 49, 0.2), transparent 34%),
+        linear-gradient(130deg, rgba(0, 157, 49, 0.15), rgba(255, 255, 255, 0.98) 46%);
+}
+
+.fyp-side-spotlight {
+    border: 1px solid rgba(17, 24, 39, 0.14);
+    border-radius: 1.1rem;
+    background: rgba(255, 255, 255, 0.94);
+    padding: 1rem;
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.08);
+}
+
+.fyp-price-bubble {
+    border: 1px solid rgba(17, 24, 39, 0.12);
+    border-radius: 0.95rem;
+    background: #ffffff;
+    padding: 0.9rem;
+}
+
+.fyp-plan-card {
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.fyp-plan-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(0, 157, 49, 0.4);
+    box-shadow: 0 12px 28px rgba(17, 24, 39, 0.1);
+}
+
+.fyp-price-tag {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(0, 157, 49, 0.36);
+    border-radius: 999px;
+    background: rgba(0, 157, 49, 0.08);
+    color: rgba(0, 122, 43, 0.98);
+    padding: 0.2rem 0.72rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.fyp-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 85;
+}
+
+.fyp-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.45);
+    backdrop-filter: blur(2px);
+}
+
+.fyp-modal-card {
+    position: relative;
+    z-index: 1;
+    width: min(92vw, 38rem);
+    max-height: calc(100vh - 3rem);
+    overflow: auto;
+    margin: 1.5rem auto;
+    border: 1px solid rgba(17, 24, 39, 0.15);
+    border-radius: 1.1rem;
+    background: #ffffff;
+    box-shadow: 0 24px 48px rgba(17, 24, 39, 0.22);
+    padding: 1.25rem;
+}
+
+.fyp-portfolio-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+@media (min-width: 900px) {
+    .fyp-portfolio-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.fyp-system-card {
+    border: 1px solid rgba(17, 24, 39, 0.14);
+    border-radius: 1.05rem;
+    background:
+        radial-gradient(circle at 86% 10%, rgba(0, 157, 49, 0.2), transparent 36%),
+        linear-gradient(148deg, rgba(255, 255, 255, 0.98), rgba(245, 250, 247, 0.96));
+    box-shadow: 0 14px 30px rgba(17, 24, 39, 0.09);
+    padding: 1.2rem;
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.fyp-system-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(0, 157, 49, 0.48);
+    box-shadow: 0 18px 34px rgba(17, 24, 39, 0.12);
+}
+
+.fyp-system-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+}
+
+.fyp-system-pill {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(17, 24, 39, 0.15);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.9);
+    color: rgba(17, 24, 39, 0.8);
+    padding: 0.14rem 0.56rem;
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.fyp-system-status {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(0, 157, 49, 0.36);
+    border-radius: 999px;
+    background: rgba(0, 157, 49, 0.12);
+    color: rgba(0, 122, 43, 0.96);
+    padding: 0.14rem 0.56rem;
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.fyp-system-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.fyp-system-stack span {
+    border: 1px solid rgba(17, 24, 39, 0.13);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    padding: 0.1rem 0.45rem;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(17, 24, 39, 0.68);
+}
+
 .tool-group {
     border: 1px solid rgba(17, 24, 39, 0.14);
     border-radius: 0.95rem;

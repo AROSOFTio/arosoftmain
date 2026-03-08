@@ -11,6 +11,7 @@
                 <nav class="hidden flex-1 items-center justify-center gap-1 lg:flex">
                     <a href="{{ route('home') }}" class="nav-link">Home</a>
                     <a href="{{ route('blog') }}" class="nav-link">Blog</a>
+                    <a href="{{ route('final-year-project-hosting') }}" class="nav-link">FYP Hosting</a>
 
                 <div class="relative" @mouseenter="openMega('services')" @mouseleave="closeMega('services')">
                     <button
@@ -56,9 +57,14 @@
                                 <p class="font-heading text-lg">Training/Courses</p>
                                 <p class="mt-1 text-sm muted-copy">Hands-on courses for teams and aspiring developers.</p>
                             </a>
+                            <a href="{{ route('final-year-project-hosting') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
+                                <p class="font-heading text-lg">Final Year Hosting</p>
+                                <p class="mt-1 text-sm muted-copy">UGX 50,000 hosting or UGX 86,000 domain + hosting package.</p>
+                            </a>
                         </div>
-                        <div class="mt-4">
+                        <div class="mt-4 flex flex-wrap gap-3">
                             <a href="{{ route('services') }}" class="btn-outline">View services landing</a>
+                            <a href="{{ route('final-year-project-hosting') }}" class="btn-solid">Student hosting deal</a>
                         </div>
                     </div>
                 </div>
@@ -202,4 +208,3 @@
         </div>
     </div>
 </header>
-

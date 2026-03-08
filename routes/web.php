@@ -12,6 +12,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BlogFeedController;
 use App\Http\Controllers\BlogMediaController as PublicBlogMediaController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\FinalYearProjectHostingController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ServicesController;
@@ -47,6 +48,17 @@ Route::get('/services/printing', [PageController::class, 'printing'])->name('ser
 Route::get('/services/website-design', [PageController::class, 'websiteDesign'])->name('services.website-design');
 Route::get('/services/web-development', [PageController::class, 'webDevelopment'])->name('services.web-development');
 Route::get('/services/training-courses', [PageController::class, 'trainingCourses'])->name('services.training-courses');
+Route::redirect('/final-yeat-project-hosting', '/final-year-project-hosting', 301);
+Route::get('/final-year-project-hosting', [FinalYearProjectHostingController::class, 'index'])->name('final-year-project-hosting');
+Route::post('/final-year-project-hosting/order', [FinalYearProjectHostingController::class, 'storeOrder'])
+    ->middleware('throttle:12,1')
+    ->name('final-year-project-hosting.order.store');
+Route::get('/final-year-project-hosting/order/{orderReference}/status', [FinalYearProjectHostingController::class, 'orderStatus'])
+    ->name('final-year-project-hosting.order.status');
+Route::get('/payments/pesapal/final-year-project/callback', [FinalYearProjectHostingController::class, 'paymentCallback'])
+    ->name('final-year-project-hosting.payment.callback');
+Route::match(['get', 'post'], '/payments/pesapal/final-year-project/ipn', [FinalYearProjectHostingController::class, 'paymentIpn'])
+    ->name('final-year-project-hosting.payment.ipn');
 Route::get('/tutorials', [PageController::class, 'tutorials'])->name('tutorials');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
