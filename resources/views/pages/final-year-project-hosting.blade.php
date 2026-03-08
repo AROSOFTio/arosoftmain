@@ -336,9 +336,9 @@
         @endif
 
         <section class="content-section">
-            <h2 class="section-title">Hosted Systems Portfolio</h2>
+            <h2 class="section-title">Deployed Final Year Projects</h2>
             <p class="mt-3 section-copy max-w-3xl">
-                Real deployment examples in a clean card layout. Browse and open any case quickly.
+                Real final year systems already deployed by AROSOFT. Browse projects and request a similar deployment.
             </p>
 
             <div class="fyp-portfolio-grid mt-8">

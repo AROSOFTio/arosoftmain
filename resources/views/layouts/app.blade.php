@@ -64,7 +64,11 @@
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <style>
+            body { font-family: "Manrope", "Avenir Next", "Segoe UI", sans-serif; }
+            h1, h2, h3, h4, h5, h6, .font-heading { font-family: "Lora", "Times New Roman", serif; }
+        </style>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6208436737131241" crossorigin="anonymous"></script>
 
         <script>

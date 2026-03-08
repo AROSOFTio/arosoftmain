@@ -7,8 +7,8 @@
     --accent: #009d31;
     --accent-deep: #007a2b;
     --ink: #111827;
-    --font-sans: "Segoe UI Variable", "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
-    --font-heading: "Segoe UI Variable", "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-sans: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
+    --font-heading: "Lora", "Times New Roman", serif;
 }
 
 *,
@@ -1071,7 +1071,7 @@ a {
 }
 
 .fyp-portfolio-media {
-    aspect-ratio: 16 / 10;
+    height: 220px;
     overflow: hidden;
     background: rgba(17, 24, 39, 0.06);
 }
@@ -1086,6 +1086,12 @@ a {
 
 .fyp-portfolio-card:hover .fyp-portfolio-media img {
     transform: scale(1.04);
+}
+
+@media (min-width: 1200px) {
+    .fyp-portfolio-media {
+        height: 205px;
+    }
 }
 
 .fyp-portfolio-body {
