@@ -37,26 +37,15 @@
                         x-transition:leave="transition duration-140 ease-in"
                         x-transition:leave-start="opacity-100 translate-y-0"
                         x-transition:leave-end="opacity-0 -translate-y-2"
-                        class="mega-panel absolute left-1/2 top-[calc(100%+0.9rem)] w-[42rem] -translate-x-1/2 p-6"
+                        class="mega-panel absolute left-1/2 top-[calc(100%+0.9rem)] w-[26rem] -translate-x-1/2 p-6"
                     >
-                        <p class="text-[0.65rem] uppercase tracking-[0.2em] muted-faint">Hosting plans</p>
-                        <div class="mt-3 grid grid-cols-2 gap-3">
-                            <a href="{{ route('hosting.shared') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
+                        <div class="grid grid-cols-2 gap-3">
+                            <a href="{{ route('hosting.shared') }}" class="shell-card rounded-xl p-4 text-center transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
                                 <p class="font-heading text-lg">Shared Hosting</p>
-                                <p class="mt-1 text-sm muted-copy">Affordable cPanel hosting for websites, school projects, and startup pages.</p>
                             </a>
-                            <a href="{{ route('final-year-project-hosting') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
+                            <a href="{{ route('final-year-project-hosting') }}" class="shell-card rounded-xl p-4 text-center transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
                                 <p class="font-heading text-lg">FYP Hosting</p>
-                                <p class="mt-1 text-sm muted-copy">Student package: UGX 50,000 hosting only or UGX 86,000 domain + hosting.</p>
                             </a>
-                            <a href="{{ route('hosting.shared') }}" class="shell-card col-span-2 rounded-xl p-4 transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
-                                <p class="font-heading text-lg">Current VPS Capacity</p>
-                                <p class="mt-1 text-sm muted-copy">Contabo Cloud VPS 10: 4 vCPU, 8 GB RAM, 75 GB NVMe. Upgrade-ready for growing deployments.</p>
-                            </a>
-                        </div>
-                        <div class="mt-4 flex flex-wrap gap-3">
-                            <a href="{{ route('hosting.shared') }}" class="btn-outline">Open shared hosting</a>
-                            <a href="{{ route('final-year-project-hosting') }}" class="btn-solid">Open FYP hosting</a>
                         </div>
                     </div>
                 </div>
