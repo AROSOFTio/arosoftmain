@@ -1004,33 +1004,6 @@ a {
     letter-spacing: 0.04em;
 }
 
-.fyp-modal-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 85;
-}
-
-.fyp-modal-backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(17, 24, 39, 0.45);
-    backdrop-filter: blur(2px);
-}
-
-.fyp-modal-card {
-    position: relative;
-    z-index: 1;
-    width: min(92vw, 38rem);
-    max-height: calc(100vh - 3rem);
-    overflow: auto;
-    margin: 1.5rem auto;
-    border: 1px solid rgba(17, 24, 39, 0.15);
-    border-radius: 1.1rem;
-    background: #ffffff;
-    box-shadow: 0 24px 48px rgba(17, 24, 39, 0.22);
-    padding: 1.25rem;
-}
-
 .fyp-portfolio-grid {
     display: grid;
     gap: 1rem;

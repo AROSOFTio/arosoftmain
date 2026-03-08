@@ -23,7 +23,7 @@
         </div>
     @endif
 
-    <div x-data="{ activePlan: null, selectedPackage: @js(old('package', 'hosting_only')) }">
+    <div x-data="{ selectedPackage: @js(old('package', 'hosting_only')) }">
         <section class="hero-surface fyp-hero p-8 sm:p-10 lg:p-12">
             <div class="hero-grid">
                 <div>
@@ -61,8 +61,7 @@
         <section class="content-section">
             <h2 class="section-title">Clear Pricing Packages</h2>
             <p class="mt-3 section-copy max-w-3xl">
-                No hidden pricing. Choose one package and proceed straight to checkout. Click
-                <strong>View package pop</strong> to see detailed inclusions.
+                No hidden pricing. Click a package button and jump straight to the order form.
             </p>
 
             <div class="mt-5 grid gap-4 md:grid-cols-2">
@@ -70,16 +69,26 @@
                     <p class="page-kicker">Package 1</p>
                     <h3 class="font-heading mt-2 text-2xl">{{ $hostingOnly['label'] }}</h3>
                     <p class="mt-2 text-sm leading-7 muted-copy">{{ $hostingOnly['summary'] }}</p>
+                    <ul class="list-check mt-4">
+                        @foreach ($hostingOnly['includes'] as $item)
+                            <li>{{ $item }}</li>
+                        @endforeach
+                    </ul>
                     <p class="fyp-price-tag mt-4">{{ $currency }} {{ $formatMoney($hostingOnly['price']) }}</p>
-                    <button type="button" class="btn-outline mt-4" @click="activePlan = 'hosting_only'">View package pop</button>
+                    <button type="button" class="btn-solid mt-4" @click="selectedPackage = 'hosting_only'; window.location.hash = 'fyp-order-form'">Order hosting only</button>
                 </article>
 
                 <article class="info-card fyp-plan-card">
                     <p class="page-kicker">Package 2</p>
                     <h3 class="font-heading mt-2 text-2xl">{{ $domainHosting['label'] }}</h3>
                     <p class="mt-2 text-sm leading-7 muted-copy">{{ $domainHosting['summary'] }}</p>
+                    <ul class="list-check mt-4">
+                        @foreach ($domainHosting['includes'] as $item)
+                            <li>{{ $item }}</li>
+                        @endforeach
+                    </ul>
                     <p class="fyp-price-tag mt-4">{{ $currency }} {{ $formatMoney($domainHosting['price']) }}</p>
-                    <button type="button" class="btn-outline mt-4" @click="activePlan = 'domain_hosting'">View package pop</button>
+                    <button type="button" class="btn-solid mt-4" @click="selectedPackage = 'domain_hosting'; window.location.hash = 'fyp-order-form'">Order domain + hosting</button>
                 </article>
             </div>
         </section>
@@ -106,44 +115,6 @@
             </div>
         </section>
 
-        <section class="content-section">
-            <div class="flex flex-wrap items-end justify-between gap-3">
-                <div>
-                    <h2 class="section-title">Current Hosted Systems Portfolio</h2>
-                    <p class="mt-3 section-copy max-w-3xl">
-                        Examples of systems currently hosted or deployed with our team. Each card shows the system type,
-                        stack direction, and actions to view or request a similar setup.
-                    </p>
-                </div>
-                <a href="{{ route('contact') }}" class="btn-outline">Need full portfolio?</a>
-            </div>
-
-            <div class="fyp-portfolio-grid mt-6">
-                @foreach ($hostedSystems as $system)
-                    <article class="fyp-system-card">
-                        <div class="fyp-system-head">
-                            <span class="fyp-system-pill">{{ $system['type'] }}</span>
-                            <span class="fyp-system-status">{{ $system['status'] }}</span>
-                        </div>
-
-                        <h3 class="font-heading mt-4 text-2xl">{{ $system['name'] }}</h3>
-                        <p class="mt-3 text-sm leading-7 muted-copy">{{ $system['summary'] }}</p>
-
-                        <div class="fyp-system-stack mt-4">
-                            @foreach ($system['stack'] as $stackItem)
-                                <span>{{ $stackItem }}</span>
-                            @endforeach
-                        </div>
-
-                        <div class="mt-5 flex flex-wrap gap-3">
-                            <a href="{{ $system['primary_url'] }}" class="btn-solid" target="_blank" rel="noopener noreferrer">{{ $system['primary_label'] }}</a>
-                            <a href="{{ $system['secondary_url'] }}" class="btn-outline">{{ $system['secondary_label'] }}</a>
-                        </div>
-                    </article>
-                @endforeach
-            </div>
-        </section>
-
         <section id="fyp-order-form" class="content-section grid gap-6 lg:grid-cols-5">
             <article class="info-card lg:col-span-3">
                 <h2 class="section-title">Place Your Order</h2>
@@ -151,7 +122,7 @@
                     Submit your project details and you will be redirected to Pesapal checkout.
                 </p>
 
-                <form action="{{ route('final-year-project-hosting.order.store') }}" method="POST" class="mt-6 space-y-5">
+                <form action="{{ route('final-year-project-hosting.order.store') }}" method="POST" enctype="multipart/form-data" class="mt-6 space-y-5">
                     @csrf
                     <div class="hidden" aria-hidden="true">
                         <label for="company">Company</label>
@@ -190,9 +161,26 @@
                     </div>
 
                     <div>
-                        <label class="form-label" for="project_title">Project title *</label>
-                        <input id="project_title" type="text" name="project_title" value="{{ old('project_title') }}" class="form-field @error('project_title') border-[color:rgba(185,28,28,0.6)] @enderror" required>
-                        @error('project_title')
+                        <label class="form-label" for="system_name">System name *</label>
+                        <input id="system_name" type="text" name="system_name" value="{{ old('system_name') }}" class="form-field @error('system_name') border-[color:rgba(185,28,28,0.6)] @enderror" placeholder="Example: Student Result Management System" required>
+                        @error('system_name')
+                            <p class="mt-2 text-sm text-[color:rgba(127,29,29,0.95)]">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="form-label" for="system_repo_url">System repo (optional)</label>
+                        <input id="system_repo_url" type="url" name="system_repo_url" value="{{ old('system_repo_url') }}" class="form-field @error('system_repo_url') border-[color:rgba(185,28,28,0.6)] @enderror" placeholder="https://github.com/username/project">
+                        @error('system_repo_url')
+                            <p class="mt-2 text-sm text-[color:rgba(127,29,29,0.95)]">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="form-label" for="system_zip_source">System ZIP source code *</label>
+                        <input id="system_zip_source" type="file" name="system_zip_source" accept=".zip,application/zip" class="form-field @error('system_zip_source') border-[color:rgba(185,28,28,0.6)] @enderror" required>
+                        <p class="mt-2 text-xs muted-faint">Upload your latest source ZIP (max 50MB).</p>
+                        @error('system_zip_source')
                             <p class="mt-2 text-sm text-[color:rgba(127,29,29,0.95)]">{{ $message }}</p>
                         @enderror
                     </div>
@@ -246,6 +234,11 @@
                 <p class="mt-3 text-sm leading-7 muted-copy">
                     Every order is saved and assigned a reference. You can refresh status after payment callback.
                 </p>
+                <div class="mt-4 rounded-xl border border-[color:rgba(0,157,49,0.34)] bg-[color:rgba(0,157,49,0.08)] px-4 py-3">
+                    <p class="text-sm font-semibold text-[color:rgba(0,122,43,0.95)]">
+                        After successful payment and valid source handover, your system goes live within a maximum of 6 hours.
+                    </p>
+                </div>
 
                 <div class="mt-5 space-y-3">
                     <div class="rounded-xl border border-[color:rgba(17,24,39,0.12)] p-4">
@@ -274,6 +267,19 @@
                                 {{ $activeOrder->package_label }} |
                                 {{ $activeOrder->currency }} {{ $formatMoney($activeOrder->amount) }}
                             </p>
+                            <p class="mt-2 text-sm muted-copy">
+                                System: {{ $activeOrder->system_name ?? $activeOrder->project_title }}
+                            </p>
+                            @if ($activeOrder->system_repo_url)
+                                <p class="mt-1 text-sm">
+                                    <a href="{{ $activeOrder->system_repo_url }}" class="underline decoration-[color:rgba(0,157,49,0.48)]" target="_blank" rel="noopener noreferrer">Open submitted repo</a>
+                                </p>
+                            @endif
+                            @if ($activeOrder->source_zip_original_name)
+                                <p class="mt-1 text-xs uppercase tracking-[0.1em] muted-faint">
+                                    ZIP uploaded: {{ $activeOrder->source_zip_original_name }}
+                                </p>
+                            @endif
                         </div>
                         <div class="rounded-lg border border-[color:rgba(17,24,39,0.14)] px-4 py-2 text-sm">
                             <span class="muted-faint">Status:</span>
@@ -299,6 +305,43 @@
         @endif
 
         <section class="content-section">
+            <div class="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                    <h2 class="section-title">Current Hosted Systems Portfolio</h2>
+                    <p class="mt-3 section-copy max-w-3xl">
+                        Live and hosted systems delivered with reliable uptime and student-friendly deployment support.
+                    </p>
+                </div>
+                <a href="{{ route('contact') }}" class="btn-outline">Need full portfolio?</a>
+            </div>
+
+            <div class="fyp-portfolio-grid mt-6">
+                @foreach ($hostedSystems as $system)
+                    <article class="fyp-system-card">
+                        <div class="fyp-system-head">
+                            <span class="fyp-system-pill">{{ $system['type'] }}</span>
+                            <span class="fyp-system-status">{{ $system['status'] }}</span>
+                        </div>
+
+                        <h3 class="font-heading mt-4 text-2xl">{{ $system['name'] }}</h3>
+                        <p class="mt-3 text-sm leading-7 muted-copy">{{ $system['summary'] }}</p>
+
+                        <div class="fyp-system-stack mt-4">
+                            @foreach ($system['stack'] as $stackItem)
+                                <span>{{ $stackItem }}</span>
+                            @endforeach
+                        </div>
+
+                        <div class="mt-5 flex flex-wrap gap-3">
+                            <a href="{{ $system['primary_url'] }}" class="btn-solid" target="_blank" rel="noopener noreferrer">{{ $system['primary_label'] }}</a>
+                            <a href="{{ $system['secondary_url'] }}" class="btn-outline">{{ $system['secondary_label'] }}</a>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+        </section>
+
+        <section class="content-section">
             <h2 class="section-title">Frequently Asked Questions</h2>
             <div class="mt-5 space-y-3">
                 <details class="rounded-xl border border-[color:rgba(17,24,39,0.12)] bg-white p-4">
@@ -322,39 +365,5 @@
             </div>
         </section>
 
-        <div x-cloak x-show="activePlan" class="fyp-modal-overlay" @keydown.escape.window="activePlan = null">
-            <div class="fyp-modal-backdrop" @click="activePlan = null"></div>
-            <article class="fyp-modal-card" x-show="activePlan" x-transition>
-                <div class="flex items-center justify-between gap-3">
-                    <h3 class="font-heading text-2xl" x-text="activePlan === 'hosting_only' ? @js($hostingOnly['label']) : @js($domainHosting['label'])"></h3>
-                    <button type="button" class="icon-button" @click="activePlan = null" aria-label="Close package details">
-                        <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">
-                            <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                </div>
-
-                <p class="mt-2 text-lg font-semibold text-[var(--accent)]" x-text="activePlan === 'hosting_only' ? @js($currency . ' ' . $formatMoney($hostingOnly['price'])) : @js($currency . ' ' . $formatMoney($domainHosting['price']))"></p>
-
-                <p class="mt-4 text-sm leading-7 muted-copy" x-text="activePlan === 'hosting_only' ? @js($hostingOnly['summary']) : @js($domainHosting['summary'])"></p>
-
-                <ul x-cloak x-show="activePlan === 'hosting_only'" class="list-check mt-4">
-                    @foreach ($hostingOnly['includes'] as $item)
-                        <li>{{ $item }}</li>
-                    @endforeach
-                </ul>
-
-                <ul x-cloak x-show="activePlan === 'domain_hosting'" class="list-check mt-4">
-                    @foreach ($domainHosting['includes'] as $item)
-                        <li>{{ $item }}</li>
-                    @endforeach
-                </ul>
-
-                <div class="mt-6 flex flex-wrap gap-3">
-                    <button type="button" class="btn-solid" @click="selectedPackage = activePlan; activePlan = null; window.location.hash = 'fyp-order-form'">Choose this package</button>
-                    <button type="button" class="btn-outline" @click="activePlan = null">Close</button>
-                </div>
-            </article>
-        </div>
     </div>
 @endsection

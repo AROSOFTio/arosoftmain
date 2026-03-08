@@ -58,7 +58,9 @@ class FinalYearProjectHostingController extends Controller
                 'email' => ['required', 'email:rfc', 'max:190'],
                 'phone' => ['required', 'string', 'max:40'],
                 'institution' => ['nullable', 'string', 'max:160'],
-                'project_title' => ['required', 'string', 'max:180'],
+                'system_name' => ['required', 'string', 'max:180'],
+                'system_repo_url' => ['nullable', 'url', 'max:2048'],
+                'system_zip_source' => ['required', 'file', 'mimes:zip', 'max:51200'],
                 'package' => ['required', 'in:'.implode(',', $packageKeys)],
                 'domain_name' => ['nullable', 'string', 'max:120'],
                 'notes' => ['nullable', 'string', 'max:1200'],
@@ -67,7 +69,9 @@ class FinalYearProjectHostingController extends Controller
                 'full_name.required' => 'Please enter your full name.',
                 'email.required' => 'Please enter your email.',
                 'phone.required' => 'Please enter your phone or WhatsApp number.',
-                'project_title.required' => 'Please enter your project title.',
+                'system_name.required' => 'Please enter your system name.',
+                'system_zip_source.required' => 'Please upload your system source ZIP file.',
+                'system_zip_source.mimes' => 'The source code file must be a ZIP archive.',
                 'package.required' => 'Please choose a hosting package.',
             ]
         );
@@ -75,6 +79,8 @@ class FinalYearProjectHostingController extends Controller
         $package = $this->packageCatalog()[$validated['package']];
         $isDomainPackage = $validated['package'] === 'domain_hosting';
         $domain = trim((string) ($validated['domain_name'] ?? ''));
+        $systemName = trim((string) $validated['system_name']);
+        $repoUrl = trim((string) ($validated['system_repo_url'] ?? ''));
 
         if ($isDomainPackage && $domain === '') {
             return redirect()
@@ -83,13 +89,27 @@ class FinalYearProjectHostingController extends Controller
                 ->withErrors(['domain_name' => 'Please enter your preferred domain name.']);
         }
 
+        $zipFile = $request->file('system_zip_source');
+        $zipPath = $zipFile?->store('fyp-system-zips', ['disk' => 'local']);
+
+        if (! is_string($zipPath) || $zipPath === '') {
+            return redirect()
+                ->route('final-year-project-hosting')
+                ->withInput()
+                ->withErrors(['system_zip_source' => 'Could not save the uploaded ZIP file. Please try again.']);
+        }
+
         $order = FinalYearProjectOrder::query()->create([
             'order_reference' => $this->generateOrderReference(),
             'customer_name' => $validated['full_name'],
             'customer_email' => $validated['email'],
             'customer_phone' => $validated['phone'],
             'institution' => (string) ($validated['institution'] ?? ''),
-            'project_title' => $validated['project_title'],
+            'project_title' => $systemName,
+            'system_name' => $systemName,
+            'system_repo_url' => $repoUrl !== '' ? $repoUrl : null,
+            'source_zip_path' => $zipPath,
+            'source_zip_original_name' => $zipFile?->getClientOriginalName(),
             'package_key' => $validated['package'],
             'package_label' => $package['label'],
             'domain_name' => $isDomainPackage ? $domain : null,
@@ -114,7 +134,7 @@ class FinalYearProjectHostingController extends Controller
                 'id' => $order->order_reference,
                 'currency' => $order->currency,
                 'amount' => round((float) $order->amount, 2),
-                'description' => "{$order->package_label} - Final Year Project Hosting",
+                'description' => "{$order->package_label} - {$systemName}",
                 'callback_url' => $this->callbackUrl(),
                 'notification_id' => $ipnId,
                 'billing_address' => [
@@ -266,6 +286,7 @@ class FinalYearProjectHostingController extends Controller
         return response()->json([
             'ok' => true,
             'order_reference' => $order->order_reference,
+            'system_name' => $order->system_name ?? $order->project_title,
             'payment_status' => $order->payment_status,
             'payment_status_description' => $order->payment_status_description,
             'amount' => (float) $order->amount,
