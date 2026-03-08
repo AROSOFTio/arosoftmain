@@ -436,7 +436,7 @@ class FinalYearProjectHostingController extends Controller
                 'summary' => 'Reliable deployment for your final year project system.',
                 'includes' => [
                     'Secure hosting setup for one student project',
-                    'Deployment support for Laravel/PHP apps',
+                    'Deployment support for Laravel, PHP, WordPress, Java, Python, and Node.js apps',
                     'Technical onboarding with DNS guidance',
                     'Valid until December 2026',
                 ],

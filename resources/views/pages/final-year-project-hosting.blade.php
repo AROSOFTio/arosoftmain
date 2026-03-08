@@ -37,6 +37,7 @@
                     <h1 class="page-title mt-4">Final Year Project Hosting</h1>
                     <p class="section-copy mt-5 max-w-3xl">
                         Reliable hosting for university final year systems with a fixed student package.
+                        We support Laravel, PHP, WordPress, Python, Java, Node.js, and other web stacks.
                         Choose your plan, place your order, and pay securely through Pesapal.
                     </p>
                     <div class="mt-7 flex flex-wrap gap-3">
@@ -44,6 +45,15 @@
                         <a href="https://wa.me/256787726388?text={{ rawurlencode('Hello AROSOFT, I need help with final year project hosting.') }}" class="btn-outline" target="_blank" rel="noopener noreferrer">
                             WhatsApp support
                         </a>
+                    </div>
+                    <div class="fyp-tech-strip mt-5">
+                        <span>Java</span>
+                        <span>Python</span>
+                        <span>WordPress</span>
+                        <span>PHP</span>
+                        <span>Laravel</span>
+                        <span>Node.js</span>
+                        <span>React/Vue</span>
                     </div>
                     <p class="mt-4 text-sm font-semibold text-[color:rgba(17,24,39,0.82)]">Offer valid until {{ $dealValidUntil }}</p>
                 </div>
@@ -117,6 +127,27 @@
                 <article class="feature-tile">
                     <h3 class="font-heading">Upgrade anytime</h3>
                     <p>Move from student package to full yearly hosting whenever you are ready.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2 class="section-title">Supported Tech Stacks</h2>
+            <p class="mt-3 section-copy max-w-3xl">
+                This hosting offer is not limited to Laravel or PHP. We also deploy and support Java, Python, WordPress, Node.js, and modern frontend stacks.
+            </p>
+            <div class="fyp-tech-grid mt-5">
+                <article class="feature-tile">
+                    <h3 class="font-heading">Backend</h3>
+                    <p>PHP, Laravel, Node.js, Java, Python.</p>
+                </article>
+                <article class="feature-tile">
+                    <h3 class="font-heading">CMS</h3>
+                    <p>WordPress and custom PHP CMS projects.</p>
+                </article>
+                <article class="feature-tile">
+                    <h3 class="font-heading">Frontend</h3>
+                    <p>React, Vue, Blade, and static web apps.</p>
                 </article>
             </div>
         </section>
