@@ -36,7 +36,6 @@ class FinalYearProjectHostingController extends Controller
 
         return view('pages.final-year-project-hosting', [
             'packages' => $this->packageCatalog(),
-            'hostedSystems' => $this->hostedSystems(),
             'activeOrder' => $activeOrder,
             'currency' => $this->pesapal->currency(),
             'dealValidUntil' => 'December 31, 2026',
@@ -455,84 +454,4 @@ class FinalYearProjectHostingController extends Controller
         ];
     }
 
-    /**
-     * @return array<int, array<string, mixed>>
-     */
-    private function hostedSystems(): array
-    {
-        return [
-            [
-                'name' => 'KIU Clinic Records',
-                'type' => 'Final Year Project',
-                'summary' => 'Role-based clinic management with patient records, pharmacy modules, and reporting dashboards.',
-                'stack' => ['Laravel', 'MySQL', 'Nginx'],
-                'status' => 'Deployed',
-                'image_url' => 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80',
-                'primary_url' => route('contact'),
-                'primary_label' => 'View case request',
-                'secondary_url' => route('contact'),
-                'secondary_label' => 'Request similar setup',
-            ],
-            [
-                'name' => 'School Voting Platform',
-                'type' => 'Final Year Project',
-                'summary' => 'Secure election workflow with candidate management, vote auditing, and real-time tally results.',
-                'stack' => ['Java', 'Spring Boot', 'MySQL'],
-                'status' => 'Deployed',
-                'image_url' => 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1200&q=80',
-                'primary_url' => route('contact'),
-                'primary_label' => 'View case request',
-                'secondary_url' => route('final-year-project-hosting').'#fyp-order-form',
-                'secondary_label' => 'Host your project',
-            ],
-            [
-                'name' => 'Hostel Booking System',
-                'type' => 'Final Year Project',
-                'summary' => 'Room allocation, fee references, and admin reporting deployed on a student-friendly budget.',
-                'stack' => ['Python', 'Django', 'PostgreSQL'],
-                'status' => 'Deployed',
-                'image_url' => 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80',
-                'primary_url' => route('contact'),
-                'primary_label' => 'View case request',
-                'secondary_url' => route('final-year-project-hosting').'#fyp-order-form',
-                'secondary_label' => 'Host your project',
-            ],
-            [
-                'name' => 'University eLearning Portal',
-                'type' => 'Final Year Project',
-                'summary' => 'Course content, assignments, and dashboards with secure student and lecturer access.',
-                'stack' => ['Node.js', 'Express', 'MongoDB'],
-                'status' => 'Deployed',
-                'image_url' => 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&q=80',
-                'primary_url' => route('contact'),
-                'primary_label' => 'View case request',
-                'secondary_url' => route('final-year-project-hosting').'#fyp-order-form',
-                'secondary_label' => 'Host your project',
-            ],
-            [
-                'name' => 'Project Repository Hub',
-                'type' => 'Final Year Project',
-                'summary' => 'University repository for uploading, reviewing, and archiving final year research projects.',
-                'stack' => ['WordPress', 'MySQL', 'Nginx'],
-                'status' => 'Deployed',
-                'image_url' => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80',
-                'primary_url' => route('contact'),
-                'primary_label' => 'View case request',
-                'secondary_url' => route('final-year-project-hosting').'#fyp-order-form',
-                'secondary_label' => 'Host your project',
-            ],
-            [
-                'name' => 'Online Clearance System',
-                'type' => 'Final Year Project',
-                'summary' => 'Departmental clearance workflow with approvals, audit trail, and downloadable clearance slips.',
-                'stack' => ['PHP', 'Laravel', 'MySQL'],
-                'status' => 'Deployed',
-                'image_url' => 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80',
-                'primary_url' => route('contact'),
-                'primary_label' => 'View case request',
-                'secondary_url' => route('final-year-project-hosting').'#fyp-order-form',
-                'secondary_label' => 'Host your project',
-            ],
-        ];
-    }
 }

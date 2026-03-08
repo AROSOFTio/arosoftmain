@@ -336,44 +336,6 @@
         @endif
 
         <section class="content-section">
-            <h2 class="section-title">Deployed Final Year Projects</h2>
-            <p class="mt-3 section-copy max-w-3xl">
-                Real final year systems already deployed by AROSOFT. Browse projects and request a similar deployment.
-            </p>
-
-            <div class="fyp-portfolio-grid mt-8">
-                @foreach ($hostedSystems as $system)
-                    <article class="fyp-portfolio-card">
-                        <div class="fyp-portfolio-media">
-                            <img src="{{ $system['image_url'] }}" alt="{{ $system['name'] }} preview image" loading="lazy">
-                        </div>
-
-                        <div class="fyp-portfolio-body">
-                            <div class="fyp-system-head">
-                                <span class="fyp-system-pill">{{ $system['type'] }}</span>
-                                <span class="fyp-system-status">{{ $system['status'] }}</span>
-                            </div>
-
-                            <h3 class="font-heading mt-4 text-2xl">{{ $system['name'] }}</h3>
-                            <p class="mt-3 text-sm leading-7 muted-copy">{{ $system['summary'] }}</p>
-
-                            <div class="fyp-system-stack mt-4">
-                                @foreach ($system['stack'] as $stackItem)
-                                    <span>{{ $stackItem }}</span>
-                                @endforeach
-                            </div>
-
-                            <div class="fyp-portfolio-actions mt-5">
-                                <a href="{{ $system['primary_url'] }}" class="btn-solid" target="_blank" rel="noopener noreferrer">{{ $system['primary_label'] }}</a>
-                                <a href="{{ $system['secondary_url'] }}" class="btn-outline">{{ $system['secondary_label'] }}</a>
-                            </div>
-                        </div>
-                    </article>
-                @endforeach
-            </div>
-        </section>
-
-        <section class="content-section">
             <h2 class="section-title">Frequently Asked Questions</h2>
             <div class="mt-5 space-y-3">
                 <details class="rounded-xl border border-[color:rgba(17,24,39,0.12)] bg-white p-4">
