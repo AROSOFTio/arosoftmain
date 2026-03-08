@@ -23,6 +23,12 @@
         </div>
     @endif
 
+    @if (!$ordersReady)
+        <div class="mt-4 rounded-xl border border-[color:rgba(185,28,28,0.32)] bg-[color:rgba(185,28,28,0.08)] p-4 text-sm text-[color:rgba(127,29,29,0.92)]">
+            Order setup is not completed on this existing database yet. Run <strong>php artisan migrate --force</strong> then reload this page.
+        </div>
+    @endif
+
     <div x-data="{ selectedPackage: @js(old('package', 'hosting_only')) }">
         <section class="hero-surface fyp-hero p-8 sm:p-10 lg:p-12">
             <div class="hero-grid">
@@ -225,7 +231,7 @@
                         <textarea id="notes" name="notes" rows="4" class="form-field">{{ old('notes') }}</textarea>
                     </div>
 
-                    <button type="submit" class="btn-solid">Order using Pesapal</button>
+                    <button type="submit" class="btn-solid" @disabled(!$ordersReady)>{{ $ordersReady ? 'Order using Pesapal' : 'Order setup pending' }}</button>
                 </form>
             </article>
 

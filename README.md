@@ -31,10 +31,12 @@ php artisan key:generate
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=arosoftmain
+DB_DATABASE=your_existing_database_name
 DB_USERNAME=root
 DB_PASSWORD=
 ```
+
+Use your already existing Arosoft database. Do not create a new one unless you want a separate environment.
 
 ### 4. Add Pesapal keys in `.env`
 
@@ -55,6 +57,12 @@ You can also set `PESAPAL_IPN_ID` and `PESAPAL_FYP_IPN_ID` if already provisione
 ```bash
 php artisan migrate
 npm run build
+```
+
+If this is production, run:
+
+```bash
+php artisan migrate --force
 ```
 
 ### 6. Final Year Hosting Offer Page

@@ -7,6 +7,7 @@ use App\Services\PesapalService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 use RuntimeException;
 
@@ -18,8 +19,9 @@ class FinalYearProjectHostingController extends Controller
 
     public function index(Request $request): View
     {
+        $ordersReady = $this->ordersTableReady();
         $orderReference = trim((string) $request->query('order', ''));
-        $activeOrder = $orderReference !== ''
+        $activeOrder = $ordersReady && $orderReference !== ''
             ? FinalYearProjectOrder::query()->where('order_reference', $orderReference)->first()
             : null;
 
@@ -39,11 +41,18 @@ class FinalYearProjectHostingController extends Controller
             'currency' => $this->pesapal->currency(),
             'dealValidUntil' => 'December 31, 2026',
             'pesapalConfigured' => $this->pesapal->isConfigured(),
+            'ordersReady' => $ordersReady,
         ]);
     }
 
     public function storeOrder(Request $request): RedirectResponse
     {
+        if (! $this->ordersTableReady()) {
+            return redirect()
+                ->route('final-year-project-hosting')
+                ->with('payment_error', 'Order table not ready yet. Please run php artisan migrate --force on the existing database.');
+        }
+
         if (filled($request->input('company'))) {
             return redirect()
                 ->route('final-year-project-hosting')
@@ -180,6 +189,12 @@ class FinalYearProjectHostingController extends Controller
 
     public function paymentCallback(Request $request): RedirectResponse
     {
+        if (! $this->ordersTableReady()) {
+            return redirect()
+                ->route('final-year-project-hosting')
+                ->with('payment_error', 'Order table not ready yet. Please run php artisan migrate --force on the existing database.');
+        }
+
         [$orderReference, $trackingId] = $this->extractPaymentReferences($request);
 
         if ($orderReference === '') {
@@ -219,6 +234,13 @@ class FinalYearProjectHostingController extends Controller
 
     public function paymentIpn(Request $request): JsonResponse
     {
+        if (! $this->ordersTableReady()) {
+            return response()->json([
+                'received' => false,
+                'message' => 'Order table not ready. Run migrations.',
+            ], 503);
+        }
+
         [$orderReference, $trackingId] = $this->extractPaymentReferences($request);
 
         if ($orderReference === '' || $trackingId === '') {
@@ -260,6 +282,13 @@ class FinalYearProjectHostingController extends Controller
 
     public function orderStatus(string $orderReference): JsonResponse
     {
+        if (! $this->ordersTableReady()) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Order table not ready. Run migrations.',
+            ], 503);
+        }
+
         $order = FinalYearProjectOrder::query()
             ->where('order_reference', $orderReference)
             ->first();
@@ -388,6 +417,11 @@ class FinalYearProjectHostingController extends Controller
         } while (FinalYearProjectOrder::query()->where('order_reference', $reference)->exists());
 
         return $reference;
+    }
+
+    private function ordersTableReady(): bool
+    {
+        return Schema::hasTable('final_year_project_orders');
     }
 
     /**
