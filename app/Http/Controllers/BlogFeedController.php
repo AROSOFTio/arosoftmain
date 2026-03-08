@@ -92,7 +92,7 @@ class BlogFeedController extends Controller
             $link = $this->xml((string) route('blog.show', $post->slug));
             $description = $this->cdata((string) ($post->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($post->body), 220)));
             $pubDate = optional($post->published_at)->toRssString();
-            $author = $this->xml((string) ($post->author?->name ?? 'Arosoft Team'));
+            $author = $this->xml((string) ($post->author?->name ?? 'AROSOFT Team'));
 
             return implode("\n", [
                 '        <item>',

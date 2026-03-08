@@ -9,7 +9,7 @@
         <tr>
             <td style="padding:24px;border-bottom:1px solid #d8dee8;">
                 <h1 style="margin:0;font-size:22px;line-height:1.3;font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;">New Contact Form Inquiry</h1>
-                <p style="margin:10px 0 0;font-size:14px;line-height:1.6;">A new message was submitted on the Arosoft website.</p>
+                <p style="margin:10px 0 0;font-size:14px;line-height:1.6;">A new message was submitted on the AROSOFT website.</p>
             </td>
         </tr>
         <tr>
@@ -24,7 +24,7 @@
         </tr>
         <tr>
             <td style="padding:16px 24px;background:#f7f8fa;border-top:1px solid #d8dee8;font-size:12px;color:#475467;">
-                Arosoft Innovations Ltd | Kitintale Road, Opposite St. Johns C.O.U, next to Sir Appolo Kaggwa St. School
+                AROSOFT Innovations Ltd | Kitintale Road, Opposite St. Johns C.O.U, next to Sir Appolo Kaggwa St. School
             </td>
         </tr>
     </table>

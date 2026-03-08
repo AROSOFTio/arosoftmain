@@ -69,7 +69,7 @@
                             <img src="{{ asset('brand/logo-mark.svg') }}" alt="" class="admin-brand-icon-img">
                         </span>
                         <div class="admin-brand-copy" x-show="!sidebarCollapsed">
-                            <p class="admin-brand-title">Arosoft Admin</p>
+                            <p class="admin-brand-title">AROSOFT Admin</p>
                             <p class="admin-brand-subtitle">Content Control</p>
                         </div>
                     </a>

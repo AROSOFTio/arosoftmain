@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Final Year Project Hosting Offer | Arosoft Innovations Ltd')
-@section('meta_description', 'Order Arosoft final year project hosting with clear student pricing: UGX 50,000 hosting only or UGX 86,000 domain + hosting. Pay securely via Pesapal.')
+@section('title', 'Final Year Project Hosting Offer | AROSOFT Innovations Ltd')
+@section('meta_description', 'Order AROSOFT final year project hosting with clear student pricing: UGX 50,000 hosting only or UGX 86,000 domain + hosting. Pay securely via Pesapal.')
 @section('canonical', route('final-year-project-hosting'))
 
 @section('content')
@@ -41,7 +41,7 @@
                     </p>
                     <div class="mt-7 flex flex-wrap gap-3">
                         <a href="#fyp-order-form" class="btn-solid">Order now</a>
-                        <a href="https://wa.me/256787726388?text={{ rawurlencode('Hello Arosoft, I need help with final year project hosting.') }}" class="btn-outline" target="_blank" rel="noopener noreferrer">
+                        <a href="https://wa.me/256787726388?text={{ rawurlencode('Hello AROSOFT, I need help with final year project hosting.') }}" class="btn-outline" target="_blank" rel="noopener noreferrer">
                             WhatsApp support
                         </a>
                     </div>
@@ -248,15 +248,9 @@
 
                 <div class="mt-5 space-y-3">
                     <div class="rounded-xl border border-[color:rgba(17,24,39,0.12)] p-4">
-                        <h3 class="font-heading text-lg">Pesapal status</h3>
-                        <p class="mt-2 text-sm leading-7 muted-copy">
-                            {{ $pesapalConfigured ? 'Credentials detected. Checkout is ready.' : 'Set PESAPAL_CONSUMER_KEY and PESAPAL_CONSUMER_SECRET in .env to enable checkout.' }}
-                        </p>
-                    </div>
-                    <div class="rounded-xl border border-[color:rgba(17,24,39,0.12)] p-4">
                         <h3 class="font-heading text-lg">Need urgent help?</h3>
                         <p class="mt-2 text-sm leading-7 muted-copy">Send your project details and we help you pick the correct package quickly.</p>
-                        <a href="https://wa.me/256787726388?text={{ rawurlencode('Hello Arosoft, I need final year project hosting help.') }}" class="btn-outline mt-3" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+                        <a href="https://wa.me/256787726388?text={{ rawurlencode('Hello AROSOFT, I need final year project hosting help.') }}" class="btn-outline mt-3" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
                     </div>
                 </div>
             </aside>

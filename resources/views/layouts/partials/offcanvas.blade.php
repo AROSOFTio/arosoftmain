@@ -24,7 +24,7 @@
     >
         <div class="flex items-center justify-between">
             <a href="{{ route('home') }}" class="inline-flex brand-logo-wrap" @click="closeOffcanvas()">
-                <img src="{{ asset('brand/logo-full.svg') }}" alt="Arosoft Innovations Ltd" class="brand-logo-full">
+                <img src="{{ asset('brand/logo-full.svg') }}" alt="AROSOFT Innovations Ltd" class="brand-logo-full">
             </a>
             <button type="button" class="icon-button" @click="closeOffcanvas()" aria-label="Close menu">
                 <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">

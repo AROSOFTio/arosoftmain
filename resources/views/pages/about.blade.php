@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'About Arosoft Innovations Ltd | IT Services, Printing, and Training in Kampala')
-@section('meta_description', 'Arosoft Innovations Ltd is an IT and creative services company on Kitintale Road, Kampala, delivering IT services, printing, graphics design, website and system development, and training.')
+@section('title', 'About AROSOFT Innovations Ltd | IT Services, Printing, and Training in Kampala')
+@section('meta_description', 'AROSOFT Innovations Ltd is an IT and creative services company on Kitintale Road, Kampala, delivering IT services, printing, graphics design, website and system development, and training.')
 @section('canonical', route('about'))
 
 @section('faq_schema')
@@ -12,7 +12,7 @@
             "mainEntity": [
                 {
                     "@type": "Question",
-                    "name": "What services does Arosoft Innovations Ltd provide?",
+                    "name": "What services does AROSOFT Innovations Ltd provide?",
                     "acceptedAnswer": {
                         "@type": "Answer",
                         "text": "We provide IT services, printing services, IT training and internship programs, graphics design, website design and development, and system development."
@@ -20,7 +20,7 @@
                 },
                 {
                     "@type": "Question",
-                    "name": "Where is Arosoft Innovations Ltd located?",
+                    "name": "Where is AROSOFT Innovations Ltd located?",
                     "acceptedAnswer": {
                         "@type": "Answer",
                         "text": "We are located on Kitintale Road, Opposite St. Johns C.O.U, next to Sir Appolo Kaggwa St. School, Kampala."
@@ -28,7 +28,7 @@
                 },
                 {
                     "@type": "Question",
-                    "name": "How can I contact Arosoft Innovations Ltd?",
+                    "name": "How can I contact AROSOFT Innovations Ltd?",
                     "acceptedAnswer": {
                         "@type": "Answer",
                         "text": "You can reach us at info@arosoft.io or via WhatsApp on +256787726388 through https://arosoft.io/contact."
@@ -41,10 +41,10 @@
 
 @section('content')
     <section class="shell-card rounded-3xl p-8 sm:p-10 lg:p-12">
-        <p class="page-kicker">About Arosoft Innovations Ltd</p>
+        <p class="page-kicker">About AROSOFT Innovations Ltd</p>
         <h1 class="page-title mt-4">Professional technology and creative services for growing organizations</h1>
         <p class="section-copy mt-5 max-w-4xl">
-            Arosoft Innovations Ltd is a practical service company based on Kitintale Road, Kampala. We partner with businesses,
+            AROSOFT Innovations Ltd is a practical service company based on Kitintale Road, Kampala. We partner with businesses,
             schools, and institutions that need reliable delivery in technology, branding, and digital systems. Our focus is clear:
             build quality solutions, support clients consistently, and deliver measurable value.
         </p>
@@ -128,7 +128,7 @@
                 <p class="mt-2 text-sm leading-7 muted-copy">Yes. Our team provides graphics, printing, website design, web development, and system development under one coordinated process.</p>
             </details>
             <details class="rounded-xl border border-[color:rgba(0,157,49,0.24)] p-4">
-                <summary class="cursor-pointer font-heading text-lg">How do we start a project with Arosoft?</summary>
+                <summary class="cursor-pointer font-heading text-lg">How do we start a project with AROSOFT?</summary>
                 <p class="mt-2 text-sm leading-7 muted-copy">Send your requirements through our <a href="{{ route('contact') }}" class="text-[var(--accent)] underline decoration-transparent transition hover:decoration-[var(--accent)]">contact page</a> or WhatsApp, and we will guide you through scope, timeline, and pricing.</p>
             </details>
         </div>

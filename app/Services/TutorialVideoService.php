@@ -71,7 +71,7 @@ class TutorialVideoService
 
         $response = Http::accept('application/xml')
             ->timeout(8)
-            ->withUserAgent('ArosoftTutorialFeed/1.0')
+            ->withUserAgent('AROSOFTTutorialFeed/1.0')
             ->get($feedUrl);
 
         if (!$response->ok()) {
@@ -93,7 +93,7 @@ class TutorialVideoService
 
         $response = Http::accept('text/html')
             ->timeout(8)
-            ->withUserAgent('ArosoftTutorialFeed/1.0')
+            ->withUserAgent('AROSOFTTutorialFeed/1.0')
             ->get($playlistsUrl);
 
         if (!$response->ok()) {
@@ -135,7 +135,7 @@ class TutorialVideoService
     private function discoverChannelId(string $channelUrl): string
     {
         $response = Http::timeout(8)
-            ->withUserAgent('ArosoftTutorialFeed/1.0')
+            ->withUserAgent('AROSOFTTutorialFeed/1.0')
             ->get($channelUrl);
 
         if (!$response->ok()) {

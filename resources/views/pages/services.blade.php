@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Services, Pricing & Quote Builder | Arosoft Innovations Ltd')
-@section('meta_description', 'Explore Arosoft service packages, pricing guidance, quote generation, WhatsApp consultation, and secure Pesapal payments.')
+@section('title', 'Services, Pricing & Quote Builder | AROSOFT Innovations Ltd')
+@section('meta_description', 'Explore AROSOFT service packages, pricing guidance, quote generation, WhatsApp consultation, and secure Pesapal payments.')
 @section('canonical', route('services'))
 
 @section('content')
     @php
         $formatMoney = fn (float|int $amount) => number_format((float) $amount);
-        $generalWhatsApp = 'https://wa.me/256787726388?text=' . rawurlencode('Hello Arosoft, I need help selecting the best service package.');
+        $generalWhatsApp = 'https://wa.me/256787726388?text=' . rawurlencode('Hello AROSOFT, I need help selecting the best service package.');
     @endphp
 
     @if (session('quote_status'))

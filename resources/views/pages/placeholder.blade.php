@@ -31,7 +31,7 @@
         <article class="info-card">
             <p class="page-kicker">Quick link</p>
             <h2 class="font-heading mt-2 text-xl">About</h2>
-            <p class="mt-3 text-sm leading-7 muted-copy">Learn about Arosoft Innovations Ltd and the values behind our work.</p>
+            <p class="mt-3 text-sm leading-7 muted-copy">Learn about AROSOFT Innovations Ltd and the values behind our work.</p>
             <a href="{{ route('about') }}" class="nav-link-sm mt-3 inline-flex">Read about us</a>
         </article>
     </section>

@@ -26,7 +26,7 @@ class ContactFormToAdmin extends Mailable
         return new Envelope(
             from: new Address(
                 config('mail.from.address', 'no-reply@arosoft.io'),
-                config('mail.from.name', 'Arosoft Innovations Ltd')
+                config('mail.from.name', 'AROSOFT Innovations Ltd')
             ),
             replyTo: [
                 new Address($this->formData['email'], $this->formData['full_name']),

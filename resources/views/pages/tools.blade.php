@@ -367,7 +367,7 @@
         <div class="h-4 bg-[var(--accent)]"></div>
 
         <header class="border-b border-[color:rgba(17,24,39,0.18)] px-5 py-6 text-center sm:px-8">
-            <h1 class="font-heading text-3xl leading-tight text-[color:rgba(17,24,39,0.95)] sm:text-4xl">Welcome to Arosoft Tools Arena</h1>
+            <h1 class="font-heading text-3xl leading-tight text-[color:rgba(17,24,39,0.95)] sm:text-4xl">Welcome to AROSOFT Tools Arena</h1>
             <p class="mt-3 text-sm leading-7 muted-copy">
                 Choose a tool category on the left. Tool details and processing workspace appear on the right.
                 Each tool has a dedicated URL for indexing, SEO, and AI optimization.

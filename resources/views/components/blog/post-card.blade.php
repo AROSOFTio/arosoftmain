@@ -49,7 +49,7 @@
         @endif
 
         <div class="blog-card-footer flex flex-wrap items-center gap-3 text-sm">
-            <span class="min-w-0 break-words muted-faint">By {{ $post->author?->name ?? 'Arosoft Team' }}</span>
+            <span class="min-w-0 break-words muted-faint">By {{ $post->author?->name ?? 'AROSOFT Team' }}</span>
             <a href="{{ route('blog.show', $post->slug) }}" class="btn-outline !w-auto !px-4 !py-2 !text-[0.68rem]">Read</a>
         </div>
     </div>

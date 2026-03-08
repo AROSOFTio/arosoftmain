@@ -90,7 +90,7 @@
 
     <section class="info-card">
         <p class="page-kicker">Newsletter</p>
-        <h3 class="mt-2 font-heading text-lg">Stay updated with Arosoft</h3>
+        <h3 class="mt-2 font-heading text-lg">Stay updated with AROSOFT</h3>
         <p class="mt-2 text-sm leading-7 muted-copy">Get notified when we publish practical guides and tech updates.</p>
         <a href="{{ route('contact') }}" class="btn-solid mt-4 !w-full !text-[0.68rem]">Request updates</a>
     </section>

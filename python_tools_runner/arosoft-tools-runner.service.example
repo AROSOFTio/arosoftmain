@@ -1,5 +1,5 @@
 [Unit]
-Description=Arosoft Python Tools Runner
+Description=AROSOFT Python Tools Runner
 After=network.target
 
 [Service]

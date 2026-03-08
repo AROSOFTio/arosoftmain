@@ -5,8 +5,8 @@
 
 @extends('layouts.app')
 
-@section('title', 'Latest Tutorials | Arosoft')
-@section('meta_description', 'Watch the latest tutorials from the Arosoft YouTube channel.')
+@section('title', 'Latest Tutorials | AROSOFT')
+@section('meta_description', 'Watch the latest tutorials from the AROSOFT YouTube channel.')
 @section('canonical', route('tutorials'))
 
 @section('content')

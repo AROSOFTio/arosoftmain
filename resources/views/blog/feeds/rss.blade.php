@@ -14,7 +14,7 @@
                 <guid isPermaLink="true">{{ route('blog.show', $post->slug) }}</guid>
                 <description><![CDATA[{{ $post->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($post->body), 220) }}]]></description>
                 <pubDate>{{ optional($post->published_at)->toRssString() }}</pubDate>
-                <author>{{ $post->author?->name ?? 'Arosoft Team' }}</author>
+                <author>{{ $post->author?->name ?? 'AROSOFT Team' }}</author>
             </item>
         @endforeach
     </channel>

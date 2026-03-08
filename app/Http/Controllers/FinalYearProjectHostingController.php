@@ -462,7 +462,7 @@ class FinalYearProjectHostingController extends Controller
     {
         return [
             [
-                'name' => 'Arosoft ERP',
+                'name' => 'AROSOFT ERP',
                 'type' => 'Enterprise System',
                 'summary' => 'Finance, stock, purchasing, and operations workflows hosted with continuous uptime monitoring.',
                 'stack' => ['ERPNext', 'MariaDB', 'Cloud VPS'],

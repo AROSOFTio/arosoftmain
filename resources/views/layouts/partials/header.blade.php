@@ -4,7 +4,7 @@
             <div class="flex h-20 items-center gap-4 px-4 sm:px-5">
                 <a href="{{ route('home') }}" class="group flex shrink-0 items-center leading-none">
                     <span class="brand-logo-wrap">
-                        <img src="{{ asset('brand/logo-full.svg') }}" alt="Arosoft Innovations Ltd" class="brand-logo-full">
+                        <img src="{{ asset('brand/logo-full.svg') }}" alt="AROSOFT Innovations Ltd" class="brand-logo-full">
                     </span>
                 </a>
 

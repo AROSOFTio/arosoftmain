@@ -317,12 +317,12 @@ class ToolsController extends Controller
         $isToolDetailPage = $slug !== null;
 
         $metaTitle = $isToolDetailPage
-            ? sprintf('%s | IT Tools | Arosoft Innovations Ltd', $activeTool['name'])
-            : 'IT Tools | Arosoft Innovations Ltd';
+            ? sprintf('%s | IT Tools | AROSOFT Innovations Ltd', $activeTool['name'])
+            : 'IT Tools | AROSOFT Innovations Ltd';
 
         $metaDescription = $isToolDetailPage
             ? $activeTool['description']
-            : 'Explore categorized Arosoft IT tools including password removers, converters, and generators with dedicated SEO-friendly URLs.';
+            : 'Explore categorized AROSOFT IT tools including password removers, converters, and generators with dedicated SEO-friendly URLs.';
 
         $canonicalUrl = $isToolDetailPage
             ? route('tools.show', ['slug' => $activeTool['slug']])
@@ -338,7 +338,7 @@ class ToolsController extends Controller
             'url' => route('tools.show', ['slug' => $activeTool['slug']]),
             'publisher' => [
                 '@type' => 'Organization',
-                'name' => 'Arosoft Innovations Ltd',
+                'name' => 'AROSOFT Innovations Ltd',
                 'url' => 'https://arosoft.io',
             ],
         ];
@@ -346,7 +346,7 @@ class ToolsController extends Controller
         $catalogSchema = [
             '@context' => 'https://schema.org',
             '@type' => 'ItemList',
-            'name' => 'Arosoft IT Tools Directory',
+            'name' => 'AROSOFT IT Tools Directory',
             'itemListElement' => array_values(array_map(
                 fn (array $tool, int $index): array => [
                     '@type' => 'ListItem',

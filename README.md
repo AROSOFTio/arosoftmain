@@ -7,7 +7,7 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## Arosoft Setup (MySQL + Pesapal)
+## AROSOFT Setup (MySQL + Pesapal)
 
 ### 1. Clone
 
@@ -36,7 +36,7 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-Use your already existing Arosoft database. Do not create a new one unless you want a separate environment.
+Use your already existing AROSOFT database. Do not create a new one unless you want a separate environment.
 
 ### 4. Add Pesapal keys in `.env`
 

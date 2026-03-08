@@ -41,7 +41,7 @@ class BlogController extends Controller
         }
 
         return $this->renderListing(
-            title: 'Arosoft Blog',
+            title: 'AROSOFT Blog',
             heading: 'Insights, tutorials, and product updates',
             queryBuilder: $queryBuilder,
             queryText: $queryText,

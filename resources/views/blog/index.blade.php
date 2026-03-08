@@ -1,7 +1,7 @@
 @php
     $metaTitle = 'AROSOFT Blog | '.$title;
     $metaDescription = $activeCategory?->description
-        ?: ($queryText !== '' ? 'Search results from Arosoft blog for '.$queryText.'.' : 'Read Arosoft blog insights, tutorials, and product updates.');
+        ?: ($queryText !== '' ? 'Search results from AROSOFT blog for '.$queryText.'.' : 'Read AROSOFT blog insights, tutorials, and product updates.');
     $selectedCategorySlug = (string) request()->query('category', $activeCategory?->slug ?? '');
 @endphp
 
@@ -9,7 +9,7 @@
 
 @section('meta_title', $metaTitle)
 @section('meta_description', $metaDescription)
-@section('meta_keywords', 'Arosoft blog, IT tutorials, web development, technology insights')
+@section('meta_keywords', 'AROSOFT blog, IT tutorials, web development, technology insights')
 @section('canonical', url()->current().(request()->getQueryString() ? '?'.request()->getQueryString() : ''))
 @section('og_type', 'website')
 @section('og_title', $metaTitle)
@@ -17,7 +17,7 @@
 
 @section('content')
     <section class="hero-surface blog-hero p-6 sm:p-10">
-        <p class="page-kicker">Arosoft Blog</p>
+        <p class="page-kicker">AROSOFT Blog</p>
         <h1 class="page-title mt-4">{{ $heading }}</h1>
         <p class="section-copy mt-4 max-w-3xl">
             Practical insights from our delivery team on software, design, operations, and digital growth.

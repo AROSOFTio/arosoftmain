@@ -40,7 +40,7 @@ class PageController extends Controller
         return $this->placeholder(
             'Services',
             'Services landing',
-            'This landing page will introduce all Arosoft service lines and case studies.'
+            'This landing page will introduce all AROSOFT service lines and case studies.'
         );
     }
 
@@ -115,7 +115,7 @@ class PageController extends Controller
     {
         return [
             [
-                'name' => 'Arosoft ERP',
+                'name' => 'AROSOFT ERP',
                 'label' => 'ERP',
                 'summary' => 'Customized ERPNext environment for finance, stock, purchasing, and operations visibility.',
                 'modules' => ['Finance', 'Inventory', 'Procurement'],

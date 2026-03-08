@@ -1,15 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'Privacy Policy | Arosoft Innovations Ltd')
-@section('meta_description', 'Read the privacy policy of Arosoft Innovations Ltd, including what data we collect, how we use it, retention practices, and your rights.')
+@section('title', 'Privacy Policy | AROSOFT Innovations Ltd')
+@section('meta_description', 'Read the privacy policy of AROSOFT Innovations Ltd, including what data we collect, how we use it, retention practices, and your rights.')
 @section('canonical', route('privacy'))
 
 @section('content')
     <section class="shell-card rounded-3xl p-8 sm:p-10 lg:p-12">
         <p class="page-kicker">Privacy Policy</p>
-        <h1 class="page-title mt-4">How Arosoft Innovations Ltd handles your information</h1>
+        <h1 class="page-title mt-4">How AROSOFT Innovations Ltd handles your information</h1>
         <p class="section-copy mt-5 max-w-4xl">
-            This Privacy Policy explains how Arosoft Innovations Ltd collects, uses, and protects personal information when you interact
+            This Privacy Policy explains how AROSOFT Innovations Ltd collects, uses, and protects personal information when you interact
             with our website and services.
         </p>
     </section>

@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Reset Password | Arosoft Admin</title>
+        <title>Reset Password | AROSOFT Admin</title>
         <meta name="robots" content="noindex,nofollow">
         @include('layouts.partials.favicons')
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +15,7 @@
         <main class="mx-auto flex min-h-screen w-full max-w-7xl items-center px-4 py-10 sm:px-6 lg:px-8">
             <section class="admin-card mx-auto w-full max-w-md p-7">
                 <a href="{{ route('home') }}" class="inline-flex brand-logo-wrap admin-login-logo-wrap">
-                    <img src="{{ asset('brand/logo-full.svg') }}" alt="Arosoft Innovations Ltd" class="brand-logo-full admin-login-logo">
+                    <img src="{{ asset('brand/logo-full.svg') }}" alt="AROSOFT Innovations Ltd" class="brand-logo-full admin-login-logo">
                 </a>
                 <p class="page-kicker">AROSOFT Innovations Ltd.</p>
                 <h1 class="mt-2 font-heading text-3xl">Reset password</h1>

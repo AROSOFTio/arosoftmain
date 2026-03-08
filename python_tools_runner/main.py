@@ -14,7 +14,7 @@ from fastapi import FastAPI, Form, Header, HTTPException
 from fastapi.responses import JSONResponse, FileResponse
 from starlette.background import BackgroundTask
 
-app = FastAPI(title="Arosoft Tools Runner", version="1.0.0")
+app = FastAPI(title="AROSOFT Tools Runner", version="1.0.0")
 
 RUNNER_TOKEN = os.getenv("TOOLS_RUNNER_TOKEN", "").strip()
 WORK_DIR = Path(os.getenv("TOOLS_RUNNER_WORKDIR", "/tmp/arosoft-tools")).resolve()

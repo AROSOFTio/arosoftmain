@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     @php
-        $defaultTitle = 'Arosoft Innovations Ltd | IT Services, Printing, Training, Web Development';
-        $defaultDescription = 'Arosoft Innovations Ltd provides IT services, printing services, graphics design, website design and development, system development, and IT training/internship in Kampala.';
+        $defaultTitle = 'AROSOFT Innovations Ltd | IT Services, Printing, Training, Web Development';
+        $defaultDescription = 'AROSOFT Innovations Ltd provides IT services, printing services, graphics design, website design and development, system development, and IT training/internship in Kampala.';
         $pageTitle = trim($__env->yieldContent('meta_title', $__env->yieldContent('title', $defaultTitle)));
         $pageDescription = trim($__env->yieldContent('meta_description', $defaultDescription));
-        $pageKeywords = trim($__env->yieldContent('meta_keywords', 'Arosoft Innovations Ltd, IT services, web development, Kampala'));
+        $pageKeywords = trim($__env->yieldContent('meta_keywords', 'AROSOFT Innovations Ltd, IT services, web development, Kampala'));
         $canonicalUrl = trim($__env->yieldContent('canonical', url()->current()));
         $robots = trim($__env->yieldContent('meta_robots', 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'));
         $ogType = trim($__env->yieldContent('og_type', 'website'));
@@ -20,7 +20,7 @@
         $localBusinessSchema = [
             '@context' => 'https://schema.org',
             '@type' => 'LocalBusiness',
-            'name' => 'Arosoft Innovations Ltd',
+            'name' => 'AROSOFT Innovations Ltd',
             'url' => 'https://arosoft.io',
             'email' => 'info@arosoft.io',
             'telephone' => '+256787726388',
@@ -53,7 +53,7 @@
         <meta property="og:description" content="{{ $ogDescription }}">
         <meta property="og:url" content="{{ $canonicalUrl }}">
         <meta property="og:image" content="{{ $ogImage }}">
-        <meta property="og:site_name" content="Arosoft Innovations Ltd">
+        <meta property="og:site_name" content="AROSOFT Innovations Ltd">
 
         <meta name="twitter:card" content="{{ $twitterCard }}">
         <meta name="twitter:title" content="{{ $twitterTitle }}">

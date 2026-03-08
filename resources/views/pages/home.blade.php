@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @section('title', 'AROSOFT | Home')
-@section('meta_description', 'Arosoft Innovations Ltd provides IT services, printing, graphics design, IT training, and website/system development from Kitintale Road, Kampala.')
+@section('meta_description', 'AROSOFT Innovations Ltd provides IT services, printing, graphics design, IT training, and website/system development from Kitintale Road, Kampala.')
 @section('canonical', route('home'))
 
 @section('content')
     <section class="hero-surface home-command p-8 sm:p-10 lg:p-12">
         <div class="hero-grid gap-8">
             <div class="relative z-[1]">
-                <p class="page-kicker">Arosoft Innovations Ltd</p>
+                <p class="page-kicker">AROSOFT Innovations Ltd</p>
                 <h1 class="page-title mt-4">Digital execution partner for systems, content, tools, and growth</h1>
                 <p class="section-copy mt-5 max-w-3xl">
                     We combine software delivery, technical content, practical tools, and business systems into one coordinated pipeline.
@@ -85,7 +85,7 @@
                             </p>
 
                             <div class="home-compact-footer">
-                                <span class="home-compact-author">By {{ $post->author?->name ?? 'Arosoft Team' }}</span>
+                                <span class="home-compact-author">By {{ $post->author?->name ?? 'AROSOFT Team' }}</span>
                                 <a href="{{ route('blog.show', $post->slug) }}" class="home-compact-link">Read -></a>
                             </div>
                         </div>

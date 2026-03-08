@@ -1,18 +1,18 @@
 @extends('layouts.app')
 
-@section('title', 'Contact Arosoft Innovations Ltd | IT and Printing Support in Kampala')
-@section('meta_description', 'Contact Arosoft Innovations Ltd on Kitintale Road, Kampala. Send inquiries for IT services, printing, training, graphics design, website development, and system development.')
+@section('title', 'Contact AROSOFT Innovations Ltd | IT and Printing Support in Kampala')
+@section('meta_description', 'Contact AROSOFT Innovations Ltd on Kitintale Road, Kampala. Send inquiries for IT services, printing, training, graphics design, website development, and system development.')
 @section('canonical', route('contact'))
 @section('schema')
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
             "@type": "ContactPage",
-            "name": "Contact Arosoft Innovations Ltd",
+            "name": "Contact AROSOFT Innovations Ltd",
             "url": "https://arosoft.io/contact",
             "mainEntity": {
                 "@type": "Organization",
-                "name": "Arosoft Innovations Ltd",
+                "name": "AROSOFT Innovations Ltd",
                 "email": "info@arosoft.io",
                 "telephone": "+256787726388",
                 "address": "Kitintale Road, Opposite St. Johns C.O.U, next to Sir Appolo Kaggwa St. School"
@@ -23,7 +23,7 @@
 
 @section('content')
     <section class="shell-card rounded-3xl p-8 sm:p-10 lg:p-12">
-        <p class="page-kicker">Contact Arosoft Innovations Ltd</p>
+        <p class="page-kicker">Contact AROSOFT Innovations Ltd</p>
         <h1 class="page-title mt-4">Let us discuss your project requirements</h1>
         <p class="section-copy mt-5 max-w-4xl">
             We support organizations in Kampala and beyond with IT services, printing services, graphics design, website design and development,
@@ -129,7 +129,7 @@
             <dl class="mt-5 space-y-4 text-sm leading-7 muted-copy">
                 <div>
                     <dt class="page-kicker">Company</dt>
-                    <dd>Arosoft Innovations Ltd</dd>
+                    <dd>AROSOFT Innovations Ltd</dd>
                 </div>
                 <div>
                     <dt class="page-kicker">Address</dt>

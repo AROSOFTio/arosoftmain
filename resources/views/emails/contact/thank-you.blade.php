@@ -27,7 +27,7 @@
         </tr>
         <tr>
             <td style="padding:16px 24px;background:#f7f8fa;border-top:1px solid #d8dee8;font-size:12px;color:#475467;">
-                Arosoft Innovations Ltd | info@arosoft.io | https://arosoft.io/contact
+                AROSOFT Innovations Ltd | info@arosoft.io | https://arosoft.io/contact
             </td>
         </tr>
     </table>

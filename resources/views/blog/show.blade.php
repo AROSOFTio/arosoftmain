@@ -2,7 +2,7 @@
     $canonical = $post->canonical_url ?: route('blog.show', $post->slug);
     $metaTitle = $post->meta_title ?: ($post->title.' | AROSOFT Blog');
     $metaDescription = $post->meta_description ?: ($post->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($post->body), 160));
-    $metaKeywords = $post->meta_keywords ?: 'Arosoft blog, software engineering, IT insights';
+    $metaKeywords = $post->meta_keywords ?: 'AROSOFT blog, software engineering, IT insights';
     $robots = $post->robots ?: 'index,follow';
     $ogTitle = $post->og_title ?: $metaTitle;
     $ogDescription = $post->og_description ?: $metaDescription;
@@ -47,11 +47,11 @@
         'dateModified' => optional($post->updated_at)->toIso8601String(),
         'author' => [
             '@type' => 'Person',
-            'name' => $post->author?->name ?? 'Arosoft Team',
+            'name' => $post->author?->name ?? 'AROSOFT Team',
         ],
         'publisher' => [
             '@type' => 'Organization',
-            'name' => 'Arosoft Innovations Ltd',
+            'name' => 'AROSOFT Innovations Ltd',
             'logo' => [
                 '@type' => 'ImageObject',
                 'url' => url('/android-chrome-512x512.png'),
@@ -120,7 +120,7 @@
         <h1 class="page-title mt-4">{{ $post->title }}</h1>
 
         <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm muted-faint">
-            <span>By {{ $post->author?->name ?? 'Arosoft Team' }}</span>
+            <span>By {{ $post->author?->name ?? 'AROSOFT Team' }}</span>
             <span>{{ optional($post->published_at)->format('M d, Y') }}</span>
             <span>{{ $post->reading_time_minutes ?: 1 }} min read</span>
             <span>{{ number_format((int) $post->view_count) }} views</span>
@@ -189,9 +189,9 @@
 
             <div class="info-card">
                 <p class="page-kicker">Author</p>
-                <h2 class="mt-2 font-heading text-xl">{{ $post->author?->name ?? 'Arosoft Team' }}</h2>
+                <h2 class="mt-2 font-heading text-xl">{{ $post->author?->name ?? 'AROSOFT Team' }}</h2>
                 <p class="mt-2 text-sm leading-7 muted-copy">
-                    Arosoft delivery team focused on practical implementation guides, platform updates, and technical operations.
+                    AROSOFT delivery team focused on practical implementation guides, platform updates, and technical operations.
                 </p>
             </div>
 

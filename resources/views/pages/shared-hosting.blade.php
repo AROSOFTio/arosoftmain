@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Shared Hosting | Arosoft Innovations Ltd')
+@section('title', 'Shared Hosting | AROSOFT Innovations Ltd')
 @section('meta_description', 'Reliable shared hosting for business websites and student systems. Fast onboarding, clear pricing, and upgrade-ready VPS capacity.')
 @section('canonical', route('hosting.shared'))
 

@@ -434,7 +434,7 @@ class ServicesController extends Controller
     private function buildQuoteWhatsAppUrl(array $quote): string
     {
         $amount = number_format((float) $quote['totals']['total']);
-        $message = "Hello Arosoft, I want to proceed with quote {$quote['quote_id']} ({$quote['service']['label']}) worth {$quote['currency']} {$amount}.";
+        $message = "Hello AROSOFT, I want to proceed with quote {$quote['quote_id']} ({$quote['service']['label']}) worth {$quote['currency']} {$amount}.";
 
         return 'https://wa.me/256787726388?text='.rawurlencode($message);
     }
