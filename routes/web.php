@@ -48,6 +48,7 @@ Route::get('/services/printing', [PageController::class, 'printing'])->name('ser
 Route::get('/services/website-design', [PageController::class, 'websiteDesign'])->name('services.website-design');
 Route::get('/services/web-development', [PageController::class, 'webDevelopment'])->name('services.web-development');
 Route::get('/services/training-courses', [PageController::class, 'trainingCourses'])->name('services.training-courses');
+Route::get('/hosting/shared', [PageController::class, 'sharedHosting'])->name('hosting.shared');
 Route::redirect('/final-yeat-project-hosting', '/final-year-project-hosting', 301);
 Route::get('/final-year-project-hosting', [FinalYearProjectHostingController::class, 'index'])->name('final-year-project-hosting');
 Route::post('/final-year-project-hosting/order', [FinalYearProjectHostingController::class, 'storeOrder'])

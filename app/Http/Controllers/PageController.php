@@ -80,6 +80,11 @@ class PageController extends Controller
         );
     }
 
+    public function sharedHosting(): View
+    {
+        return view('pages.shared-hosting');
+    }
+
     public function tutorials(TutorialVideoService $tutorialVideoService): View
     {
         return view('pages.tutorials', [

@@ -11,17 +11,17 @@
                 <nav class="hidden flex-1 items-center justify-center gap-1 lg:flex">
                     <a href="{{ route('home') }}" class="nav-link">Home</a>
                     <a href="{{ route('blog') }}" class="nav-link">Blog</a>
-                    <a href="{{ route('final-year-project-hosting') }}" class="nav-link">FYP Hosting</a>
+                    <a href="{{ route('services') }}" class="nav-link">Services</a>
 
-                <div class="relative" @mouseenter="openMega('services')" @mouseleave="closeMega('services')">
+                <div class="relative" @mouseenter="openMega('hosting')" @mouseleave="closeMega('hosting')">
                     <button
                         type="button"
                         class="nav-link"
-                        @click="toggleMega('services')"
-                        @focus="openMega('services')"
-                        :aria-expanded="megaOpen === 'services'"
+                        @click="toggleMega('hosting')"
+                        @focus="openMega('hosting')"
+                        :aria-expanded="megaOpen === 'hosting'"
                     >
-                        Services
+                        Hosting
                         <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4" aria-hidden="true">
                             <path d="m5 7.5 5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
@@ -29,42 +29,34 @@
 
                     <div
                         x-cloak
-                        x-show="megaOpen === 'services'"
-                        @click.outside="closeMega('services')"
+                        x-show="megaOpen === 'hosting'"
+                        @click.outside="closeMega('hosting')"
                         x-transition:enter="transition duration-180 ease-out"
                         x-transition:enter-start="opacity-0 -translate-y-3"
                         x-transition:enter-end="opacity-100 translate-y-0"
                         x-transition:leave="transition duration-140 ease-in"
                         x-transition:leave-start="opacity-100 translate-y-0"
                         x-transition:leave-end="opacity-0 -translate-y-2"
-                        class="mega-panel absolute left-1/2 top-[calc(100%+0.9rem)] w-[40rem] -translate-x-1/2 p-6"
+                        class="mega-panel absolute left-1/2 top-[calc(100%+0.9rem)] w-[42rem] -translate-x-1/2 p-6"
                     >
-                        <p class="text-[0.65rem] uppercase tracking-[0.2em] muted-faint">Service clusters</p>
+                        <p class="text-[0.65rem] uppercase tracking-[0.2em] muted-faint">Hosting plans</p>
                         <div class="mt-3 grid grid-cols-2 gap-3">
-                            <a href="{{ route('services.printing') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
-                                <p class="font-heading text-lg">Printing</p>
-                                <p class="mt-1 text-sm muted-copy">Business cards, branding packs, and premium print runs.</p>
-                            </a>
-                            <a href="{{ route('services.website-design') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
-                                <p class="font-heading text-lg">Website Design</p>
-                                <p class="mt-1 text-sm muted-copy">Conversion-first layouts with high-end visuals.</p>
-                            </a>
-                            <a href="{{ route('services.web-development') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
-                                <p class="font-heading text-lg">Web Development</p>
-                                <p class="mt-1 text-sm muted-copy">Custom Laravel builds and scalable web architecture.</p>
-                            </a>
-                            <a href="{{ route('services.training-courses') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
-                                <p class="font-heading text-lg">Training/Courses</p>
-                                <p class="mt-1 text-sm muted-copy">Hands-on courses for teams and aspiring developers.</p>
+                            <a href="{{ route('hosting.shared') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
+                                <p class="font-heading text-lg">Shared Hosting</p>
+                                <p class="mt-1 text-sm muted-copy">Affordable cPanel hosting for websites, school projects, and startup pages.</p>
                             </a>
                             <a href="{{ route('final-year-project-hosting') }}" class="shell-card rounded-xl p-4 transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
-                                <p class="font-heading text-lg">Final Year Hosting</p>
-                                <p class="mt-1 text-sm muted-copy">UGX 50,000 hosting or UGX 86,000 domain + hosting package.</p>
+                                <p class="font-heading text-lg">FYP Hosting</p>
+                                <p class="mt-1 text-sm muted-copy">Student package: UGX 50,000 hosting only or UGX 86,000 domain + hosting.</p>
+                            </a>
+                            <a href="{{ route('hosting.shared') }}" class="shell-card col-span-2 rounded-xl p-4 transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
+                                <p class="font-heading text-lg">Current VPS Capacity</p>
+                                <p class="mt-1 text-sm muted-copy">Contabo Cloud VPS 10: 4 vCPU, 8 GB RAM, 75 GB NVMe. Upgrade-ready for growing deployments.</p>
                             </a>
                         </div>
                         <div class="mt-4 flex flex-wrap gap-3">
-                            <a href="{{ route('services') }}" class="btn-outline">View services landing</a>
-                            <a href="{{ route('final-year-project-hosting') }}" class="btn-solid">Student hosting deal</a>
+                            <a href="{{ route('hosting.shared') }}" class="btn-outline">Open shared hosting</a>
+                            <a href="{{ route('final-year-project-hosting') }}" class="btn-solid">Open FYP hosting</a>
                         </div>
                     </div>
                 </div>

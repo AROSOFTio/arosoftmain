@@ -311,36 +311,44 @@
         @endif
 
         <section class="content-section">
-            <div class="flex flex-wrap items-end justify-between gap-3">
-                <div>
-                    <h2 class="section-title">Current Hosted Systems Portfolio</h2>
-                    <p class="mt-3 section-copy max-w-3xl">
-                        Live and hosted systems delivered with reliable uptime and student-friendly deployment support.
-                    </p>
-                </div>
-                <a href="{{ route('contact') }}" class="btn-outline">Need full portfolio?</a>
-            </div>
+            <h2 class="section-title">Hosted Systems Portfolio</h2>
+            <p class="mt-3 section-copy max-w-3xl">
+                Real deployment examples with clean presentation. Hover or focus a card to flip and view full system details.
+            </p>
 
-            <div class="fyp-portfolio-grid mt-6">
+            <div class="fyp-portfolio-grid mt-8">
                 @foreach ($hostedSystems as $system)
-                    <article class="fyp-system-card">
-                        <div class="fyp-system-head">
-                            <span class="fyp-system-pill">{{ $system['type'] }}</span>
-                            <span class="fyp-system-status">{{ $system['status'] }}</span>
-                        </div>
+                    <article class="fyp-flip-card" tabindex="0" aria-label="{{ $system['name'] }} portfolio card">
+                        <div class="fyp-flip-card-inner">
+                            <div class="fyp-flip-card-face fyp-flip-card-front">
+                                <img src="{{ $system['image_url'] }}" alt="{{ $system['name'] }} preview image" loading="lazy">
+                                <div class="fyp-flip-overlay">
+                                    <span class="fyp-system-pill">{{ $system['type'] }}</span>
+                                    <h3 class="font-heading mt-3 text-2xl text-white">{{ $system['name'] }}</h3>
+                                    <p class="mt-2 text-sm text-[color:rgba(255,255,255,0.88)]">{{ $system['status'] }}</p>
+                                </div>
+                            </div>
 
-                        <h3 class="font-heading mt-4 text-2xl">{{ $system['name'] }}</h3>
-                        <p class="mt-3 text-sm leading-7 muted-copy">{{ $system['summary'] }}</p>
+                            <div class="fyp-flip-card-face fyp-flip-card-back">
+                                <div class="fyp-system-head">
+                                    <span class="fyp-system-pill">{{ $system['type'] }}</span>
+                                    <span class="fyp-system-status">{{ $system['status'] }}</span>
+                                </div>
 
-                        <div class="fyp-system-stack mt-4">
-                            @foreach ($system['stack'] as $stackItem)
-                                <span>{{ $stackItem }}</span>
-                            @endforeach
-                        </div>
+                                <h3 class="font-heading mt-4 text-2xl">{{ $system['name'] }}</h3>
+                                <p class="mt-3 text-sm leading-7 muted-copy">{{ $system['summary'] }}</p>
 
-                        <div class="mt-5 flex flex-wrap gap-3">
-                            <a href="{{ $system['primary_url'] }}" class="btn-solid" target="_blank" rel="noopener noreferrer">{{ $system['primary_label'] }}</a>
-                            <a href="{{ $system['secondary_url'] }}" class="btn-outline">{{ $system['secondary_label'] }}</a>
+                                <div class="fyp-system-stack mt-4">
+                                    @foreach ($system['stack'] as $stackItem)
+                                        <span>{{ $stackItem }}</span>
+                                    @endforeach
+                                </div>
+
+                                <div class="mt-5 flex flex-wrap gap-3">
+                                    <a href="{{ $system['primary_url'] }}" class="btn-solid" target="_blank" rel="noopener noreferrer">{{ $system['primary_label'] }}</a>
+                                    <a href="{{ $system['secondary_url'] }}" class="btn-outline">{{ $system['secondary_label'] }}</a>
+                                </div>
+                            </div>
                         </div>
                     </article>
                 @endforeach

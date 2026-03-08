@@ -37,18 +37,16 @@
             <a href="{{ route('home') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Home</a>
             <a href="{{ route('blog') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Blog</a>
             <a href="{{ route('services') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Services</a>
+            <a href="{{ route('hosting.shared') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Shared Hosting</a>
             <a href="{{ route('final-year-project-hosting') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">FYP Hosting</a>
             <a href="{{ route('tutorials') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Tutorials</a>
             <a href="{{ route('tools') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Tools</a>
         </nav>
 
         <section class="mt-8">
-            <p class="text-[0.66rem] uppercase tracking-[0.2em] muted-faint">Services</p>
+            <p class="text-[0.66rem] uppercase tracking-[0.2em] muted-faint">Hosting</p>
             <div class="mt-3 space-y-2">
-                <a href="{{ route('services.printing') }}" class="shell-card block rounded-xl px-4 py-3 text-sm font-semibold" @click="closeOffcanvas()">Printing</a>
-                <a href="{{ route('services.website-design') }}" class="shell-card block rounded-xl px-4 py-3 text-sm font-semibold" @click="closeOffcanvas()">Website Design</a>
-                <a href="{{ route('services.web-development') }}" class="shell-card block rounded-xl px-4 py-3 text-sm font-semibold" @click="closeOffcanvas()">Web Development</a>
-                <a href="{{ route('services.training-courses') }}" class="shell-card block rounded-xl px-4 py-3 text-sm font-semibold" @click="closeOffcanvas()">Training/Courses</a>
+                <a href="{{ route('hosting.shared') }}" class="shell-card block rounded-xl px-4 py-3 text-sm font-semibold" @click="closeOffcanvas()">Shared Hosting</a>
                 <a href="{{ route('final-year-project-hosting') }}" class="shell-card block rounded-xl px-4 py-3 text-sm font-semibold" @click="closeOffcanvas()">Final Year Hosting</a>
             </div>
         </section>
