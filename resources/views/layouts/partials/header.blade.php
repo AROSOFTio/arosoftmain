@@ -42,10 +42,10 @@
                         x-transition:leave="transition duration-140 ease-in"
                         x-transition:leave-start="opacity-100 translate-y-0"
                         x-transition:leave-end="opacity-0 -translate-y-2"
-                        class="mega-panel absolute left-1/2 w-[26rem] -translate-x-1/2 p-6"
-                        style="top: 100%;"
+                        class="mega-panel absolute left-1/2 -translate-x-1/2 p-6"
+                        style="top: 100%; width: 26rem;"
                     >
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-2 gap-3" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem;">
                             <a href="{{ route('hosting.shared') }}" class="shell-card rounded-xl p-4 text-center transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
                                 <p class="font-heading text-lg">Shared Hosting</p>
                             </a>
