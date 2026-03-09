@@ -37,9 +37,9 @@
                         x-transition:leave="transition duration-140 ease-in"
                         x-transition:leave-start="opacity-100 translate-y-0"
                         x-transition:leave-end="opacity-0 -translate-y-2"
-                        class="mega-panel absolute left-1/2 top-[calc(100%+0.9rem)] w-[26rem] -translate-x-1/2 p-6"
+                        class="mega-panel mega-panel-hosting absolute left-1/2 -translate-x-1/2 p-6"
                     >
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="mega-hosting-grid">
                             <a href="{{ route('hosting.shared') }}" class="shell-card rounded-xl p-4 text-center transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
                                 <p class="font-heading text-lg">Shared Hosting</p>
                             </a>
