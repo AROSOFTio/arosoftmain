@@ -13,7 +13,12 @@
                     <a href="{{ route('blog') }}" class="nav-link">Blog</a>
                     <a href="{{ route('services') }}" class="nav-link">Services</a>
 
-                <div class="relative" @mouseenter="openMega('hosting')" @mouseleave="closeMega('hosting')">
+                <div
+                    class="relative -mb-4 pb-4"
+                    @mouseenter="openMega('hosting')"
+                    @mouseleave="closeMega('hosting')"
+                    @click.outside="closeMega('hosting')"
+                >
                     <button
                         type="button"
                         class="nav-link"
@@ -30,14 +35,13 @@
                     <div
                         x-cloak
                         x-show="megaOpen === 'hosting'"
-                        @click.outside="closeMega('hosting')"
                         x-transition:enter="transition duration-180 ease-out"
                         x-transition:enter-start="opacity-0 -translate-y-3"
                         x-transition:enter-end="opacity-100 translate-y-0"
                         x-transition:leave="transition duration-140 ease-in"
                         x-transition:leave-start="opacity-100 translate-y-0"
                         x-transition:leave-end="opacity-0 -translate-y-2"
-                        class="mega-panel absolute left-1/2 top-[calc(100%+0.9rem)] w-[26rem] -translate-x-1/2 p-6"
+                        class="mega-panel absolute left-1/2 top-full w-[26rem] -translate-x-1/2 p-6"
                     >
                         <div class="grid grid-cols-2 gap-3">
                             <a href="{{ route('hosting.shared') }}" class="shell-card rounded-xl p-4 text-center transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
