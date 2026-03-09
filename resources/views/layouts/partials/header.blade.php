@@ -13,13 +13,7 @@
                     <a href="{{ route('blog') }}" class="nav-link">Blog</a>
                     <a href="{{ route('services') }}" class="nav-link">Services</a>
 
-                <div
-                    class="relative"
-                    style="margin-bottom: -1rem; padding-bottom: 1rem;"
-                    @mouseenter="openMega('hosting')"
-                    @mouseleave="closeMega('hosting')"
-                    @click.outside="closeMega('hosting')"
-                >
+                <div class="relative" @mouseenter="openMega('hosting')" @mouseleave="closeMega('hosting')">
                     <button
                         type="button"
                         class="nav-link"
@@ -36,16 +30,16 @@
                     <div
                         x-cloak
                         x-show="megaOpen === 'hosting'"
+                        @click.outside="closeMega('hosting')"
                         x-transition:enter="transition duration-180 ease-out"
                         x-transition:enter-start="opacity-0 -translate-y-3"
                         x-transition:enter-end="opacity-100 translate-y-0"
                         x-transition:leave="transition duration-140 ease-in"
                         x-transition:leave-start="opacity-100 translate-y-0"
                         x-transition:leave-end="opacity-0 -translate-y-2"
-                        class="mega-panel absolute left-1/2 -translate-x-1/2 p-6"
-                        style="top: 100%; width: 26rem;"
+                        class="mega-panel absolute left-1/2 top-[calc(100%+0.9rem)] w-[26rem] -translate-x-1/2 p-6"
                     >
-                        <div class="grid grid-cols-2 gap-3" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem;">
+                        <div class="grid grid-cols-2 gap-3">
                             <a href="{{ route('hosting.shared') }}" class="shell-card rounded-xl p-4 text-center transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]">
                                 <p class="font-heading text-lg">Shared Hosting</p>
                             </a>
