@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\TiffMergeService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -16,6 +17,11 @@ use Throwable;
 
 class ToolsController extends Controller
 {
+    public function __construct(
+        private readonly TiffMergeService $tiffMergeService,
+    ) {
+    }
+
     public function index(): View
     {
         return $this->renderCatalog();
@@ -59,12 +65,21 @@ class ToolsController extends Controller
                 ->with('tool_error', $result['message']);
         }
 
-        $rules = array_merge(['required'], $tool['validation_rules']);
+        $allowsMultipleUploads = (bool) ($tool['allows_multiple'] ?? false);
+        $fileRules = array_merge(['required'], $tool['validation_rules']);
 
-        $validated = $request->validate([
-            'upload_file' => $rules,
-            'processing_note' => ['nullable', 'string', 'max:500'],
-        ]);
+        if ($allowsMultipleUploads) {
+            $validated = $request->validate([
+                'upload_file' => ['required', 'array', 'min:2', 'max:20'],
+                'upload_file.*' => $fileRules,
+                'processing_note' => ['nullable', 'string', 'max:500'],
+            ]);
+        } else {
+            $validated = $request->validate([
+                'upload_file' => $fileRules,
+                'processing_note' => ['nullable', 'string', 'max:500'],
+            ]);
+        }
 
         $uploadedFile = $validated['upload_file'];
         $result = $this->runFileProcessor($tool, $uploadedFile);
@@ -78,10 +93,11 @@ class ToolsController extends Controller
 
         if (isset($result['download_relative_path'])) {
             $downloadPath = Storage::disk('local')->path($result['download_relative_path']);
-            $downloadName = $result['download_name'] ?? 'converted-file.pdf';
+            $downloadName = $result['download_name'] ?? 'downloaded-file';
+            $contentType = $result['download_content_type'] ?? 'application/pdf';
 
             return response()->download($downloadPath, $downloadName, [
-                'Content-Type' => 'application/pdf',
+                'Content-Type' => $contentType,
             ])->deleteFileAfterSend(true);
         }
 
@@ -1167,12 +1183,30 @@ class ToolsController extends Controller
         return 'Failed to process YouTube download. Verify server tools (yt-dlp/ffmpeg) and try again.';
     }
 
-    private function runFileProcessor(array $tool, UploadedFile $uploadedFile): array
+    /**
+     * @param UploadedFile|array<int, UploadedFile> $uploadedFile
+     */
+    private function runFileProcessor(array $tool, UploadedFile|array $uploadedFile): array
     {
         $processor = $tool['processor'] ?? '';
 
+        if ($processor === 'merge_tiff') {
+            $uploadedFiles = $uploadedFile instanceof UploadedFile
+                ? [$uploadedFile]
+                : array_values(array_filter($uploadedFile, fn (mixed $file): bool => $file instanceof UploadedFile));
+
+            return $this->mergeTiffFiles($uploadedFiles);
+        }
+
         if ($processor === 'tiff_to_pdf') {
             return $this->convertTiffToPdf($uploadedFile);
+        }
+
+        if (is_array($uploadedFile)) {
+            return [
+                'ok' => false,
+                'message' => 'This tool currently accepts a single file upload.',
+            ];
         }
 
         $storedPath = $uploadedFile->store("tool-uploads/{$tool['slug']}", 'local');
@@ -1196,6 +1230,62 @@ class ToolsController extends Controller
                 $modeLabel,
                 $storedPath
             ),
+        ];
+    }
+
+    /**
+     * @param array<int, UploadedFile> $uploadedFiles
+     */
+    private function mergeTiffFiles(array $uploadedFiles): array
+    {
+        $disk = Storage::disk('local');
+        $inputPaths = [];
+
+        foreach ($uploadedFiles as $uploadedFile) {
+            $storedPath = $uploadedFile->store('tool-uploads/merge-tiff-tif-files', 'local');
+            if ($storedPath === false) {
+                $disk->delete($inputPaths);
+
+                return [
+                    'ok' => false,
+                    'message' => 'Unable to store uploaded TIFF/TIF files.',
+                ];
+            }
+
+            $inputPaths[] = $storedPath;
+        }
+
+        $resultDirectory = 'tool-results/merge-tiff-tif-files';
+        $disk->makeDirectory($resultDirectory);
+
+        $outputPath = $resultDirectory . '/' . Str::uuid() . '.tif';
+        $outputAbsolutePath = $disk->path($outputPath);
+        $inputAbsolutePaths = array_map(fn (string $path): string => $disk->path($path), $inputPaths);
+
+        $firstBaseName = Str::slug(pathinfo($uploadedFiles[0]->getClientOriginalName(), PATHINFO_FILENAME));
+        if ($firstBaseName === '') {
+            $firstBaseName = 'merged-tiff';
+        }
+
+        $downloadName = count($uploadedFiles) > 1
+            ? $firstBaseName . '-merged.tif'
+            : $firstBaseName . '.tif';
+
+        $mergeResult = $this->tiffMergeService->merge($inputAbsolutePaths, $outputAbsolutePath);
+        $disk->delete($inputPaths);
+
+        if (!$mergeResult['ok']) {
+            $disk->delete($outputPath);
+
+            return $mergeResult;
+        }
+
+        return [
+            'ok' => true,
+            'message' => 'TIFF/TIF files merged successfully.',
+            'download_relative_path' => $outputPath,
+            'download_name' => $downloadName,
+            'download_content_type' => 'image/tiff',
         ];
     }
 

@@ -509,15 +509,38 @@
                                 @endif
                             @endif
                         @else
+                            @php
+                                $allowsMultipleUploads = (bool) ($activeTool['allows_multiple'] ?? false);
+                                $uploadFieldName = $allowsMultipleUploads ? 'upload_file[]' : 'upload_file';
+                                $uploadFieldErrors = $errors->get('upload_file');
+
+                                foreach ($errors->get('upload_file.*') as $messages) {
+                                    foreach ($messages as $message) {
+                                        $uploadFieldErrors[] = $message;
+                                    }
+                                }
+                            @endphp
                             <form action="{{ route('tools.process', ['slug' => $activeTool['slug']]) }}" method="POST" enctype="multipart/form-data" class="mt-3 space-y-3">
                                 @csrf
                                 <div>
-                                    <label class="form-label" for="upload_file">Upload file</label>
-                                    <input id="upload_file" type="file" name="upload_file" class="form-field @error('upload_file') border-[color:rgba(0,157,49,0.85)] @enderror" accept="{{ $activeTool['accept'] }}">
-                                    @error('upload_file')
+                                    <label class="form-label" for="upload_file">{{ $allowsMultipleUploads ? 'Upload files' : 'Upload file' }}</label>
+                                    <input
+                                        id="upload_file"
+                                        type="file"
+                                        name="{{ $uploadFieldName }}"
+                                        class="form-field {{ $uploadFieldErrors !== [] ? 'border-[color:rgba(0,157,49,0.85)]' : '' }}"
+                                        accept="{{ $activeTool['accept'] }}"
+                                        @if ($allowsMultipleUploads) multiple @endif
+                                    >
+                                    @foreach ($uploadFieldErrors as $message)
                                         <p class="mt-2 text-sm text-[var(--accent)]">{{ $message }}</p>
-                                    @enderror
-                                    <p class="mt-2 text-xs muted-faint">Accepted input: {{ $activeTool['accept'] ?: 'File upload' }}</p>
+                                    @endforeach
+                                    <p class="mt-2 text-xs muted-faint">
+                                        Accepted input: {{ $activeTool['accept'] ?: 'File upload' }}
+                                        @if ($allowsMultipleUploads)
+                                            . Select files in the order you want them merged.
+                                        @endif
+                                    </p>
                                 </div>
 
                                 <button type="submit" class="btn-solid">{{ $activeTool['button_label'] }}</button>
