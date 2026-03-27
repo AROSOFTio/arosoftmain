@@ -67,13 +67,19 @@ class ToolsController extends Controller
 
         $allowsMultipleUploads = (bool) ($tool['allows_multiple'] ?? false);
         $fileRules = array_merge(['required'], $tool['validation_rules']);
+        $minFiles = max(1, (int) ($tool['min_files'] ?? 2));
+        $maxFiles = max($minFiles, (int) ($tool['max_files'] ?? 20));
+        $validationMessages = [
+            'upload_file.min' => "Select at least {$minFiles} files.",
+            'upload_file.max' => "Select no more than {$maxFiles} files per batch.",
+        ];
 
         if ($allowsMultipleUploads) {
             $validated = $request->validate([
-                'upload_file' => ['required', 'array', 'min:2', 'max:20'],
+                'upload_file' => ['required', 'array', 'min:' . $minFiles, 'max:' . $maxFiles],
                 'upload_file.*' => $fileRules,
                 'processing_note' => ['nullable', 'string', 'max:500'],
-            ]);
+            ], $validationMessages);
         } else {
             $validated = $request->validate([
                 'upload_file' => $fileRules,

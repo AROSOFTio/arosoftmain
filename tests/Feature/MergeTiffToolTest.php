@@ -18,6 +18,7 @@ class MergeTiffToolTest extends TestCase
         $response->assertSee('name="upload_file[]"', false);
         $response->assertSee('multiple', false);
         $response->assertSee('CCITT4 Group 4', false);
+        $response->assertSee('Up to 150 TIFF/TIF files per batch, 25 MB each.', false);
     }
 
     public function test_merge_tiff_tool_requires_multiple_files(): void
@@ -66,5 +67,64 @@ class MergeTiffToolTest extends TestCase
         $response->assertOk();
         $response->assertDownload('scan-1-merged.tif');
         $response->assertHeader('content-type', 'image/tiff');
+    }
+
+    public function test_merge_tiff_tool_accepts_large_batches(): void
+    {
+        Storage::fake('local');
+
+        $uploads = $this->makeFakeTiffUploads(100);
+
+        $this->mock(TiffMergeService::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('merge')
+                ->once()
+                ->withArgs(function (array $inputAbsolutePaths, string $outputAbsolutePath): bool {
+                    $this->assertCount(100, $inputAbsolutePaths);
+                    $this->assertStringEndsWith('.tif', $outputAbsolutePath);
+
+                    file_put_contents($outputAbsolutePath, 'merged-large-batch-binary');
+
+                    return true;
+                })
+                ->andReturn([
+                    'ok' => true,
+                    'message' => 'TIFF/TIF files merged successfully.',
+                ]);
+        });
+
+        $response = $this->post(route('tools.process', ['slug' => 'merge-tiff-tif-files']), [
+            'upload_file' => $uploads,
+        ]);
+
+        $response->assertOk();
+        $response->assertDownload('scan-001-merged.tif');
+        $response->assertHeader('content-type', 'image/tiff');
+    }
+
+    public function test_merge_tiff_tool_rejects_batches_above_the_limit(): void
+    {
+        Storage::fake('local');
+
+        $response = $this->from(route('tools.show', ['slug' => 'merge-tiff-tif-files']))
+            ->post(route('tools.process', ['slug' => 'merge-tiff-tif-files']), [
+                'upload_file' => $this->makeFakeTiffUploads(151),
+            ]);
+
+        $response->assertRedirect(route('tools.show', ['slug' => 'merge-tiff-tif-files']));
+        $response->assertSessionHasErrors('upload_file');
+    }
+
+    /**
+     * @return array<int, UploadedFile>
+     */
+    private function makeFakeTiffUploads(int $count): array
+    {
+        $uploads = [];
+
+        for ($index = 1; $index <= $count; $index++) {
+            $uploads[] = UploadedFile::fake()->create(sprintf('scan-%03d.tif', $index), 10, 'image/tiff');
+        }
+
+        return $uploads;
     }
 }

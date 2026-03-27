@@ -41,6 +41,10 @@ return [
         'timeout' => (int) env('TOOLS_RUNNER_TIMEOUT', 300),
     ],
 
+    'imagemagick' => [
+        'binary' => env('TOOLS_IMAGEMAGICK_BINARY'),
+    ],
+
     'pesapal' => [
         'base_url' => env('PESAPAL_BASE_URL', 'https://pay.pesapal.com/v3'),
         'consumer_key' => env('PESAPAL_CONSUMER_KEY'),

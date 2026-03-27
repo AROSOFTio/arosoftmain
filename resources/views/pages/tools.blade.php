@@ -540,6 +540,9 @@
                                         @if ($allowsMultipleUploads)
                                             . Select files in the order you want them merged.
                                         @endif
+                                        @if (!empty($activeTool['upload_help_text']))
+                                            . {{ $activeTool['upload_help_text'] }}
+                                        @endif
                                     </p>
                                 </div>
 
