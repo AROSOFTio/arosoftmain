@@ -335,8 +335,9 @@ class ToolsController extends Controller
     private function renderCatalog(?string $slug = null): View
     {
         $catalog = $this->catalog();
-        $activeTool = $this->resolveActiveTool($catalog, $slug);
-        $isToolDetailPage = $slug !== null;
+        $requestedTool = $slug ?? request()->query('tool');
+        $activeTool = $this->resolveActiveTool($catalog, $requestedTool);
+        $isToolDetailPage = $requestedTool !== null;
 
         $metaTitle = $isToolDetailPage
             ? sprintf('%s | IT Tools | AROSOFT Innovations Ltd', $activeTool['name'])
@@ -344,11 +345,11 @@ class ToolsController extends Controller
 
         $metaDescription = $isToolDetailPage
             ? $activeTool['description']
-            : 'Explore categorized AROSOFT IT tools including password removers, converters, and generators with dedicated SEO-friendly URLs.';
+            : 'Explore categorized AROSOFT IT tools including password removers, converters, mergers, generators, and downloaders.';
 
         $canonicalUrl = $isToolDetailPage
             ? route('tools.show', ['slug' => $activeTool['slug']])
-            : route('tools');
+            : $activeTool['workspace_url'];
 
         $toolSchema = [
             '@context' => 'https://schema.org',
@@ -440,6 +441,8 @@ class ToolsController extends Controller
                     'processing_mode' => (string) ($tool['processing_mode'] ?? 'assisted'),
                     'processor' => (string) ($tool['processor'] ?? ''),
                     'use_cases' => (array) ($tool['use_cases'] ?? []),
+                    'workspace_url' => route('tools', ['tool' => $slug]),
+                    'detail_url' => route('tools.show', ['slug' => $slug]),
                     'category_key' => $categoryKey,
                     'category_name' => $categoryName,
                     'position' => $toolIndex + 1,

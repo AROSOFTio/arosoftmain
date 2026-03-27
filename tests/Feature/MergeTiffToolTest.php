@@ -21,6 +21,16 @@ class MergeTiffToolTest extends TestCase
         $response->assertSee('Up to 150 TIFF/TIF files per batch, 25 MB each.', false);
     }
 
+    public function test_tools_index_can_open_merge_tiff_tool_via_query_parameter(): void
+    {
+        $response = $this->get(route('tools', ['tool' => 'merge-tiff-tif-files']));
+
+        $response->assertOk();
+        $response->assertSee('Mergers', false);
+        $response->assertSee('Merge TIFF/TIF Files', false);
+        $response->assertSee('name="upload_file[]"', false);
+    }
+
     public function test_merge_tiff_tool_requires_multiple_files(): void
     {
         Storage::fake('local');

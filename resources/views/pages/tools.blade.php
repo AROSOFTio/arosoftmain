@@ -323,6 +323,7 @@
         $categoryIconTone = static function (string $key): string {
             return match ($key) {
                 'converter' => 'tool-group-icon--green',
+                'mergers' => 'tool-group-icon--teal',
                 'password-remover' => 'tool-group-icon--amber',
                 'generators' => 'tool-group-icon--blue',
                 'downloaders' => 'tool-group-icon--red',
@@ -333,6 +334,7 @@
         $categoryIconLabel = static function (string $key): string {
             return match ($key) {
                 'converter' => 'CV',
+                'mergers' => 'MG',
                 'password-remover' => 'PW',
                 'generators' => 'GN',
                 'downloaders' => 'DL',
@@ -400,7 +402,7 @@
                                 <ul class="tool-nav-list">
                                     @foreach ($category['tools'] as $tool)
                                         <li>
-                                            <a href="{{ route('tools.show', ['slug' => $tool['slug']]) }}" class="tool-nav-link {{ $activeTool['slug'] === $tool['slug'] ? 'is-active' : '' }}">
+                                            <a href="{{ $tool['workspace_url'] }}" class="tool-nav-link {{ $activeTool['slug'] === $tool['slug'] ? 'is-active' : '' }}">
                                                 <span class="tool-nav-icon {{ $toolIconTone($tool['slug']) }}">
                                                     {{ $toolIconLabel($tool) }}
                                                 </span>
@@ -426,8 +428,8 @@
                     <article class="rounded-lg border border-[color:rgba(17,24,39,0.14)] p-4">
                         <p class="text-sm leading-7 muted-copy">{{ $activeTool['description'] }}</p>
                         <p class="mt-4 text-[0.68rem] uppercase tracking-[0.13em] muted-faint">Tool URL</p>
-                        <a href="{{ route('tools.show', ['slug' => $activeTool['slug']]) }}" class="mt-1 inline-block break-all text-sm font-semibold text-[var(--accent)] underline decoration-transparent transition hover:decoration-[var(--accent)]">
-                            {{ route('tools.show', ['slug' => $activeTool['slug']]) }}
+                        <a href="{{ $activeTool['workspace_url'] }}" class="mt-1 inline-block break-all text-sm font-semibold text-[var(--accent)] underline decoration-transparent transition hover:decoration-[var(--accent)]">
+                            {{ $activeTool['workspace_url'] }}
                         </a>
                     </article>
 
