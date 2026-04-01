@@ -31,6 +31,14 @@ class MergeTiffToolTest extends TestCase
         $response->assertSee('name="upload_file[]"', false);
     }
 
+    public function test_tools_index_links_to_merge_tiff_dedicated_url(): void
+    {
+        $response = $this->get(route('tools'));
+
+        $response->assertOk();
+        $response->assertSee(route('tools.show', ['slug' => 'merge-tiff-tif-files']), false);
+    }
+
     public function test_merge_tiff_tool_requires_multiple_files(): void
     {
         Storage::fake('local');

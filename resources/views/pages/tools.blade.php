@@ -402,7 +402,7 @@
                                 <ul class="tool-nav-list">
                                     @foreach ($category['tools'] as $tool)
                                         <li>
-                                            <a href="{{ $tool['workspace_url'] }}" class="tool-nav-link {{ $activeTool['slug'] === $tool['slug'] ? 'is-active' : '' }}">
+                                            <a href="{{ $tool['detail_url'] }}" class="tool-nav-link {{ $activeTool['slug'] === $tool['slug'] ? 'is-active' : '' }}">
                                                 <span class="tool-nav-icon {{ $toolIconTone($tool['slug']) }}">
                                                     {{ $toolIconLabel($tool) }}
                                                 </span>
@@ -428,8 +428,8 @@
                     <article class="rounded-lg border border-[color:rgba(17,24,39,0.14)] p-4">
                         <p class="text-sm leading-7 muted-copy">{{ $activeTool['description'] }}</p>
                         <p class="mt-4 text-[0.68rem] uppercase tracking-[0.13em] muted-faint">Tool URL</p>
-                        <a href="{{ $activeTool['workspace_url'] }}" class="mt-1 inline-block break-all text-sm font-semibold text-[var(--accent)] underline decoration-transparent transition hover:decoration-[var(--accent)]">
-                            {{ $activeTool['workspace_url'] }}
+                        <a href="{{ $activeTool['detail_url'] }}" class="mt-1 inline-block break-all text-sm font-semibold text-[var(--accent)] underline decoration-transparent transition hover:decoration-[var(--accent)]">
+                            {{ $activeTool['detail_url'] }}
                         </a>
                     </article>
 
