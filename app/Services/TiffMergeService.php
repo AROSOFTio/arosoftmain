@@ -24,6 +24,8 @@ class TiffMergeService
             ];
         }
 
+        $backend = null;
+
         try {
             $this->prepareExecutionEnvironment();
             $this->assertInputFilesAreReadable($inputAbsolutePaths);
@@ -37,7 +39,7 @@ class TiffMergeService
                 ];
             }
 
-            $temporaryDirectory = $this->createTemporaryWorkspace(dirname($outputAbsolutePath));
+            $temporaryDirectory = $this->createTemporaryWorkspace($this->resolveWorkspaceBaseDirectory($outputAbsolutePath));
             $this->activateTemporaryPath($temporaryDirectory);
 
             try {
@@ -49,6 +51,14 @@ class TiffMergeService
                 $this->removeDirectory($temporaryDirectory);
             }
         } catch (Throwable $error) {
+            report($error);
+            logger()->error('TIFF merge failed.', [
+                'backend' => is_array($backend) ? ($backend['type'] ?? 'unknown') : 'unresolved',
+                'input_count' => count($inputAbsolutePaths),
+                'output_path' => $outputAbsolutePath,
+                'temporary_path' => $this->activeTemporaryPath,
+                'message' => $error->getMessage(),
+            ]);
             $this->removeFile($outputAbsolutePath);
 
             return [
@@ -797,6 +807,23 @@ class TiffMergeService
         return $temporaryDirectory;
     }
 
+    protected function resolveWorkspaceBaseDirectory(string $outputAbsolutePath): string
+    {
+        $configuredTemporaryPath = trim((string) config('services.imagemagick.temporary_path', ''));
+
+        if ($configuredTemporaryPath !== '') {
+            if (!is_dir($configuredTemporaryPath)) {
+                @mkdir($configuredTemporaryPath, 0775, true);
+            }
+
+            if (is_dir($configuredTemporaryPath) && is_writable($configuredTemporaryPath)) {
+                return $configuredTemporaryPath;
+            }
+        }
+
+        return dirname($outputAbsolutePath);
+    }
+
     protected function publishOutput(string $temporaryOutputPath, string $outputAbsolutePath): void
     {
         $this->removeFile($outputAbsolutePath);
@@ -837,8 +864,23 @@ class TiffMergeService
             return 'Server ImageMagick cannot write CCITT4 Group 4 TIFF output.';
         }
 
+        if (Str::contains($normalized, [
+            'bits/sample',
+            'bilevel',
+            'fax3setupstate',
+            'compression scheme does not support',
+            'photometric',
+            'predictor',
+        ])) {
+            return 'Server ImageMagick could not encode one of the TIFF/TIF pages as CCITT4 Group 4 output.';
+        }
+
         if (Str::contains($normalized, ['cache resources exhausted', 'memory allocation failed', 'not enough memory'])) {
             return 'Server ImageMagick ran out of memory or disk cache while merging this batch. Increase ImageMagick limits or split the upload.';
+        }
+
+        if (Str::contains($normalized, ['no space left on device', 'disk full', 'unable to extend cache', 'unable to create temporary file'])) {
+            return 'Server storage ran out of space for TIFF/TIF merging. Increase temporary disk space and retry.';
         }
 
         if (Str::contains($normalized, ['output directory', 'destination path', 'workspace'])) {
