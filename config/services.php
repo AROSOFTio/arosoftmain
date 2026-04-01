@@ -43,6 +43,13 @@ return [
 
     'imagemagick' => [
         'binary' => env('TOOLS_IMAGEMAGICK_BINARY'),
+        'temporary_path' => env('TOOLS_IMAGEMAGICK_TEMP_PATH'),
+        'thread_limit' => (int) env('TOOLS_IMAGEMAGICK_THREAD_LIMIT', 1),
+        'memory_limit_mb' => (int) env('TOOLS_IMAGEMAGICK_MEMORY_LIMIT_MB', 256),
+        'map_limit_mb' => (int) env('TOOLS_IMAGEMAGICK_MAP_LIMIT_MB', 512),
+        'disk_limit_mb' => (int) env('TOOLS_IMAGEMAGICK_DISK_LIMIT_MB', 4096),
+        'cli_chunk_size' => (int) env('TOOLS_IMAGEMAGICK_CLI_CHUNK_SIZE', 12),
+        'imagick_chunk_size' => (int) env('TOOLS_IMAGEMAGICK_CHUNK_SIZE', 4),
     ],
 
     'pesapal' => [

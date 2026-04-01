@@ -9,6 +9,7 @@ class TiffMergeService
 {
     private const CLI_CHUNK_SIZE = 20;
     private const IMAGICK_CHUNK_SIZE = 12;
+    protected ?string $activeTemporaryPath = null;
 
     /**
      * @param array<int, string> $inputAbsolutePaths
@@ -24,6 +25,7 @@ class TiffMergeService
         }
 
         try {
+            $this->prepareExecutionEnvironment();
             $this->assertInputFilesAreReadable($inputAbsolutePaths);
             $this->ensureOutputDirectoryExists($outputAbsolutePath);
 
@@ -36,12 +38,14 @@ class TiffMergeService
             }
 
             $temporaryDirectory = $this->createTemporaryWorkspace(dirname($outputAbsolutePath));
+            $this->activateTemporaryPath($temporaryDirectory);
 
             try {
                 $normalizedPaths = $this->normalizeInputs($inputAbsolutePaths, $temporaryDirectory, $backend);
                 $temporaryMergedOutput = $this->composeMergedOutput($normalizedPaths, $temporaryDirectory, $backend);
                 $this->publishOutput($temporaryMergedOutput, $outputAbsolutePath);
             } finally {
+                $this->deactivateTemporaryPath();
                 $this->removeDirectory($temporaryDirectory);
             }
         } catch (Throwable $error) {
@@ -190,6 +194,7 @@ class TiffMergeService
     {
         $commandRun = $this->runCommand([
             $binary,
+            ...$this->imageMagickRuntimeArguments(),
             ...$chunkPaths,
             '-adjoin',
             '-define',
@@ -208,6 +213,7 @@ class TiffMergeService
     {
         $commandRun = $this->runCommand([
             $binary,
+            ...$this->imageMagickRuntimeArguments(),
             $inputAbsolutePath,
             '-background',
             'white',
@@ -396,9 +402,129 @@ class TiffMergeService
 
     protected function mergeChunkSize(array $backend): int
     {
-        return $backend['type'] === 'cli'
-            ? self::CLI_CHUNK_SIZE
-            : self::IMAGICK_CHUNK_SIZE;
+        $configuredSize = $backend['type'] === 'cli'
+            ? (int) config('services.imagemagick.cli_chunk_size', self::CLI_CHUNK_SIZE)
+            : (int) config('services.imagemagick.imagick_chunk_size', self::IMAGICK_CHUNK_SIZE);
+
+        return max(2, $configuredSize);
+    }
+
+    protected function prepareExecutionEnvironment(): void
+    {
+        if (function_exists('ignore_user_abort')) {
+            @ignore_user_abort(true);
+        }
+
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(0);
+        }
+
+        @ini_set('max_execution_time', '0');
+        @ini_set('memory_limit', '-1');
+    }
+
+    protected function activateTemporaryPath(string $temporaryDirectory): void
+    {
+        $configuredTemporaryPath = trim((string) config('services.imagemagick.temporary_path', ''));
+        $resolvedTemporaryPath = $configuredTemporaryPath !== '' ? $configuredTemporaryPath : $temporaryDirectory;
+
+        if (!is_dir($resolvedTemporaryPath)) {
+            @mkdir($resolvedTemporaryPath, 0775, true);
+        }
+
+        if (!is_dir($resolvedTemporaryPath) || !is_writable($resolvedTemporaryPath)) {
+            $resolvedTemporaryPath = $temporaryDirectory;
+        }
+
+        $this->activeTemporaryPath = $resolvedTemporaryPath;
+
+        foreach (['MAGICK_TEMPORARY_PATH', 'MAGICK_TMPDIR', 'TMPDIR', 'TMP', 'TEMP'] as $environmentVariable) {
+            @putenv($environmentVariable . '=' . $resolvedTemporaryPath);
+        }
+
+        $this->configureImagickRuntime($resolvedTemporaryPath);
+    }
+
+    protected function deactivateTemporaryPath(): void
+    {
+        $this->activeTemporaryPath = null;
+    }
+
+    protected function configureImagickRuntime(string $temporaryPath): void
+    {
+        if (!class_exists(\Imagick::class)) {
+            return;
+        }
+
+        if (method_exists(\Imagick::class, 'setRegistry')) {
+            try {
+                \Imagick::setRegistry('temporary-path', $temporaryPath);
+            } catch (Throwable) {
+                // Ignore runtime registry errors and continue with default behavior.
+            }
+        }
+
+        $threadLimit = max(1, (int) config('services.imagemagick.thread_limit', 1));
+        $memoryLimitMb = max(0, (int) config('services.imagemagick.memory_limit_mb', 256));
+        $mapLimitMb = max(0, (int) config('services.imagemagick.map_limit_mb', 512));
+        $diskLimitMb = max(0, (int) config('services.imagemagick.disk_limit_mb', 4096));
+
+        $this->applyImagickResourceLimit('RESOURCETYPE_THREAD', $threadLimit);
+        $this->applyImagickResourceLimit('RESOURCETYPE_MEMORY', $this->megabytesToBytes($memoryLimitMb));
+        $this->applyImagickResourceLimit('RESOURCETYPE_MAP', $this->megabytesToBytes($mapLimitMb));
+        $this->applyImagickResourceLimit('RESOURCETYPE_DISK', $this->megabytesToBytes($diskLimitMb));
+    }
+
+    protected function applyImagickResourceLimit(string $constantName, int $limit): void
+    {
+        $constantReference = \Imagick::class . '::' . $constantName;
+
+        if ($limit < 1 || !defined($constantReference)) {
+            return;
+        }
+
+        try {
+            \Imagick::setResourceLimit(constant($constantReference), $limit);
+        } catch (Throwable) {
+            // Ignore unsupported limit calls and continue with available defaults.
+        }
+    }
+
+    protected function megabytesToBytes(int $megabytes): int
+    {
+        return max(0, $megabytes) * 1024 * 1024;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function imageMagickRuntimeArguments(): array
+    {
+        $arguments = [];
+        $threadLimit = max(1, (int) config('services.imagemagick.thread_limit', 1));
+        $memoryLimitMb = max(0, (int) config('services.imagemagick.memory_limit_mb', 256));
+        $mapLimitMb = max(0, (int) config('services.imagemagick.map_limit_mb', 512));
+        $diskLimitMb = max(0, (int) config('services.imagemagick.disk_limit_mb', 4096));
+
+        $arguments = array_merge($arguments, ['-limit', 'thread', (string) $threadLimit]);
+
+        if ($memoryLimitMb > 0) {
+            $arguments = array_merge($arguments, ['-limit', 'memory', $memoryLimitMb . 'MiB']);
+        }
+
+        if ($mapLimitMb > 0) {
+            $arguments = array_merge($arguments, ['-limit', 'map', $mapLimitMb . 'MiB']);
+        }
+
+        if ($diskLimitMb > 0) {
+            $arguments = array_merge($arguments, ['-limit', 'disk', $diskLimitMb . 'MiB']);
+        }
+
+        if ($this->activeTemporaryPath !== null) {
+            $arguments = array_merge($arguments, ['-define', 'registry:temporary-path=' . $this->activeTemporaryPath]);
+        }
+
+        return $arguments;
     }
 
     protected function canRunShellCommands(): bool
