@@ -73,6 +73,9 @@ Route::post('/tools/{slug}/process', [ToolsController::class, 'process'])
 Route::post('/tools/{slug}/formats', [ToolsController::class, 'formats'])
     ->middleware('throttle:20,1')
     ->name('tools.formats');
+Route::get('/tools/{slug}/jobs/{jobToken}', [ToolsController::class, 'jobStatus'])
+    ->middleware('throttle:60,1')
+    ->name('tools.job-status');
 Route::get('/tools/{slug}/download', [ToolsController::class, 'download'])
     ->middleware(['throttle:20,1', 'signed'])
     ->name('tools.download');

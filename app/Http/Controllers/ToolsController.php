@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessTiffMergeJob;
+use App\Services\TiffMergeJobStatusService;
 use App\Services\TiffMergeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
@@ -19,6 +21,7 @@ class ToolsController extends Controller
 {
     public function __construct(
         private readonly TiffMergeService $tiffMergeService,
+        private readonly TiffMergeJobStatusService $tiffMergeJobStatusService,
     ) {
     }
 
@@ -88,6 +91,26 @@ class ToolsController extends Controller
         }
 
         $uploadedFile = $validated['upload_file'];
+
+        if (($tool['processor'] ?? '') === 'merge_tiff') {
+            $uploadedFiles = $uploadedFile instanceof UploadedFile
+                ? [$uploadedFile]
+                : array_values(array_filter($uploadedFile, fn (mixed $file): bool => $file instanceof UploadedFile));
+
+            $result = $this->queueTiffMergeFiles($uploadedFiles);
+
+            if (!$result['ok']) {
+                return redirect()
+                    ->route('tools.show', ['slug' => $slug])
+                    ->withInput()
+                    ->with('tool_error', $result['message']);
+            }
+
+            return redirect()
+                ->route('tools.show', ['slug' => $slug, 'job' => $result['job_token']])
+                ->with('tool_status', $result['message']);
+        }
+
         $result = $this->runFileProcessor($tool, $uploadedFile);
 
         if (!$result['ok']) {
@@ -333,6 +356,38 @@ class ToolsController extends Controller
         $downloadName = 'youtube-' . $parsed['video_id'] . '-' . $label . '.' . $extension;
 
         return response()->download($downloadPath, $downloadName)->deleteFileAfterSend(true);
+    }
+
+    public function jobStatus(string $slug, string $jobToken): JsonResponse
+    {
+        $catalog = $this->catalog();
+        abort_unless(isset($catalog['tools'][$slug]), 404);
+
+        $tool = $catalog['tools'][$slug];
+        abort_unless(($tool['processor'] ?? '') === 'merge_tiff', 404);
+
+        $jobState = $this->tiffMergeJobStatusService->find($jobToken);
+        if ($jobState === null || ($jobState['slug'] ?? null) !== $slug) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Merge job not found or expired. Start a new TIFF/TIF merge.',
+            ], 404);
+        }
+
+        $response = [
+            'ok' => true,
+            'status' => (string) ($jobState['status'] ?? 'queued'),
+            'progress' => (int) ($jobState['progress'] ?? 0),
+            'message' => (string) ($jobState['message'] ?? 'Preparing TIFF/TIF merge...'),
+        ];
+
+        if (($jobState['status'] ?? null) === 'completed' && !empty($jobState['download_relative_path'])) {
+            $response['download_url'] = $this->buildGeneratedDownloadUrl($slug, $jobState);
+            $response['download_name'] = (string) ($jobState['download_name'] ?? 'merged-tiff.tif');
+            $response['download_label'] = $this->downloadLabelForTool($tool);
+        }
+
+        return response()->json($response);
     }
 
     /**
@@ -1272,14 +1327,6 @@ class ToolsController extends Controller
     {
         $processor = $tool['processor'] ?? '';
 
-        if ($processor === 'merge_tiff') {
-            $uploadedFiles = $uploadedFile instanceof UploadedFile
-                ? [$uploadedFile]
-                : array_values(array_filter($uploadedFile, fn (mixed $file): bool => $file instanceof UploadedFile));
-
-            return $this->mergeTiffFiles($uploadedFiles);
-        }
-
         if ($processor === 'tiff_to_pdf') {
             return $this->convertTiffToPdf($uploadedFile);
         }
@@ -1318,7 +1365,7 @@ class ToolsController extends Controller
     /**
      * @param array<int, UploadedFile> $uploadedFiles
      */
-    private function mergeTiffFiles(array $uploadedFiles): array
+    private function queueTiffMergeFiles(array $uploadedFiles): array
     {
         $disk = Storage::disk('local');
         $inputPaths = [];
@@ -1341,8 +1388,6 @@ class ToolsController extends Controller
         $disk->makeDirectory($resultDirectory);
 
         $outputPath = $resultDirectory . '/' . Str::uuid() . '.tif';
-        $outputAbsolutePath = $disk->path($outputPath);
-        $inputAbsolutePaths = array_map(fn (string $path): string => $disk->path($path), $inputPaths);
 
         $firstBaseName = Str::slug(pathinfo($uploadedFiles[0]->getClientOriginalName(), PATHINFO_FILENAME));
         if ($firstBaseName === '') {
@@ -1353,21 +1398,19 @@ class ToolsController extends Controller
             ? $firstBaseName . '-merged.tif'
             : $firstBaseName . '.tif';
 
-        $mergeResult = $this->tiffMergeService->merge($inputAbsolutePaths, $outputAbsolutePath);
-        $disk->delete($inputPaths);
+        $jobToken = (string) Str::uuid();
 
-        if (!$mergeResult['ok']) {
-            $disk->delete($outputPath);
+        $this->tiffMergeJobStatusService->create($jobToken, [
+            'slug' => 'merge-tiff-tif-files',
+            'message' => 'TIFF/TIF merge started. Keep this page open while the merged file is prepared.',
+        ]);
 
-            return $mergeResult;
-        }
+        ProcessTiffMergeJob::dispatchAfterResponse($jobToken, $inputPaths, $outputPath, $downloadName);
 
         return [
             'ok' => true,
-            'message' => 'TIFF/TIF files merged successfully.',
-            'download_relative_path' => $outputPath,
-            'download_name' => $downloadName,
-            'download_content_type' => 'image/tiff',
+            'message' => 'TIFF/TIF merge started. Keep this page open while the merged file is prepared.',
+            'job_token' => $jobToken,
         ];
     }
 

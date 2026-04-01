@@ -346,20 +346,80 @@
                 const value = document.getElementById('merge-progress-value');
                 const status = document.getElementById('merge-progress-status');
                 const submitButton = document.getElementById('merge-submit-button');
+                const downloadPanel = document.getElementById('tool-download-panel');
+                const downloadName = document.getElementById('tool-download-name');
+                const downloadLink = document.getElementById('tool-download-link');
+                const errorPanel = document.getElementById('tool-error-panel');
+                const errorMessage = document.getElementById('tool-error-message');
                 const stageMessages = [
                     'Uploading TIFF/TIF files...',
                     'Preparing TIFF/TIF pages...',
                     'Merging pages into one output...',
                     'Finalizing merged TIFF/TIF file...',
                 ];
+                const statusUrl = panel.dataset.statusUrl || '';
 
                 let progressTimer = null;
                 let stageTimer = null;
+                let pollingTimer = null;
 
-                const setProgress = (nextValue) => {
-                    const safeValue = Math.max(0, Math.min(96, nextValue));
+                const setProgress = (nextValue, ceiling = 96) => {
+                    const safeValue = Math.max(0, Math.min(ceiling, nextValue));
                     bar.style.width = `${safeValue}%`;
                     value.textContent = `${safeValue}%`;
+                };
+
+                const setFormDisabled = (isDisabled) => {
+                    submitButton.disabled = isDisabled;
+                    form.querySelectorAll('button[type="button"]').forEach((button) => {
+                        button.disabled = isDisabled;
+                    });
+                };
+
+                const hideError = () => {
+                    if (!errorPanel || !errorMessage) {
+                        return;
+                    }
+
+                    errorPanel.classList.add('hidden');
+                    errorMessage.textContent = '';
+                };
+
+                const showError = (message) => {
+                    if (!errorPanel || !errorMessage) {
+                        return;
+                    }
+
+                    errorMessage.textContent = message;
+                    errorPanel.classList.remove('hidden');
+                };
+
+                const showDownload = (payload) => {
+                    if (!downloadPanel || !downloadName || !downloadLink) {
+                        return;
+                    }
+
+                    downloadName.textContent = payload.download_name || 'merged-tiff.tif';
+                    downloadLink.href = payload.download_url || '#';
+                    downloadLink.textContent = payload.download_label || 'Download merged file';
+                    downloadPanel.classList.remove('hidden');
+                };
+
+                const stopTimers = () => {
+                    if (progressTimer !== null) {
+                        window.clearInterval(progressTimer);
+                        progressTimer = null;
+                    }
+
+                    if (stageTimer !== null) {
+                        window.clearInterval(stageTimer);
+                        stageTimer = null;
+                    }
+
+                    if (pollingTimer !== null) {
+                        window.clearInterval(pollingTimer);
+                        pollingTimer = null;
+                    }
                 };
 
                 const startProcessingState = () => {
@@ -370,11 +430,9 @@
                     setProgress(currentValue);
                     status.textContent = stageMessages[stageIndex];
 
-                    submitButton.disabled = true;
+                    hideError();
+                    setFormDisabled(true);
                     submitButton.textContent = 'Processing merge...';
-                    form.querySelectorAll('button[type="button"]').forEach((button) => {
-                        button.disabled = true;
-                    });
 
                     progressTimer = window.setInterval(() => {
                         currentValue = Math.min(96, currentValue + (currentValue < 48 ? 9 : (currentValue < 78 ? 5 : 2)));
@@ -387,6 +445,78 @@
                     }, 1800);
                 };
 
+                const beginPolling = () => {
+                    if (!statusUrl) {
+                        return;
+                    }
+
+                    let displayedProgress = 18;
+                    panel.classList.remove('hidden');
+                    setFormDisabled(true);
+                    submitButton.textContent = 'Processing merge...';
+                    hideError();
+
+                    const poll = async () => {
+                        try {
+                            const response = await window.fetch(statusUrl, {
+                                headers: {
+                                    'Accept': 'application/json',
+                                },
+                                cache: 'no-store',
+                            });
+                            const payload = await response.json();
+
+                            if (!response.ok || payload.ok === false) {
+                                stopTimers();
+                                setFormDisabled(false);
+                                submitButton.textContent = 'Merge TIFF/TIF';
+                                showError(payload.message || 'Unable to read TIFF/TIF merge status.');
+                                status.textContent = payload.message || 'Unable to read TIFF/TIF merge status.';
+                                setProgress(100, 100);
+                                return;
+                            }
+
+                            const remoteProgress = Number.isFinite(payload.progress) ? payload.progress : displayedProgress;
+                            displayedProgress = Math.max(displayedProgress, Math.min(96, remoteProgress));
+                            setProgress(displayedProgress);
+                            status.textContent = payload.message || 'Processing TIFF/TIF merge...';
+
+                            if (payload.status === 'completed') {
+                                stopTimers();
+                                setProgress(100, 100);
+                                setFormDisabled(false);
+                                submitButton.textContent = 'Merge TIFF/TIF';
+                                status.textContent = payload.message || 'TIFF/TIF merge completed successfully.';
+                                showDownload(payload);
+                                return;
+                            }
+
+                            if (payload.status === 'failed') {
+                                stopTimers();
+                                setProgress(100, 100);
+                                setFormDisabled(false);
+                                submitButton.textContent = 'Merge TIFF/TIF';
+                                status.textContent = payload.message || 'TIFF/TIF merge failed.';
+                                showError(payload.message || 'TIFF/TIF merge failed.');
+                            }
+                        } catch (error) {
+                            status.textContent = 'Checking TIFF/TIF merge status...';
+                        }
+                    };
+
+                    progressTimer = window.setInterval(() => {
+                        displayedProgress = Math.min(94, displayedProgress + (displayedProgress < 52 ? 7 : 3));
+                        setProgress(displayedProgress);
+                    }, 900);
+
+                    stageTimer = window.setInterval(() => {
+                        status.textContent = stageMessages[Math.min(stageMessages.length - 1, 2)];
+                    }, 2200);
+
+                    pollingTimer = window.setInterval(poll, 2200);
+                    poll();
+                };
+
                 form.addEventListener('submit', () => {
                     if (form.dataset.processing === 'true') {
                         return;
@@ -397,14 +527,12 @@
                 });
 
                 window.addEventListener('pageshow', () => {
-                    if (progressTimer !== null) {
-                        window.clearInterval(progressTimer);
-                    }
-
-                    if (stageTimer !== null) {
-                        window.clearInterval(stageTimer);
-                    }
+                    stopTimers();
                 });
+
+                if (statusUrl) {
+                    beginPolling();
+                }
             });
         </script>
     @endpush
@@ -501,32 +629,42 @@
                 default => 'TL',
             };
         };
+
+        $activeMergeJobToken = ($activeTool['processor'] ?? '') === 'merge_tiff'
+            ? trim((string) request()->query('job'))
+            : '';
+        $activeMergeJobStatusUrl = $activeMergeJobToken !== ''
+            ? route('tools.job-status', ['slug' => $activeTool['slug'], 'jobToken' => $activeMergeJobToken])
+            : null;
     @endphp
 
     @if (session('tool_status'))
-        <div class="alert-success">
+        <div id="tool-status-panel" class="alert-success">
             {{ session('tool_status') }}
         </div>
     @endif
 
-    @if (session('tool_error'))
-        <div class="mt-4 rounded-xl border border-[color:rgba(17,24,39,0.16)] bg-[color:rgba(0,157,49,0.08)] p-4 text-sm text-[color:rgba(17,24,39,0.92)]">
-            {{ session('tool_error') }}
-        </div>
-    @endif
+    <div
+        id="tool-error-panel"
+        class="mt-4 rounded-xl border border-[color:rgba(17,24,39,0.16)] bg-[color:rgba(0,157,49,0.08)] p-4 text-sm text-[color:rgba(17,24,39,0.92)] {{ session('tool_error') ? '' : 'hidden' }}"
+    >
+        <span id="tool-error-message">{{ session('tool_error') }}</span>
+    </div>
 
-    @if (session('tool_download_url'))
-        <div class="tool-download-panel mt-4">
-            <p class="text-[0.68rem] uppercase tracking-[0.13em] muted-faint">Output ready</p>
-            <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                    <p class="font-semibold text-[color:rgba(17,24,39,0.94)]">{{ session('tool_download_name') }}</p>
-                    <p class="mt-1 text-sm muted-copy">Your processed file is ready for download.</p>
-                </div>
-                <a href="{{ session('tool_download_url') }}" class="btn-solid">{{ session('tool_download_label', 'Download file') }}</a>
+    <div id="tool-download-panel" class="tool-download-panel mt-4 {{ session('tool_download_url') ? '' : 'hidden' }}">
+        <p class="text-[0.68rem] uppercase tracking-[0.13em] muted-faint">Output ready</p>
+        <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <p id="tool-download-name" class="font-semibold text-[color:rgba(17,24,39,0.94)]">{{ session('tool_download_name') }}</p>
+                <p class="mt-1 text-sm muted-copy">Your processed file is ready for download.</p>
             </div>
+            <a
+                id="tool-download-link"
+                href="{{ session('tool_download_url') ?: '#' }}"
+                class="btn-solid"
+            >{{ session('tool_download_label', 'Download file') }}</a>
         </div>
-    @endif
+    </div>
 
     <div class="mt-6">
         <x-adsense.unit
@@ -769,7 +907,11 @@
                                 </div>
 
                                 @if (($activeTool['processor'] ?? '') === 'merge_tiff')
-                                    <div id="merge-progress-panel" class="tool-processing-panel hidden">
+                                    <div
+                                        id="merge-progress-panel"
+                                        class="tool-processing-panel {{ $activeMergeJobStatusUrl ? '' : 'hidden' }}"
+                                        data-status-url="{{ $activeMergeJobStatusUrl ?? '' }}"
+                                    >
                                         <div class="flex flex-wrap items-center justify-between gap-3">
                                             <div>
                                                 <p class="text-[0.68rem] uppercase tracking-[0.13em] muted-faint">Processing progress</p>

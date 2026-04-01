@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Services\TiffMergeService;
+use App\Jobs\ProcessTiffMergeJob;
+use App\Services\TiffMergeJobStatusService;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Storage;
-use Mockery\MockInterface;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class MergeTiffToolTest extends TestCase
@@ -56,26 +58,10 @@ class MergeTiffToolTest extends TestCase
         $response->assertSessionHasErrors('upload_file');
     }
 
-    public function test_merge_tiff_tool_redirects_with_a_signed_download_button(): void
+    public function test_merge_tiff_tool_dispatches_a_background_merge_job(): void
     {
         Storage::fake('local');
-
-        $this->mock(TiffMergeService::class, function (MockInterface $mock): void {
-            $mock->shouldReceive('merge')
-                ->once()
-                ->withArgs(function (array $inputAbsolutePaths, string $outputAbsolutePath): bool {
-                    $this->assertCount(2, $inputAbsolutePaths);
-                    $this->assertStringEndsWith('.tif', $outputAbsolutePath);
-
-                    file_put_contents($outputAbsolutePath, 'merged-tiff-binary');
-
-                    return true;
-                })
-                ->andReturn([
-                    'ok' => true,
-                    'message' => 'TIFF/TIF files merged successfully.',
-                ]);
-        });
+        Bus::fake();
 
         $response = $this->post(route('tools.process', ['slug' => 'merge-tiff-tif-files']), [
             'upload_file' => [
@@ -84,52 +70,65 @@ class MergeTiffToolTest extends TestCase
             ],
         ]);
 
-        $response->assertRedirect(route('tools.show', ['slug' => 'merge-tiff-tif-files']));
-        $response->assertSessionHas('tool_download_url');
-        $response->assertSessionHas('tool_download_label', 'Download merged file');
+        $redirectLocation = (string) $response->headers->get('Location');
 
-        $downloadResponse = $this->get((string) session('tool_download_url'));
+        $response->assertRedirect();
+        $this->assertStringContainsString(route('tools.show', ['slug' => 'merge-tiff-tif-files'], false), $redirectLocation);
+        $this->assertStringContainsString('job=', $redirectLocation);
 
-        $downloadResponse->assertOk();
-        $downloadResponse->assertDownload('scan-1-merged.tif');
-        $downloadResponse->assertHeader('content-type', 'image/tiff');
+        parse_str((string) parse_url($redirectLocation, PHP_URL_QUERY), $query);
+        $jobToken = (string) ($query['job'] ?? '');
+
+        $this->assertNotSame('', $jobToken);
+        $response->assertSessionHas('tool_status', 'TIFF/TIF merge started. Keep this page open while the merged file is prepared.');
+
+        Bus::assertDispatched(ProcessTiffMergeJob::class, function (ProcessTiffMergeJob $job) use ($jobToken): bool {
+            return $job->jobToken === $jobToken
+                && count($job->inputPaths) === 2
+                && Str::endsWith($job->outputPath, '.tif')
+                && $job->downloadName === 'scan-1-merged.tif';
+        });
     }
 
     public function test_merge_tiff_tool_accepts_large_batches(): void
     {
         Storage::fake('local');
-
-        $uploads = $this->makeFakeTiffUploads(60);
-
-        $this->mock(TiffMergeService::class, function (MockInterface $mock): void {
-            $mock->shouldReceive('merge')
-                ->once()
-                ->withArgs(function (array $inputAbsolutePaths, string $outputAbsolutePath): bool {
-                    $this->assertCount(60, $inputAbsolutePaths);
-                    $this->assertStringEndsWith('.tif', $outputAbsolutePath);
-
-                    file_put_contents($outputAbsolutePath, 'merged-large-batch-binary');
-
-                    return true;
-                })
-                ->andReturn([
-                    'ok' => true,
-                    'message' => 'TIFF/TIF files merged successfully.',
-                ]);
-        });
+        Bus::fake();
 
         $response = $this->post(route('tools.process', ['slug' => 'merge-tiff-tif-files']), [
-            'upload_file' => $uploads,
+            'upload_file' => $this->makeFakeTiffUploads(60),
         ]);
 
-        $response->assertRedirect(route('tools.show', ['slug' => 'merge-tiff-tif-files']));
-        $response->assertSessionHas('tool_download_url');
+        $response->assertRedirect();
 
-        $downloadResponse = $this->get((string) session('tool_download_url'));
+        Bus::assertDispatched(ProcessTiffMergeJob::class, function (ProcessTiffMergeJob $job): bool {
+            return count($job->inputPaths) === 60
+                && $job->downloadName === 'scan-001-merged.tif';
+        });
+    }
 
-        $downloadResponse->assertOk();
-        $downloadResponse->assertDownload('scan-001-merged.tif');
-        $downloadResponse->assertHeader('content-type', 'image/tiff');
+    public function test_merge_tiff_job_status_endpoint_returns_download_details_for_completed_jobs(): void
+    {
+        Storage::fake('local');
+
+        $jobToken = (string) Str::uuid();
+        app(TiffMergeJobStatusService::class)->create($jobToken);
+        app(TiffMergeJobStatusService::class)->markCompleted($jobToken, [
+            'message' => 'TIFF/TIF files merged successfully.',
+            'download_relative_path' => 'tool-results/merge-tiff-tif-files/example-output.tif',
+            'download_name' => 'scan-1-merged.tif',
+            'download_content_type' => 'image/tiff',
+        ]);
+
+        $response = $this->get(route('tools.job-status', [
+            'slug' => 'merge-tiff-tif-files',
+            'jobToken' => $jobToken,
+        ]));
+
+        $response->assertOk();
+        $response->assertJsonPath('status', 'completed');
+        $response->assertJsonPath('download_name', 'scan-1-merged.tif');
+        $response->assertJsonPath('download_label', 'Download merged file');
     }
 
     public function test_merge_tiff_tool_rejects_batches_above_the_limit(): void
