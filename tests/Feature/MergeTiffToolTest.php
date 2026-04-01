@@ -18,6 +18,7 @@ class MergeTiffToolTest extends TestCase
         $response->assertSee('name="upload_file[]"', false);
         $response->assertSee('TIFF/TIF file 1', false);
         $response->assertSee('Add TIFF/TIF file', false);
+        $response->assertSee('Processing progress', false);
         $response->assertSee('CCITT4 Group 4', false);
         $response->assertSee('Up to 60 files per batch, 20 MB each.', false);
     }
@@ -55,7 +56,7 @@ class MergeTiffToolTest extends TestCase
         $response->assertSessionHasErrors('upload_file');
     }
 
-    public function test_merge_tiff_tool_returns_a_tiff_download(): void
+    public function test_merge_tiff_tool_redirects_with_a_signed_download_button(): void
     {
         Storage::fake('local');
 
@@ -83,9 +84,15 @@ class MergeTiffToolTest extends TestCase
             ],
         ]);
 
-        $response->assertOk();
-        $response->assertDownload('scan-1-merged.tif');
-        $response->assertHeader('content-type', 'image/tiff');
+        $response->assertRedirect(route('tools.show', ['slug' => 'merge-tiff-tif-files']));
+        $response->assertSessionHas('tool_download_url');
+        $response->assertSessionHas('tool_download_label', 'Download merged file');
+
+        $downloadResponse = $this->get((string) session('tool_download_url'));
+
+        $downloadResponse->assertOk();
+        $downloadResponse->assertDownload('scan-1-merged.tif');
+        $downloadResponse->assertHeader('content-type', 'image/tiff');
     }
 
     public function test_merge_tiff_tool_accepts_large_batches(): void
@@ -115,9 +122,14 @@ class MergeTiffToolTest extends TestCase
             'upload_file' => $uploads,
         ]);
 
-        $response->assertOk();
-        $response->assertDownload('scan-001-merged.tif');
-        $response->assertHeader('content-type', 'image/tiff');
+        $response->assertRedirect(route('tools.show', ['slug' => 'merge-tiff-tif-files']));
+        $response->assertSessionHas('tool_download_url');
+
+        $downloadResponse = $this->get((string) session('tool_download_url'));
+
+        $downloadResponse->assertOk();
+        $downloadResponse->assertDownload('scan-001-merged.tif');
+        $downloadResponse->assertHeader('content-type', 'image/tiff');
     }
 
     public function test_merge_tiff_tool_rejects_batches_above_the_limit(): void

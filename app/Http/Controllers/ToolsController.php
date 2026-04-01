@@ -98,13 +98,12 @@ class ToolsController extends Controller
         }
 
         if (isset($result['download_relative_path'])) {
-            $downloadPath = Storage::disk('local')->path($result['download_relative_path']);
-            $downloadName = $result['download_name'] ?? 'downloaded-file';
-            $contentType = $result['download_content_type'] ?? 'application/pdf';
-
-            return response()->download($downloadPath, $downloadName, [
-                'Content-Type' => $contentType,
-            ])->deleteFileAfterSend(true);
+            return redirect()
+                ->route('tools.show', ['slug' => $slug])
+                ->with('tool_status', $result['message'])
+                ->with('tool_download_url', $this->buildGeneratedDownloadUrl($slug, $result))
+                ->with('tool_download_label', $this->downloadLabelForTool($tool))
+                ->with('tool_download_name', (string) ($result['download_name'] ?? 'processed-file'));
         }
 
         return redirect()
@@ -187,6 +186,10 @@ class ToolsController extends Controller
         abort_unless(isset($catalog['tools'][$slug]), 404);
 
         $tool = $catalog['tools'][$slug];
+        if ($request->query('file') !== null) {
+            return $this->downloadGeneratedFile($request, $tool);
+        }
+
         if (($tool['processor'] ?? '') !== 'youtube_downloader') {
             abort(404);
         }
@@ -332,6 +335,43 @@ class ToolsController extends Controller
         return response()->download($downloadPath, $downloadName)->deleteFileAfterSend(true);
     }
 
+    /**
+     * @param array{slug: string, processor?: string} $tool
+     */
+    private function downloadGeneratedFile(Request $request, array $tool): RedirectResponse|BinaryFileResponse
+    {
+        $validated = $request->validate([
+            'file' => ['required', 'string', 'max:500'],
+            'name' => ['nullable', 'string', 'max:255'],
+            'content_type' => ['nullable', 'string', 'max:120'],
+        ]);
+
+        $relativePath = ltrim(str_replace('\\', '/', (string) $validated['file']), '/');
+        $expectedPrefix = 'tool-results/' . trim((string) $tool['slug'], '/');
+
+        if (!Str::startsWith($relativePath, $expectedPrefix . '/')) {
+            abort(403);
+        }
+
+        $disk = Storage::disk('local');
+        if (!$disk->exists($relativePath)) {
+            return redirect()
+                ->route('tools.show', ['slug' => $tool['slug']])
+                ->with('tool_error', 'Generated file is no longer available. Process the tool again.');
+        }
+
+        $downloadName = basename((string) ($validated['name'] ?? ''));
+        if ($downloadName === '' || $downloadName === '.' || $downloadName === '..') {
+            $downloadName = basename($relativePath);
+        }
+
+        $contentType = (string) ($validated['content_type'] ?? 'application/octet-stream');
+
+        return response()->download($disk->path($relativePath), $downloadName, [
+            'Content-Type' => $contentType,
+        ])->deleteFileAfterSend(true);
+    }
+
     private function renderCatalog(?string $slug = null): View
     {
         $catalog = $this->catalog();
@@ -393,6 +433,35 @@ class ToolsController extends Controller
             'toolSchema' => $toolSchema,
             'catalogSchema' => $catalogSchema,
         ]);
+    }
+
+    /**
+     * @param array{download_relative_path: string, download_name?: string, download_content_type?: string} $result
+     */
+    private function buildGeneratedDownloadUrl(string $slug, array $result): string
+    {
+        $relativePath = (string) $result['download_relative_path'];
+        $downloadName = (string) ($result['download_name'] ?? basename($relativePath));
+        $contentType = (string) ($result['download_content_type'] ?? 'application/octet-stream');
+
+        return URL::temporarySignedRoute('tools.download', now()->addMinutes(30), [
+            'slug' => $slug,
+            'file' => $relativePath,
+            'name' => $downloadName,
+            'content_type' => $contentType,
+        ]);
+    }
+
+    /**
+     * @param array{processor?: string} $tool
+     */
+    private function downloadLabelForTool(array $tool): string
+    {
+        return match ((string) ($tool['processor'] ?? '')) {
+            'merge_tiff' => 'Download merged file',
+            'tiff_to_pdf' => 'Download converted file',
+            default => 'Download processed file',
+        };
     }
 
     private function resolveActiveTool(array $catalog, ?string $slug): array

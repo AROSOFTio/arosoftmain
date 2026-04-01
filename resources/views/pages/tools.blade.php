@@ -332,6 +332,84 @@
     @endpush
 @endif
 
+@if (($activeTool['processor'] ?? '') === 'merge_tiff')
+    @push('head')
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const form = document.getElementById('merge-tiff-form');
+                const panel = document.getElementById('merge-progress-panel');
+                if (!form || !panel) {
+                    return;
+                }
+
+                const bar = document.getElementById('merge-progress-bar');
+                const value = document.getElementById('merge-progress-value');
+                const status = document.getElementById('merge-progress-status');
+                const submitButton = document.getElementById('merge-submit-button');
+                const stageMessages = [
+                    'Uploading TIFF/TIF files...',
+                    'Preparing TIFF/TIF pages...',
+                    'Merging pages into one output...',
+                    'Finalizing merged TIFF/TIF file...',
+                ];
+
+                let progressTimer = null;
+                let stageTimer = null;
+
+                const setProgress = (nextValue) => {
+                    const safeValue = Math.max(0, Math.min(96, nextValue));
+                    bar.style.width = `${safeValue}%`;
+                    value.textContent = `${safeValue}%`;
+                };
+
+                const startProcessingState = () => {
+                    let currentValue = 8;
+                    let stageIndex = 0;
+
+                    panel.classList.remove('hidden');
+                    setProgress(currentValue);
+                    status.textContent = stageMessages[stageIndex];
+
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Processing merge...';
+                    form.querySelectorAll('button[type="button"]').forEach((button) => {
+                        button.disabled = true;
+                    });
+
+                    progressTimer = window.setInterval(() => {
+                        currentValue = Math.min(96, currentValue + (currentValue < 48 ? 9 : (currentValue < 78 ? 5 : 2)));
+                        setProgress(currentValue);
+                    }, 650);
+
+                    stageTimer = window.setInterval(() => {
+                        stageIndex = Math.min(stageMessages.length - 1, stageIndex + 1);
+                        status.textContent = stageMessages[stageIndex];
+                    }, 1800);
+                };
+
+                form.addEventListener('submit', () => {
+                    if (form.dataset.processing === 'true') {
+                        return;
+                    }
+
+                    form.dataset.processing = 'true';
+                    startProcessingState();
+                });
+
+                window.addEventListener('pageshow', () => {
+                    if (progressTimer !== null) {
+                        window.clearInterval(progressTimer);
+                    }
+
+                    if (stageTimer !== null) {
+                        window.clearInterval(stageTimer);
+                    }
+                });
+            });
+        </script>
+    @endpush
+@endif
+
 @section('content')
     @php
         $textPlaceholder = match ($activeTool['processor'] ?? '') {
@@ -434,6 +512,19 @@
     @if (session('tool_error'))
         <div class="mt-4 rounded-xl border border-[color:rgba(17,24,39,0.16)] bg-[color:rgba(0,157,49,0.08)] p-4 text-sm text-[color:rgba(17,24,39,0.92)]">
             {{ session('tool_error') }}
+        </div>
+    @endif
+
+    @if (session('tool_download_url'))
+        <div class="tool-download-panel mt-4">
+            <p class="text-[0.68rem] uppercase tracking-[0.13em] muted-faint">Output ready</p>
+            <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <p class="font-semibold text-[color:rgba(17,24,39,0.94)]">{{ session('tool_download_name') }}</p>
+                    <p class="mt-1 text-sm muted-copy">Your processed file is ready for download.</p>
+                </div>
+                <a href="{{ session('tool_download_url') }}" class="btn-solid">{{ session('tool_download_label', 'Download file') }}</a>
+            </div>
         </div>
     @endif
 
@@ -607,7 +698,13 @@
                                     }
                                 }
                             @endphp
-                            <form action="{{ route('tools.process', ['slug' => $activeTool['slug']]) }}" method="POST" enctype="multipart/form-data" class="mt-3 space-y-3">
+                            <form
+                                @if (($activeTool['processor'] ?? '') === 'merge_tiff') id="merge-tiff-form" @endif
+                                action="{{ route('tools.process', ['slug' => $activeTool['slug']]) }}"
+                                method="POST"
+                                enctype="multipart/form-data"
+                                class="mt-3 space-y-3"
+                            >
                                 @csrf
                                 <div>
                                     <label class="form-label" for="upload_file">{{ $allowsMultipleUploads ? 'Upload files in order' : 'Upload file' }}</label>
@@ -671,7 +768,27 @@
                                     </p>
                                 </div>
 
-                                <button type="submit" class="btn-solid">{{ $activeTool['button_label'] }}</button>
+                                @if (($activeTool['processor'] ?? '') === 'merge_tiff')
+                                    <div id="merge-progress-panel" class="tool-processing-panel hidden">
+                                        <div class="flex flex-wrap items-center justify-between gap-3">
+                                            <div>
+                                                <p class="text-[0.68rem] uppercase tracking-[0.13em] muted-faint">Processing progress</p>
+                                                <p id="merge-progress-status" class="mt-2 text-sm text-[color:rgba(17,24,39,0.88)]">Preparing merge...</p>
+                                            </div>
+                                            <strong id="merge-progress-value" class="text-sm text-[var(--accent)]">0%</strong>
+                                        </div>
+                                        <div class="tool-progress-track mt-3">
+                                            <div id="merge-progress-bar" class="tool-progress-bar" style="width: 0%"></div>
+                                        </div>
+                                        <p class="mt-3 text-xs muted-faint">Keep this page open while the TIFF/TIF merge completes.</p>
+                                    </div>
+                                @endif
+
+                                <button
+                                    @if (($activeTool['processor'] ?? '') === 'merge_tiff') id="merge-submit-button" @endif
+                                    type="submit"
+                                    class="btn-solid"
+                                >{{ $activeTool['button_label'] }}</button>
 
                                 <div>
                                     <label class="form-label" for="processing_note">Notes (optional)</label>
