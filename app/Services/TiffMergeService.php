@@ -448,8 +448,10 @@ class TiffMergeService
 
         $this->activeTemporaryPath = $resolvedTemporaryPath;
 
-        foreach (['MAGICK_TEMPORARY_PATH', 'MAGICK_TMPDIR', 'TMPDIR', 'TMP', 'TEMP'] as $environmentVariable) {
-            @putenv($environmentVariable . '=' . $resolvedTemporaryPath);
+        if (function_exists('putenv')) {
+            foreach (['MAGICK_TEMPORARY_PATH', 'MAGICK_TMPDIR', 'TMPDIR', 'TMP', 'TEMP'] as $environmentVariable) {
+                @putenv($environmentVariable . '=' . $resolvedTemporaryPath);
+            }
         }
 
         $this->configureImagickRuntime($resolvedTemporaryPath);
