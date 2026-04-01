@@ -31,7 +31,7 @@ class TiffMergeService
             if ($backend === null) {
                 return [
                     'ok' => false,
-                    'message' => 'TIFF/TIF merge requires a working ImageMagick CLI or PHP Imagick extension on this server.',
+                    'message' => 'TIFF/TIF merge requires ImageMagick on this server. Enable PHP Imagick for the site PHP version or install ImageMagick CLI and configure TOOLS_IMAGEMAGICK_BINARY.',
                 ];
             }
 

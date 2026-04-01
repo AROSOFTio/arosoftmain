@@ -2350,3 +2350,31 @@ a {
         padding-right: 0.85rem;
     }
 }
+
+.ordered-upload-panel {
+    border: 1px solid rgba(17, 24, 39, 0.12);
+    border-radius: 1rem;
+    background: rgba(17, 24, 39, 0.02);
+    padding: 1rem;
+}
+
+.ordered-upload-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.ordered-upload-grid {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.ordered-upload-row {
+    border: 1px solid rgba(17, 24, 39, 0.1);
+    border-radius: 0.9rem;
+    background: #fff;
+    padding: 0.85rem;
+}

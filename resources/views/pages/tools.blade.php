@@ -250,6 +250,88 @@
     @endpush
 @endif
 
+@if (($activeTool['allows_multiple'] ?? false) && ($activeTool['input_type'] ?? '') === 'file')
+    @push('head')
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const container = document.getElementById('ordered-upload-fields');
+                if (!container) {
+                    return;
+                }
+
+                const addButton = document.getElementById('ordered-upload-add');
+                const removeButton = document.getElementById('ordered-upload-remove');
+                const counter = document.getElementById('ordered-upload-counter');
+                const emptyState = document.getElementById('ordered-upload-empty');
+                const maxFiles = Number.parseInt(container.dataset.maxFiles || '20', 10);
+                const accept = container.dataset.accept || '';
+                const inputName = container.dataset.inputName || 'upload_file[]';
+                const inputClass = container.dataset.inputClass || 'form-field';
+                const labelText = container.dataset.labelText || 'File';
+                const initialCount = Math.max(1, Number.parseInt(container.dataset.initialCount || '2', 10));
+
+                const syncState = () => {
+                    const rows = container.querySelectorAll('[data-upload-row]');
+                    counter.textContent = rows.length.toString();
+                    emptyState.classList.toggle('hidden', rows.length > 0);
+                    addButton.disabled = rows.length >= maxFiles;
+                    removeButton.disabled = rows.length <= initialCount;
+
+                    rows.forEach((row, index) => {
+                        const label = row.querySelector('[data-upload-label]');
+                        if (label) {
+                            label.textContent = `${labelText} ${index + 1}`;
+                        }
+                    });
+                };
+
+                const createRow = () => {
+                    const row = document.createElement('div');
+                    row.dataset.uploadRow = 'true';
+                    row.className = 'ordered-upload-row';
+
+                    const label = document.createElement('label');
+                    label.className = 'form-label';
+                    label.dataset.uploadLabel = 'true';
+
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.name = inputName;
+                    input.className = inputClass;
+                    input.accept = accept;
+
+                    row.appendChild(label);
+                    row.appendChild(input);
+
+                    return row;
+                };
+
+                addButton.addEventListener('click', () => {
+                    const rows = container.querySelectorAll('[data-upload-row]');
+                    if (rows.length >= maxFiles) {
+                        return;
+                    }
+
+                    container.appendChild(createRow());
+                    syncState();
+                });
+
+                removeButton.addEventListener('click', () => {
+                    const rows = container.querySelectorAll('[data-upload-row]');
+                    if (rows.length <= initialCount) {
+                        return;
+                    }
+
+                    rows[rows.length - 1].remove();
+                    syncState();
+                });
+
+                syncState();
+            });
+        </script>
+    @endpush
+@endif
+
 @section('content')
     @php
         $textPlaceholder = match ($activeTool['processor'] ?? '') {
@@ -515,6 +597,9 @@
                                 $allowsMultipleUploads = (bool) ($activeTool['allows_multiple'] ?? false);
                                 $uploadFieldName = $allowsMultipleUploads ? 'upload_file[]' : 'upload_file';
                                 $uploadFieldErrors = $errors->get('upload_file');
+                                $maxFiles = max(1, (int) ($activeTool['max_files'] ?? 20));
+                                $minFiles = max(1, (int) ($activeTool['min_files'] ?? 2));
+                                $orderedUploadInitialCount = min($maxFiles, max($minFiles, 3));
 
                                 foreach ($errors->get('upload_file.*') as $messages) {
                                     foreach ($messages as $message) {
@@ -525,22 +610,60 @@
                             <form action="{{ route('tools.process', ['slug' => $activeTool['slug']]) }}" method="POST" enctype="multipart/form-data" class="mt-3 space-y-3">
                                 @csrf
                                 <div>
-                                    <label class="form-label" for="upload_file">{{ $allowsMultipleUploads ? 'Upload files' : 'Upload file' }}</label>
-                                    <input
-                                        id="upload_file"
-                                        type="file"
-                                        name="{{ $uploadFieldName }}"
-                                        class="form-field {{ $uploadFieldErrors !== [] ? 'border-[color:rgba(0,157,49,0.85)]' : '' }}"
-                                        accept="{{ $activeTool['accept'] }}"
-                                        @if ($allowsMultipleUploads) multiple @endif
-                                    >
+                                    <label class="form-label" for="upload_file">{{ $allowsMultipleUploads ? 'Upload files in order' : 'Upload file' }}</label>
+                                    @if ($allowsMultipleUploads)
+                                        <div class="ordered-upload-panel">
+                                            <div class="ordered-upload-toolbar">
+                                                <p class="text-xs uppercase tracking-[0.12em] muted-faint">
+                                                    Added slots: <span id="ordered-upload-counter">{{ $orderedUploadInitialCount }}</span> / {{ $maxFiles }}
+                                                </p>
+                                                <div class="flex flex-wrap gap-2">
+                                                    <button id="ordered-upload-add" type="button" class="btn-outline sm:w-auto">Add TIFF/TIF file</button>
+                                                    <button id="ordered-upload-remove" type="button" class="btn-outline sm:w-auto">Remove last file</button>
+                                                </div>
+                                            </div>
+
+                                            <div
+                                                id="ordered-upload-fields"
+                                                class="ordered-upload-grid"
+                                                data-max-files="{{ $maxFiles }}"
+                                                data-accept="{{ $activeTool['accept'] }}"
+                                                data-input-name="{{ $uploadFieldName }}"
+                                                data-input-class="form-field {{ $uploadFieldErrors !== [] ? 'border-[color:rgba(0,157,49,0.85)]' : '' }}"
+                                                data-label-text="TIFF/TIF file"
+                                                data-initial-count="{{ $orderedUploadInitialCount }}"
+                                            >
+                                                @for ($slotIndex = 1; $slotIndex <= $orderedUploadInitialCount; $slotIndex++)
+                                                    <div class="ordered-upload-row" data-upload-row="true">
+                                                        <label class="form-label" data-upload-label="true">TIFF/TIF file {{ $slotIndex }}</label>
+                                                        <input
+                                                            type="file"
+                                                            name="{{ $uploadFieldName }}"
+                                                            class="form-field {{ $uploadFieldErrors !== [] ? 'border-[color:rgba(0,157,49,0.85)]' : '' }}"
+                                                            accept="{{ $activeTool['accept'] }}"
+                                                        >
+                                                    </div>
+                                                @endfor
+                                            </div>
+
+                                            <p id="ordered-upload-empty" class="hidden text-sm muted-copy">Use the add button to insert more ordered TIFF/TIF slots up to the limit.</p>
+                                        </div>
+                                    @else
+                                        <input
+                                            id="upload_file"
+                                            type="file"
+                                            name="{{ $uploadFieldName }}"
+                                            class="form-field {{ $uploadFieldErrors !== [] ? 'border-[color:rgba(0,157,49,0.85)]' : '' }}"
+                                            accept="{{ $activeTool['accept'] }}"
+                                        >
+                                    @endif
                                     @foreach ($uploadFieldErrors as $message)
                                         <p class="mt-2 text-sm text-[var(--accent)]">{{ $message }}</p>
                                     @endforeach
                                     <p class="mt-2 text-xs muted-faint">
                                         Accepted input: {{ $activeTool['accept'] ?: 'File upload' }}
                                         @if ($allowsMultipleUploads)
-                                            . Select files in the order you want them merged.
+                                            . Add files in the exact order you want them merged.
                                         @endif
                                         @if (!empty($activeTool['upload_help_text']))
                                             . {{ $activeTool['upload_help_text'] }}

@@ -16,9 +16,10 @@ class MergeTiffToolTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('name="upload_file[]"', false);
-        $response->assertSee('multiple', false);
+        $response->assertSee('TIFF/TIF file 1', false);
+        $response->assertSee('Add TIFF/TIF file', false);
         $response->assertSee('CCITT4 Group 4', false);
-        $response->assertSee('Up to 150 TIFF/TIF files per batch, 25 MB each.', false);
+        $response->assertSee('Up to 60 files per batch, 20 MB each.', false);
     }
 
     public function test_tools_index_can_open_merge_tiff_tool_via_query_parameter(): void
@@ -91,13 +92,13 @@ class MergeTiffToolTest extends TestCase
     {
         Storage::fake('local');
 
-        $uploads = $this->makeFakeTiffUploads(100);
+        $uploads = $this->makeFakeTiffUploads(60);
 
         $this->mock(TiffMergeService::class, function (MockInterface $mock): void {
             $mock->shouldReceive('merge')
                 ->once()
                 ->withArgs(function (array $inputAbsolutePaths, string $outputAbsolutePath): bool {
-                    $this->assertCount(100, $inputAbsolutePaths);
+                    $this->assertCount(60, $inputAbsolutePaths);
                     $this->assertStringEndsWith('.tif', $outputAbsolutePath);
 
                     file_put_contents($outputAbsolutePath, 'merged-large-batch-binary');
@@ -125,7 +126,7 @@ class MergeTiffToolTest extends TestCase
 
         $response = $this->from(route('tools.show', ['slug' => 'merge-tiff-tif-files']))
             ->post(route('tools.process', ['slug' => 'merge-tiff-tif-files']), [
-                'upload_file' => $this->makeFakeTiffUploads(151),
+                'upload_file' => $this->makeFakeTiffUploads(61),
             ]);
 
         $response->assertRedirect(route('tools.show', ['slug' => 'merge-tiff-tif-files']));
