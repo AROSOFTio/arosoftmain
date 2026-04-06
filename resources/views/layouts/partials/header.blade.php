@@ -38,14 +38,22 @@
                         x-transition:leave-start="opacity-100 translate-y-0"
                         x-transition:leave-end="opacity-0 -translate-y-2"
                         class="mega-panel mega-panel-hosting absolute left-1/2 -translate-x-1/2 p-6"
-                        style="top: calc(100% + 0.9rem); width: 26rem;"
+                        style="top: calc(100% + 0.9rem); width: 34rem;"
                     >
-                        <div class="mega-hosting-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem;">
-                            <a href="{{ route('hosting.shared') }}" class="shell-card rounded-xl p-4 text-center transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]" style="display: block;">
-                                <p class="font-heading text-lg">Shared Hosting</p>
+                        <div class="mega-hosting-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem;">
+                            <a
+                                href="{{ route('hosting.shared') }}"
+                                class="shell-card rounded-2xl p-4 text-center transition duration-200 hover:border-[color:rgba(0,157,49,0.52)]"
+                                style="display: flex; align-items: center; justify-content: center; min-height: 6.4rem; font-size: 1.2rem; font-weight: 600;"
+                            >
+                                Shared Hosting
                             </a>
-                            <a href="{{ route('final-year-project-hosting') }}" class="shell-card rounded-xl p-4 text-center transition duration-200 hover:border-[color:rgba(0,157,49,0.42)]" style="display: block;">
-                                <p class="font-heading text-lg">FYP Hosting</p>
+                            <a
+                                href="{{ route('final-year-project-hosting') }}"
+                                class="shell-card rounded-2xl p-4 text-center transition duration-200 hover:border-[color:rgba(0,157,49,0.52)]"
+                                style="display: flex; align-items: center; justify-content: center; min-height: 6.4rem; font-size: 1.2rem; font-weight: 600;"
+                            >
+                                FYP Hosting
                             </a>
                         </div>
                     </div>
