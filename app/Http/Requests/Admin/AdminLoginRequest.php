@@ -11,6 +11,14 @@ class AdminLoginRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $email = strtolower(trim((string) $this->input('email', '')));
+        $this->merge([
+            'email' => $email,
+        ]);
+    }
+
     /**
      * @return array<string, mixed>
      */

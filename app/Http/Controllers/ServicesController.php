@@ -115,13 +115,13 @@ class ServicesController extends Controller
         [$firstName, $lastName] = $this->splitName((string) $quote['customer']['full_name']);
 
         try {
-            $ipnId = $this->pesapal->resolveIpnId();
+            $ipnId = $this->resolveIpnId();
             $response = $this->pesapal->submitOrder([
                 'id' => $quote['quote_id'],
                 'currency' => $this->pesapal->currency(),
                 'amount' => round($amount, 2),
                 'description' => "{$quote['service']['label']} quote payment ({$validated['payment_mode']})",
-                'callback_url' => $this->pesapal->callbackUrl(),
+                'callback_url' => $this->callbackUrl(),
                 'notification_id' => $ipnId,
                 'billing_address' => [
                     'email_address' => (string) $quote['customer']['email'],
@@ -386,6 +386,34 @@ class ServicesController extends Controller
         return 0.0;
     }
 
+    private function resolveIpnId(): string
+    {
+        $configured = (string) config('services.pesapal.ipn_id', '');
+        if ($configured !== '') {
+            return $configured;
+        }
+
+        return $this->pesapal->resolveIpnId($this->ipnUrl());
+    }
+
+    private function callbackUrl(): string
+    {
+        $configured = (string) config('services.pesapal.callback_url', '');
+
+        return $configured !== ''
+            ? rtrim($configured, '/')
+            : route('services.payment.callback');
+    }
+
+    private function ipnUrl(): string
+    {
+        $configured = (string) config('services.pesapal.ipn_url', '');
+
+        return $configured !== ''
+            ? rtrim($configured, '/')
+            : route('services.payment.ipn');
+    }
+
     private function syncPaymentStatus(array $quote, string $trackingId): array
     {
         $payload = $this->pesapal->transactionStatus($trackingId);
@@ -576,4 +604,3 @@ class ServicesController extends Controller
         ];
     }
 }
-
