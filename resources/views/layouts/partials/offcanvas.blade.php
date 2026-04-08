@@ -35,6 +35,7 @@
 
         <nav class="mt-8 space-y-2">
             <a href="{{ route('home') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Home</a>
+            <a href="{{ route('portfolio.index') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Portfolio</a>
             <a href="{{ route('blog') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Blog</a>
             <a href="{{ route('services') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Services</a>
             <a href="{{ route('hosting.shared') }}" class="btn-outline w-full justify-center" @click="closeOffcanvas()">Shared Hosting</a>

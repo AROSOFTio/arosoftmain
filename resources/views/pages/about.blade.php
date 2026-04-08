@@ -63,6 +63,7 @@
             <p class="section-copy mt-3">
                 We provide IT Services, Printing Services, IT Training/Internship, Graphics Design, Website Design & Development, and
                 System Development. Explore our <a href="{{ route('services') }}" class="text-[var(--accent)] underline decoration-transparent transition hover:decoration-[var(--accent)]">services page</a>,
+                <a href="{{ route('portfolio.index') }}" class="text-[var(--accent)] underline decoration-transparent transition hover:decoration-[var(--accent)]">portfolio</a>,
                 <a href="{{ route('tutorials') }}" class="text-[var(--accent)] underline decoration-transparent transition hover:decoration-[var(--accent)]">tutorials</a>,
                 and <a href="{{ route('blog') }}" class="text-[var(--accent)] underline decoration-transparent transition hover:decoration-[var(--accent)]">blog</a>.
             </p>
@@ -142,6 +143,7 @@
         <div class="mt-5 flex flex-wrap gap-3">
             <a href="{{ route('contact') }}" class="btn-solid">Get in touch</a>
             <a href="{{ route('services') }}" class="btn-outline">Explore services</a>
+            <a href="{{ route('portfolio.index') }}" class="btn-outline">View portfolio</a>
         </div>
     </section>
 @endsection

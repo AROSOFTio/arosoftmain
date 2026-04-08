@@ -61,6 +61,8 @@ Route::get('/payments/pesapal/final-year-project/callback', [FinalYearProjectHos
 Route::match(['get', 'post'], '/payments/pesapal/final-year-project/ipn', [FinalYearProjectHostingController::class, 'paymentIpn'])
     ->name('final-year-project-hosting.payment.ipn');
 Route::get('/tutorials', [PageController::class, 'tutorials'])->name('tutorials');
+Route::get('/portfolio', [PageController::class, 'portfolio'])->name('portfolio.index');
+Route::get('/portfolio/{slug}', [PageController::class, 'portfolioShow'])->name('portfolio.show');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');

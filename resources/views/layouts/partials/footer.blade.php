@@ -35,6 +35,7 @@
                     <p class="text-[0.7rem] uppercase tracking-[0.2em] muted-faint">Resources</p>
                     <div class="mt-4 space-y-1.5">
                         <a href="{{ route('blog') }}" class="inline-block text-sm muted-copy transition hover:text-white">Blog</a><br>
+                        <a href="{{ route('portfolio.index') }}" class="inline-block text-sm muted-copy transition hover:text-white">Portfolio</a><br>
                         <a href="{{ route('tutorials') }}" class="inline-block text-sm muted-copy transition hover:text-white">Tutorials</a><br>
                         <a href="{{ route('tools') }}" class="inline-block text-sm muted-copy transition hover:text-white">Tools</a><br>
                         <a href="{{ route('about') }}" class="inline-block text-sm muted-copy transition hover:text-white">About</a><br>

@@ -17,6 +17,7 @@
                 <div class="mt-7 flex flex-wrap gap-3">
                     <a href="{{ route('contact') }}" class="btn-solid">Book strategy call</a>
                     <a href="{{ route('services') }}" class="btn-outline">Explore service catalog</a>
+                    <a href="{{ route('portfolio.index') }}" class="btn-outline">View portfolio</a>
                 </div>
             </div>
 
@@ -203,6 +204,22 @@
                         </div>
                     </div>
                 </article>
+            @endforeach
+        </div>
+    </section>
+
+    <section class="content-section home-section-shell">
+        <div class="home-section-head">
+            <div>
+                <p class="page-kicker">Portfolio</p>
+                <h2 class="section-title mt-2">Integrated case studies from our delivery pipeline</h2>
+            </div>
+            <a href="{{ route('portfolio.index') }}" class="btn-outline !w-auto !px-4 !py-2 !text-[0.68rem]">Open portfolio</a>
+        </div>
+
+        <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            @foreach ($portfolioProjects as $project)
+                <x-portfolio.card :project="$project" compact />
             @endforeach
         </div>
     </section>

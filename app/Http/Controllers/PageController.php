@@ -23,6 +23,30 @@ class PageController extends Controller
             'tutorialPlaylists' => $tutorialVideoService->latestPlaylists(3),
             'systems' => $this->homeSystems(),
             'toolHighlights' => $this->homeToolHighlights(6),
+            'portfolioProjects' => $this->featuredPortfolioProjects(4),
+        ]);
+    }
+
+    public function portfolio(): View
+    {
+        return view('pages.portfolio.index', [
+            'projects' => $this->portfolioProjects(),
+        ]);
+    }
+
+    public function portfolioShow(string $slug): View
+    {
+        $project = collect($this->portfolioProjects())->firstWhere('slug', $slug);
+
+        abort_if(! $project, 404);
+
+        return view('pages.portfolio.show', [
+            'project' => $project,
+            'relatedProjects' => collect($this->portfolioProjects())
+                ->reject(fn (array $item): bool => $item['slug'] === $slug)
+                ->take(3)
+                ->values()
+                ->all(),
         ]);
     }
 
@@ -202,6 +226,32 @@ class PageController extends Controller
         }
 
         return $highlights;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function portfolioProjects(): array
+    {
+        $projects = config('portfolio.projects', []);
+
+        return collect($projects)
+            ->filter(fn (mixed $project): bool => is_array($project) && filled($project['slug'] ?? null))
+            ->map(function (array $project): array {
+                return array_merge($project, [
+                    'detail_url' => route('portfolio.show', ['slug' => $project['slug']]),
+                ]);
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function featuredPortfolioProjects(int $limit = 3): array
+    {
+        return array_slice($this->portfolioProjects(), 0, $limit);
     }
 
     private function placeholder(string $title, string $heading, string $copy): View

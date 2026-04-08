@@ -40,6 +40,7 @@
                 <div class="mt-7 flex flex-wrap gap-3">
                     <a href="#quote-builder" class="btn-solid">Generate quote</a>
                     <a href="{{ $generalWhatsApp }}" class="btn-outline" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+                    <a href="{{ route('portfolio.index') }}" class="btn-outline">View portfolio</a>
                 </div>
             </div>
 

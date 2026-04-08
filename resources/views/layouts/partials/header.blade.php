@@ -10,6 +10,7 @@
 
                 <nav class="hidden flex-1 items-center justify-center gap-1 lg:flex">
                     <a href="{{ route('home') }}" class="nav-link">Home</a>
+                    <a href="{{ route('portfolio.index') }}" class="nav-link">Portfolio</a>
                     <a href="{{ route('blog') }}" class="nav-link">Blog</a>
                     <a href="{{ route('services') }}" class="nav-link">Services</a>
 

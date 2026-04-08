@@ -214,6 +214,13 @@ class SearchController extends Controller
             ],
             [
                 'type' => 'Pages',
+                'title' => 'Portfolio',
+                'url' => route('portfolio.index'),
+                'meta' => 'Case studies and delivery work',
+                'keywords' => 'portfolio projects case studies systems saas dashboards',
+            ],
+            [
+                'type' => 'Pages',
                 'title' => 'Contact',
                 'url' => route('contact'),
                 'meta' => 'Reach the team',
@@ -283,6 +290,25 @@ class SearchController extends Controller
                 'keywords' => 'converter generator remover',
             ],
         ];
+
+        foreach (config('portfolio.projects', []) as $project) {
+            if (!is_array($project) || !filled($project['slug'] ?? null)) {
+                continue;
+            }
+
+            $items[] = [
+                'type' => 'Pages',
+                'title' => (string) ($project['name'] ?? 'Portfolio Project'),
+                'url' => route('portfolio.show', ['slug' => $project['slug']]),
+                'meta' => 'Portfolio project',
+                'keywords' => trim(implode(' ', [
+                    (string) ($project['category'] ?? ''),
+                    (string) ($project['short_description'] ?? ''),
+                    implode(' ', $project['tags'] ?? []),
+                    implode(' ', $project['technologies'] ?? []),
+                ])),
+            ];
+        }
 
         $toolCategories = config('it_tools.categories', []);
 
