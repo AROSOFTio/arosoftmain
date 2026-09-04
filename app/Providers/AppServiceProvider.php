@@ -67,5 +67,22 @@ class AppServiceProvider extends ServiceProvider
                 );
             }
         });
+
+        View::composer('pages.home', function ($view): void {
+            $systems = $view->getData()['systems'] ?? [];
+
+            array_unshift($systems, [
+                'name' => 'AROMOTION Studio',
+                'label' => 'Screen Studio',
+                'summary' => 'Professional Windows screen recording with lossless capture, smart motion, captions, cursor effects, 3D presentation and AROMOTION Cloud.',
+                'modules' => ['Recorder', 'Smart Motion', 'Cloud'],
+                'url' => route('aromotion.show'),
+                'cta' => 'Explore AROMOTION',
+                'status' => 'Beta',
+                'external' => false,
+            ]);
+
+            $view->with('systems', $systems);
+        });
     }
 }
