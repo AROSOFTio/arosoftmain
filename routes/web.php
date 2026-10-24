@@ -20,6 +20,11 @@ use App\Http\Controllers\ToolsController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'pages.labs-home')->name('home');
+Route::get('/software', [\App\Http\Controllers\Labs\MarketplaceController::class, 'index'])->name('labs.catalogue');
+Route::get('/software/{slug}', [\App\Http\Controllers\Labs\MarketplaceController::class, 'show'])->name('labs.product');
+Route::get('/request-software', [\App\Http\Controllers\Labs\SoftwareRequestController::class, 'create'])->name('labs.request.create');
+Route::post('/request-software', [\App\Http\Controllers\Labs\SoftwareRequestController::class, 'store'])->middleware('throttle:5,1')->name('labs.request.store');
+
 Route::get('/legacy-home', [PageController::class, 'home'])->name('legacy-home');
 Route::get('/search/suggestions', [SearchController::class, 'suggestions'])
     ->middleware('throttle:240,1')
