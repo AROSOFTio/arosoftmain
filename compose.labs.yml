@@ -1,0 +1,32 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.labs
+    restart: unless-stopped
+    env_file: .env.production
+    ports:
+      - '127.0.0.1:18082:80'
+    volumes:
+      - labs_storage:/var/www/html/storage
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: mysql:8
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: arosoftlabs
+      MYSQL_USER: arosoftlabs
+      MYSQL_PASSWORD: ${LABS_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${LABS_DB_ROOT_PASSWORD}
+    volumes:
+      - labs_mysql:/var/lib/mysql
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD --silent']
+      interval: 10s
+      timeout: 5s
+      retries: 20
+volumes:
+  labs_mysql:
+  labs_storage:
