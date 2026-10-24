@@ -106,6 +106,12 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
     });
 
     Route::middleware(['auth', 'can:manage-blog'])->group(function (): void {
+        Route::get('/labs', [\App\Http\Controllers\Admin\LabPublishingController::class, 'index'])->name('labs.index');
+        Route::get('/labs/create', [\App\Http\Controllers\Admin\LabPublishingController::class, 'create'])->name('labs.create');
+        Route::post('/labs', [\App\Http\Controllers\Admin\LabPublishingController::class, 'store'])->name('labs.store');
+        Route::get('/labs/{product}/edit', [\App\Http\Controllers\Admin\LabPublishingController::class, 'edit'])->name('labs.edit');
+        Route::put('/labs/{product}', [\App\Http\Controllers\Admin\LabPublishingController::class, 'update'])->name('labs.update');
+
         Route::post('/logout', [AdminAuthController::class, 'destroy'])->name('logout');
 
         Route::get('/', fn () => redirect()->route('admin.blog.dashboard'))->name('index');
