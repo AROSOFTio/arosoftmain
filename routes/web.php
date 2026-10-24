@@ -19,7 +19,8 @@ use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\ToolsController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [PageController::class, 'home'])->name('home');
+Route::view('/', 'pages.labs-home')->name('home');
+Route::get('/legacy-home', [PageController::class, 'home'])->name('legacy-home');
 Route::get('/search/suggestions', [SearchController::class, 'suggestions'])
     ->middleware('throttle:240,1')
     ->name('search.suggestions');
